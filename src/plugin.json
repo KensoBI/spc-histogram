@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "panel",
+  "name": "SPC Histogram",
+  "id": "kensobi-histogram-panel",
+  "info": {
+    "keywords": ["panel", "spc", "histogram", "kensobi"],
+    "description": "Create common SPC Histograms",
+    "author": {
+      "name": "Kenso Software",
+      "url": "https://kensobi.com"
+    },
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [
+      {
+        "name": "Author's site",
+        "url": "https://kensobi.com"
+      }
+    ],
+    "screenshots": [],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=9.5.7",
+    "plugins": []
+  }
+}
