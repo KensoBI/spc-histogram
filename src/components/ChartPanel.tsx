@@ -4,10 +4,10 @@ import { css, cx } from '@emotion/css';
 import { usePanelContext, useStyles2 } from '@grafana/ui';
 import { parseData } from 'data/parseData';
 import { PanelPropsProvider } from './PanelPropsProvider';
-import { TimeSeriesComponent } from './SpcChart/TimeSeriesComponent';
 import { TimeseriesSettings, defaultTimeseriesSettings } from './SpcChart/types';
 import { calcSpc } from 'data/calcSpc';
 import { useParseOptions } from './options/parseOptions';
+import { HistogramComponent } from './Histogram/SpcHistogram';
 
 export function ChartPanel(props: ChartPanelProps) {
   const { data, width, height } = props;
@@ -93,7 +93,7 @@ export function ChartPanel(props: ChartPanelProps) {
         )}
       >
         {selectedFeature && selectedCharacteristic && (
-          <TimeSeriesComponent feature={selectedFeature} characteristic={selectedCharacteristic} settings={settings} />
+          <HistogramComponent characteristic={selectedCharacteristic} settings={settings} />
         )}
       </div>
     </PanelPropsProvider>

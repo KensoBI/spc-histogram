@@ -3,15 +3,14 @@ version: '3.7'
 services:
   grafana:
     image: grafana/grafana:latest
-    container_name: 'kensobi-histogram-panel'
+    container_name: 'kensobi-spchistogram-panel'
     ports:
       - 3000:3000/tcp
     volumes:
-      - ./dist:/var/lib/grafana/plugins/kensobi-histogram-panel
+      - ./dist:/var/lib/grafana/plugins/kensobi-spchistogram-panel
       - ./provisioning:/etc/grafana/provisioning
     environment:
       - TERM=linux
       - GF_LOG_LEVEL=debug
       - GF_DATAPROXY_LOGGING=true
       - GF_DEFAULT_APP_MODE=development
-

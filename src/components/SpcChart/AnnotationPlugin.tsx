@@ -151,9 +151,9 @@ export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotation
         }
         const x = u.valToPos(value, 'x', true);
         ctx.beginPath();
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 4;
         ctx.strokeStyle = color;
-        ctx.setLineDash([5, 5]);
+        ctx.setLineDash([10, 5]);
         ctx.moveTo(x, u.bbox.top);
         ctx.lineTo(x, u.bbox.top + u.bbox.height);
         ctx.stroke();
@@ -181,8 +181,6 @@ export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotation
             x: xCssPixelPosition + u.over.offsetLeft,
           });
         } else if (entity.type === 'region') {
-          renderLine(entity.timeStart, lineColor);
-          renderLine(entity.timeEnd, lineColor);
           renderRect(entity.timeStart, entity.timeEnd, lineColor);
 
           const x0CssPixelPosition = entity.timeStart ? u.valToPos(entity.timeStart, 'x', false) : undefined;
