@@ -51,6 +51,31 @@ export const HistogramPanel = ({ series, options, width, height, annotations }: 
     return histogramFieldsToFrame(hist, theme);
   }, [series, options, theme]);
 
+  const annotationsRange = useMemo(() => {
+    if (annotations == null || annotations.length === 0) {
+      return undefined;
+    }
+
+    const values: number[] = [];
+    for (const an of annotations) {
+      if (an.type === 'flag') {
+        values.push(an.time);
+      } else {
+        if (an.timeStart) {
+          values.push(an.timeStart);
+        }
+        if (an.timeEnd) {
+          values.push(an.timeEnd);
+        }
+      }
+    }
+
+    return {
+      max: values.reduce((max, item) => Math.max(max, item), values?.[0]),
+      min: values.reduce((min, item) => Math.min(min, item), values?.[0]),
+    };
+  }, [annotations]);
+
   if (!histogram || !histogram.fields.length) {
     return (
       <div className="panel-empty">
@@ -72,6 +97,7 @@ export const HistogramPanel = ({ series, options, width, height, annotations }: 
       height={height}
       alignedFrame={histogram}
       bucketSize={bucketSize}
+      annotationsRange={annotationsRange}
     >
       {(config, alignedFrame) => {
         return <>{annotations && <AnnotationsPlugin annotations={annotations} config={config} />}</>;

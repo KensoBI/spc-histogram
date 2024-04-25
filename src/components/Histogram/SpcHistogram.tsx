@@ -15,7 +15,6 @@ type Props = {
 };
 
 export function HistogramComponent({ characteristic, settings }: Props) {
-  console.log('🚀 ~ HistogramComponent ~ settings:', settings);
   const styles = useStyles2(getStyles);
 
   const settingsWithDefaults = React.useMemo(() => defaults(settings, defaultTimeseriesSettings), [settings]);

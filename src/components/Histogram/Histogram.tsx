@@ -39,6 +39,7 @@ export interface HistogramProps extends Themeable2 {
   structureRev?: number; // a number that will change when the frames[] structure changes
   legend: VizLegendOptions;
   rawSeries?: DataFrame[];
+  annotationsRange?: { min: number; max: number };
   children?: (builder: UPlotConfigBuilder, frame: DataFrame) => React.ReactNode;
 }
 
@@ -47,12 +48,21 @@ export function getBucketSize(frame: DataFrame) {
   return frame.fields[1].values[0] - frame.fields[0].values[0];
 }
 
-const prepConfig = (frame: DataFrame, theme: GrafanaTheme2) => {
+const prepConfig = (frame: DataFrame, theme: GrafanaTheme2, annotationsRange: HistogramProps['annotationsRange']) => {
   // todo: scan all values in BucketMin and BucketMax fields to assert if uniform bucketSize
 
-  // since this is x axis range, this should ideally come from xMin or xMax fields, not a count field
-  // though both methods are probably hacks, and we should just accept explicit opts into this prepConfig
-  let { min: xScaleMin, max: xScaleMax } = frame.fields[2].config;
+  const calcScaleRange = (u: uPlot) => {
+    const xScaleMin =
+      annotationsRange != null && annotationsRange.min < u.data[0][0] ? annotationsRange.min : undefined;
+    const xScaleMax =
+      annotationsRange != null && annotationsRange.max > u.data[0][u.data[0].length - 1] + bucketSize
+        ? annotationsRange.max
+        : undefined;
+    return {
+      xScaleMin,
+      xScaleMax,
+    };
+  };
 
   let builder = new UPlotConfigBuilder();
 
@@ -64,6 +74,8 @@ const prepConfig = (frame: DataFrame, theme: GrafanaTheme2) => {
     /** @ts-ignore */
     let minSpace = u.axes[axisIdx]._space;
     let bucketWidth = u.valToPos(u.data[0][0] + bucketSize, 'x') - u.valToPos(u.data[0][0], 'x');
+
+    const { xScaleMin, xScaleMax } = calcScaleRange(u);
 
     let firstSplit = incrRoundDn(xScaleMin ?? u.data[0][0], bucketSize);
     let lastSplit = incrRoundUp(xScaleMax ?? u.data[0][u.data[0].length - 1] + bucketSize, bucketSize);
@@ -85,7 +97,8 @@ const prepConfig = (frame: DataFrame, theme: GrafanaTheme2) => {
     orientation: ScaleOrientation.Horizontal,
     direction: ScaleDirection.Right,
     range: (u, wantedMin, wantedMax) => {
-      // these settings will prevent zooming, probably okay?
+      const { xScaleMin, xScaleMax } = calcScaleRange(u);
+
       if (xScaleMin != null) {
         wantedMin = xScaleMin;
       }
@@ -269,7 +282,7 @@ export class Histogram extends React.Component<HistogramProps, State> {
       };
 
       if (withConfig) {
-        state.config = prepConfig(alignedFrame, this.props.theme);
+        state.config = prepConfig(alignedFrame, this.props.theme, this.props.annotationsRange);
       }
     }
 
@@ -287,7 +300,7 @@ export class Histogram extends React.Component<HistogramProps, State> {
   }
 
   componentDidUpdate(prevProps: HistogramProps) {
-    const { structureRev, alignedFrame, bucketSize } = this.props;
+    const { structureRev, alignedFrame, bucketSize, annotationsRange } = this.props;
 
     if (alignedFrame !== prevProps.alignedFrame) {
       let newState = this.prepState(this.props, false);
@@ -298,10 +311,11 @@ export class Histogram extends React.Component<HistogramProps, State> {
           this.props.options !== prevProps.options ||
           this.state.config === undefined ||
           structureRev !== prevProps.structureRev ||
-          !structureRev;
+          !structureRev ||
+          annotationsRange !== prevProps.annotationsRange;
 
         if (shouldReconfig) {
-          newState.config = prepConfig(alignedFrame, this.props.theme);
+          newState.config = prepConfig(alignedFrame, this.props.theme, this.props.annotationsRange);
         }
       }
 
