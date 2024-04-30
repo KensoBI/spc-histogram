@@ -2,10 +2,9 @@ import React from 'react';
 import { TimeSeriesParams, PanelOptions, defaultTimeseriesSettingsColor } from 'types';
 import { GrafanaTheme2, StandardEditorProps } from '@grafana/data';
 import { css } from '@emotion/css';
-import { InlineField, InlineSwitch, Input, Select, useStyles2 } from '@grafana/ui';
+import { InlineField, InlineSwitch, Select, useStyles2 } from '@grafana/ui';
 import { InlineColorField } from 'components/InlineColorField';
-import { toNumber } from 'lodash';
-import { selectableZeroToTen, selectableHalfToTen } from './selectableValues';
+import { selectableZeroToTen } from './selectableValues';
 
 type Props = StandardEditorProps<TimeSeriesParams, any, PanelOptions>;
 
@@ -39,43 +38,15 @@ export function SimpleParamsEditor({ value, onChange }: Props) {
               }}
             />
           </InlineField>
-          <InlineField label={'Point Radius'} className={styles.noMargin}>
-            <Select
-              width={8}
-              options={selectableHalfToTen}
-              value={value.pointSize}
-              onChange={(selected) => {
-                if (selected?.value != null) {
-                  onChange({ ...value, pointSize: selected.value });
-                }
-              }}
-            />
-          </InlineField>
           <InlineSwitch
             label="View legend"
             showLabel={true}
             value={value.showLegend}
             onChange={(e) => onChange({ ...value, showLegend: e.currentTarget.checked })}
           />
-          <InlineField label={'Decimals'} className={styles.noMargin}>
-            <Input
-              value={value.decimals ?? ''}
-              onChange={(e) => {
-                let number = toNumber(e.currentTarget.value);
-                const decimals =
-                  e.currentTarget.value === '' || isNaN(number) ? undefined : Math.min(Math.max(number, 0), 6);
-                onChange({ ...value, decimals });
-              }}
-              type="number"
-              min={0}
-              max={6}
-              onFocus={(e) => e.currentTarget.select()}
-              placeholder="Decimal places"
-            />
-          </InlineField>
           <div>
             <InlineColorField
-              label="Line color"
+              label="Color"
               color={value.lineColor ?? defaultTimeseriesSettingsColor}
               onChange={(color) => {
                 onChange({ ...value, lineColor: color });
