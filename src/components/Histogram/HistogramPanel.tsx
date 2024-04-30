@@ -6,7 +6,7 @@ import { useTheme2 } from '@grafana/ui';
 
 import { Histogram, getBucketSize } from './Histogram';
 import { Options } from './panelcfg';
-import { AnnotationEntity, AnnotationsPlugin } from 'components/SpcChart/AnnotationPlugin';
+import { AnnotationEntity, AnnotationsPlugin } from 'components/Histogram/AnnotationPlugin';
 
 type Props = {
   options: Options;

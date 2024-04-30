@@ -48,7 +48,7 @@ export interface PanelOptions {
 
 export const defaultTimeseriesSettingsColor = 'rgb(31, 96, 196)';
 export const defaultTimeseriesParams = {
-  fill: 0,
+  fill: 8,
   lineWidth: 2,
   pointSize: 6,
   lineColor: defaultTimeseriesSettingsColor,

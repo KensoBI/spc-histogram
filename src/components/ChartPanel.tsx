@@ -4,7 +4,7 @@ import { css, cx } from '@emotion/css';
 import { usePanelContext, useStyles2 } from '@grafana/ui';
 import { parseData } from 'data/parseData';
 import { PanelPropsProvider } from './PanelPropsProvider';
-import { TimeseriesSettings, defaultTimeseriesSettings } from './SpcChart/types';
+import { TimeseriesSettings, defaultTimeseriesSettings } from './Histogram/types';
 import { calcSpc } from 'data/calcSpc';
 import { useParseOptions } from './options/parseOptions';
 import { HistogramComponent } from './Histogram/SpcHistogram';

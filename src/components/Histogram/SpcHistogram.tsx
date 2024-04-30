@@ -2,12 +2,12 @@ import { DataFrame, GrafanaTheme2, toDataFrame } from '@grafana/data';
 import { useStyles2 } from '@grafana/ui';
 import React from 'react';
 import { HistogramPanel } from './HistogramPanel';
-import { defaultTimeseriesSettings, TimeseriesSettings } from '../SpcChart/types';
+import { defaultTimeseriesSettings, TimeseriesSettings } from './types';
 import { cloneDeep, defaults } from 'lodash';
 import { Characteristic } from 'data/types';
 import { css } from '@emotion/css';
 import { Options } from './panelcfg';
-import { AnnotationEntity } from 'components/SpcChart/AnnotationPlugin';
+import { AnnotationEntity } from './AnnotationPlugin';
 
 type Props = {
   characteristic: Characteristic;
@@ -22,6 +22,9 @@ export function HistogramComponent({ characteristic, settings }: Props) {
   const controlName = settingsWithDefaults.controlName;
   const constantsConfig = settingsWithDefaults.constantsConfig;
   const limitConfig = settingsWithDefaults.limitConfig;
+  const color = settingsWithDefaults.lineColor;
+  const lineWidth = settingsWithDefaults.lineWidth!;
+  const fill = settingsWithDefaults.fill!;
 
   const limits = React.useMemo(
     () => ({
@@ -90,13 +93,23 @@ export function HistogramComponent({ characteristic, settings }: Props) {
     }
 
     const fields = [cloneDeep(timeField), cloneDeep(valueField)];
+    fields[1].config = {
+      color: {
+        mode: 'fixed',
+        fixedColor: color,
+      },
+      custom: {
+        lineWidth: lineWidth,
+        fillOpacity: fill * 10,
+      },
+    };
 
     const df = toDataFrame({
       name: controlName,
       fields,
     });
     return [df];
-  }, [controlName, timeField, valueField]);
+  }, [color, controlName, fill, lineWidth, timeField, valueField]);
 
   const constants = React.useMemo(() => {
     return constantsConfig?.items
