@@ -171,7 +171,6 @@ export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotation
       for (let i = 0; i < annotationsRef.current.length; i++) {
         const entity = annotationsRef.current[i];
         const lineColor = entity.color ?? DEFAULT_TIMESERIES_FLAG_COLOR;
-        console.log(entity, 'entity');
         const lineWidth = entity.lineWidth ?? 2;
         if (entity.type === 'flag') {
           renderLine(entity.time, lineColor, lineWidth);
