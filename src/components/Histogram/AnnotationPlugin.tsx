@@ -225,6 +225,8 @@ export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotation
         paddingRight: 3,
         fontSize: 12,
         borderRadius: 2,
+        fontFamily:
+          'system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji',
       }}
     >
       {tooltip.annotation.title ?? 'EMPTY'}
