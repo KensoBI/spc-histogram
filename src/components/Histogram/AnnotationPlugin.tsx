@@ -152,7 +152,7 @@ export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotation
         }
         const x = u.valToPos(value, 'x', true);
         ctx.beginPath();
-        ctx.lineWidth = lineWidth; //TODO set line width
+        ctx.lineWidth = lineWidth;
         ctx.strokeStyle = color;
         ctx.moveTo(x, u.bbox.top);
         ctx.lineTo(x, u.bbox.top + u.bbox.height);
