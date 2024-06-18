@@ -133,6 +133,7 @@ export function HistogramComponent({ characteristic, settings, fieldConfig }: Pr
           type: 'flag',
           title: c.title,
           color: c.color,
+          lineWidth: c.lineWidth,
         });
       }
     }

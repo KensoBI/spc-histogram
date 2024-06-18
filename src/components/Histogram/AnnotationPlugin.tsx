@@ -9,6 +9,7 @@ const DEFAULT_TIMESERIES_FLAG_COLOR = '#03839e';
 export type AnnotationInfo = {
   title?: string;
   color?: string;
+  lineWidth?: number;
 };
 
 export type Flag = AnnotationInfo & {
@@ -145,15 +146,14 @@ export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotation
       ctx.rect(u.bbox.left, u.bbox.top, u.bbox.width, u.bbox.height);
       ctx.clip();
 
-      const renderLine = (value: number | undefined, color: string) => {
+      const renderLine = (value: number | undefined, color: string, lineWidth: number) => {
         if (value == null) {
           return;
         }
         const x = u.valToPos(value, 'x', true);
         ctx.beginPath();
-        ctx.lineWidth = 4;
+        ctx.lineWidth = lineWidth;
         ctx.strokeStyle = color;
-        ctx.setLineDash([10, 5]);
         ctx.moveTo(x, u.bbox.top);
         ctx.lineTo(x, u.bbox.top + u.bbox.height);
         ctx.stroke();
@@ -171,8 +171,9 @@ export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotation
       for (let i = 0; i < annotationsRef.current.length; i++) {
         const entity = annotationsRef.current[i];
         const lineColor = entity.color ?? DEFAULT_TIMESERIES_FLAG_COLOR;
+        const lineWidth = entity.lineWidth ?? 2;
         if (entity.type === 'flag') {
-          renderLine(entity.time, lineColor);
+          renderLine(entity.time, lineColor, lineWidth);
           const xCssPixelPosition = u.valToPos(entity.time, 'x', false);
 
           conditions.push({
@@ -225,6 +226,8 @@ export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotation
         paddingRight: 3,
         fontSize: 12,
         borderRadius: 2,
+        fontFamily:
+          'system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji',
       }}
     >
       {tooltip.annotation.title ?? 'EMPTY'}
