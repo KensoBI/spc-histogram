@@ -1,4 +1,4 @@
-import { DataFrame, GrafanaTheme2, toDataFrame } from '@grafana/data';
+import { DataFrame, GrafanaTheme2, toDataFrame, FieldConfig } from '@grafana/data';
 import { useStyles2 } from '@grafana/ui';
 import React from 'react';
 import { HistogramPanel } from './HistogramPanel';
@@ -12,9 +12,10 @@ import { AnnotationEntity } from './AnnotationPlugin';
 type Props = {
   characteristic: Characteristic;
   settings?: TimeseriesSettings;
+  fieldConfig?: FieldConfig;
 };
 
-export function HistogramComponent({ characteristic, settings }: Props) {
+export function HistogramComponent({ characteristic, settings, fieldConfig }: Props) {
   const styles = useStyles2(getStyles);
 
   const settingsWithDefaults = React.useMemo(() => defaults(settings, defaultTimeseriesSettings), [settings]);
@@ -80,8 +81,9 @@ export function HistogramComponent({ characteristic, settings }: Props) {
         mode: 'multi' as any,
         sort: 'asc' as any,
       },
+      fieldConfig: fieldConfig,
     }),
-    [showLegend]
+    [showLegend,fieldConfig]
   );
 
   const valueField = characteristic.timeseries?.values;

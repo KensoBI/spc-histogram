@@ -8,11 +8,23 @@ import { TimeseriesSettings, defaultTimeseriesSettings } from './Histogram/types
 import { calcSpc } from 'data/calcSpc';
 import { useParseOptions } from './options/parseOptions';
 import { HistogramComponent } from './Histogram/SpcHistogram';
+import { Field, FieldConfig, FieldType } from '@grafana/data';
 
 export function ChartPanel(props: ChartPanelProps) {
   const { data, width, height } = props;
   const styles = useStyles2(getStyles);
   const { value: options } = useParseOptions(props.options);
+
+  const getValueFieldIndex = (fields: Field[]): number | null => {
+    const index = fields.findIndex((field) => field.type === FieldType.number);
+    return index !== -1 ? index : null;
+  };
+
+  const fields = data.series?.[0]?.fields;
+  const valueFieldIndex = fields ? getValueFieldIndex(fields) : null;
+  const fieldConfig: FieldConfig | undefined =
+    fields && valueFieldIndex !== null ? fields[valueFieldIndex].config : undefined;
+
 
   const { features, hasTableData, hasCustomTableData } = React.useMemo(() => parseData(data.series), [data.series]);
 
@@ -93,7 +105,7 @@ export function ChartPanel(props: ChartPanelProps) {
         )}
       >
         {selectedFeature && selectedCharacteristic && (
-          <HistogramComponent characteristic={selectedCharacteristic} settings={settings} />
+          <HistogramComponent characteristic={selectedCharacteristic} settings={settings} fieldConfig={fieldConfig} />
         )}
       </div>
     </PanelPropsProvider>

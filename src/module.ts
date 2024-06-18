@@ -1,4 +1,4 @@
-import { PanelPlugin } from '@grafana/data';
+import { PanelPlugin, FieldConfigProperty } from '@grafana/data';
 import { PanelOptions, defaultPanelOptions } from './types';
 import { ChartPanel } from './components/ChartPanel';
 import { LimitsEditor } from './components/options/LimitsEditor';
@@ -7,7 +7,20 @@ import { SimpleParamsEditor } from 'components/options/SimpleParamsEditor';
 import { SpcOptionEditor } from 'components/options/SpcOptionEditor';
 import { parseData } from 'data/parseData';
 
-export const plugin = new PanelPlugin<PanelOptions>(ChartPanel).setPanelOptions((builder) => {
+export const plugin = new PanelPlugin<PanelOptions>(ChartPanel)
+
+.useFieldConfig({
+  disableStandardOptions: [
+    FieldConfigProperty.Unit,
+    FieldConfigProperty.NoValue,
+    FieldConfigProperty.Thresholds,
+    FieldConfigProperty.Mappings,
+    FieldConfigProperty.Links,
+    FieldConfigProperty.Color,
+    FieldConfigProperty.Filterable,
+  ],
+})
+.setPanelOptions((builder) => {
   builder.addCustomEditor({
     id: 'spcOptions',
     path: 'spcOptions',
