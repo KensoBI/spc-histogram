@@ -131,6 +131,7 @@ export function HistogramComponent({ characteristic, settings }: Props) {
           type: 'flag',
           title: c.title,
           color: c.color,
+          lineWidth: c.lineWidth,
         });
       }
     }
