@@ -1,14 +1,15 @@
 import React from 'react';
-import { LimitConfig, LimitConfigItem, PanelOptions } from 'types';
+import { LimitOptions, LimitConfigItem } from 'types';
 import { GrafanaTheme2, StandardEditorProps } from '@grafana/data';
 import { css } from '@emotion/css';
 import { InlineField, Select, useStyles2 } from '@grafana/ui';
 import { InlineColorField } from '../InlineColorField';
 import { SpcParam, allSpcParamsDict } from 'data/spcParams';
+import { Options } from 'components/Histogram/panelcfg';
 
 const defaultColor = 'rgb(196, 22, 42)';
 
-type Props = StandardEditorProps<LimitConfig, any, PanelOptions>;
+type Props = StandardEditorProps<LimitOptions, any, Options>;
 
 export function LimitsEditor({ value, onChange, context }: Props) {
   const styles = useStyles2(getStyles);
@@ -25,14 +26,14 @@ export function LimitsEditor({ value, onChange, context }: Props) {
     }));
   }, [characteristicKeys]);
 
-  const setLimitConfig = (key: keyof NonNullable<LimitConfig>, item: LimitConfigItem | undefined) => {
+  const setLimitConfig = (key: keyof NonNullable<LimitOptions>, item: LimitConfigItem | undefined) => {
     onChange({
       ...(value ?? {}),
       [key]: item,
     });
   };
 
-  const setName = (key: keyof NonNullable<LimitConfig>, name: string | undefined) => {
+  const setName = (key: keyof NonNullable<LimitOptions>, name: string | undefined) => {
     const item: LimitConfigItem | undefined =
       name != null
         ? {
@@ -44,7 +45,7 @@ export function LimitsEditor({ value, onChange, context }: Props) {
     setLimitConfig(key, item);
   };
 
-  const setColor = (key: keyof NonNullable<LimitConfig>, color: string) => {
+  const setColor = (key: keyof NonNullable<LimitOptions>, color: string) => {
     const name = value?.[key]?.name;
     if (name != null) {
       setLimitConfig(key, {

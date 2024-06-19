@@ -1,7 +1,8 @@
 import React from 'react';
-import { PanelOptions, SpcOptions } from 'types';
 import { getTemplateSrv } from '@grafana/runtime';
 import { VariableWithOptions } from '@grafana/data';
+import { SpcOptions } from 'types';
+import { Options } from 'components/Histogram/panelcfg';
 
 const SAMPLE_SIZE_VARIABLE = 'sampleSize';
 
@@ -49,8 +50,8 @@ function useSearchParamsChange() {
   return searchParams;
 }
 
-export function useParseOptions(options: PanelOptions): WithIsVar<PanelOptions> {
-  const { value: sampleSize, isVar } = getSampleSize(options.spcOptions);
+export function useParseOptions(options: Options): WithIsVar<Options> {
+  const { value: sampleSize, isVar } = getSampleSize(options.spc);
   const searchParams = useSearchParamsChange().get(`var-${SAMPLE_SIZE_VARIABLE}`);
 
   return React.useMemo(
@@ -58,7 +59,7 @@ export function useParseOptions(options: PanelOptions): WithIsVar<PanelOptions> 
       value: {
         ...options,
         spcOptions: {
-          ...options.spcOptions,
+          ...options.spc,
           sampleSize,
         },
       },

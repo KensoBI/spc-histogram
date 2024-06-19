@@ -1,4 +1,5 @@
 import { PanelProps } from '@grafana/data';
+import { Options } from 'components/Histogram/panelcfg';
 
 export type ConstantConfigItem = {
   name: string;
@@ -22,15 +23,15 @@ export type SpcOptions = {
   usl?: number;
 };
 
-export type LimitConfig = {
+export type LimitOptions = {
   up?: LimitConfigItem;
   down?: LimitConfigItem;
 };
-export type ConstantsConfig = {
+export type ConstantsOptions = {
   items: ConstantConfigItem[];
 };
 
-export type TimeSeriesParams = {
+export type TimeSeriesOptions = {
   fill?: number;
   lineWidth?: number;
   pointSize?: number;
@@ -39,37 +40,24 @@ export type TimeSeriesParams = {
   decimals?: number;
 };
 
-export interface PanelOptions {
-  limitConfig?: LimitConfig;
-  constantsConfig?: ConstantsConfig;
-  timeseriesParams?: TimeSeriesParams;
-  spcOptions?: SpcOptions;
-}
-
-export const defaultTimeseriesSettingsColor = 'rgb(31, 96, 196)';
-export const defaultTimeseriesParams = {
+export const defaultTimeseriesColor = 'rgb(31, 96, 196)';
+export const defaultTimeseriesOptions: TimeSeriesOptions = {
   fill: 8,
   lineWidth: 2,
   pointSize: 6,
-  lineColor: defaultTimeseriesSettingsColor,
+  lineColor: defaultTimeseriesColor,
   showLegend: true,
   decimals: 2,
 };
 
-export const defaultSpcOptons: SpcOptions = {
+export const defaultSpcOptions: SpcOptions = {
   sampleSize: 1,
   aggregation: 'mean',
   nominal: undefined,
   lsl: undefined,
   usl: undefined,
 };
+
 export const defaultConstantColor = '#37872d';
 
-export const defaultPanelOptions: PanelOptions = {
-  limitConfig: undefined,
-  constantsConfig: undefined,
-  timeseriesParams: defaultTimeseriesParams,
-  spcOptions: defaultSpcOptons,
-};
-
-export interface ChartPanelProps extends PanelProps<PanelOptions> {}
+export interface ChartPanelProps extends PanelProps<Options> {}

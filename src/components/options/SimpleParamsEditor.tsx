@@ -1,12 +1,13 @@
 import React from 'react';
-import { TimeSeriesParams, PanelOptions, defaultTimeseriesSettingsColor } from 'types';
+import { TimeSeriesOptions, defaultTimeseriesColor } from 'types';
 import { GrafanaTheme2, StandardEditorProps } from '@grafana/data';
 import { css } from '@emotion/css';
 import { InlineField, InlineSwitch, Select, useStyles2 } from '@grafana/ui';
 import { InlineColorField } from 'components/InlineColorField';
 import { selectableZeroToTen } from './selectableValues';
+import { Options } from 'components/Histogram/panelcfg';
 
-type Props = StandardEditorProps<TimeSeriesParams, any, PanelOptions>;
+type Props = StandardEditorProps<TimeSeriesOptions, any, Options>;
 
 export function SimpleParamsEditor({ value, onChange }: Props) {
   const styles = useStyles2(getStyles);
@@ -47,7 +48,7 @@ export function SimpleParamsEditor({ value, onChange }: Props) {
           <div>
             <InlineColorField
               label="Color"
-              color={value.lineColor ?? defaultTimeseriesSettingsColor}
+              color={value.lineColor ?? defaultTimeseriesColor}
               onChange={(color) => {
                 onChange({ ...value, lineColor: color });
               }}

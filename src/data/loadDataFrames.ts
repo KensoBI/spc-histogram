@@ -3,7 +3,7 @@ import { Dictionary, keyBy, omit } from 'lodash';
 import { Feature } from './types';
 import { dvGet } from './deprecatedVectorUtils';
 
-type VectorField = Field<string, number[]>;
+type VectorField = Field<any>;
 type ColumnsDict = {
   feature?: VectorField;
   control?: VectorField;
@@ -49,7 +49,7 @@ function getRecord(columns: ColumnsDict, i: number) {
 }
 
 export function loadFeaturesByControl(
-  fields: Array<Field<string, number[]>>,
+  fields: Array<Field<any>>,
   refId: string,
   mappedFeatures: MappedFeatures
 ) {
@@ -89,7 +89,7 @@ function noNulls(timeVector: number[], valuesVector: number[]) {
 }
 
 export function loadTimeseries(
-  fields: Array<Field<string, number[]>>,
+  fields: Array<Field<any>>,
   refId: string,
   mappedFeatures: MappedFeatures,
   meta?: Dictionary<any>
@@ -130,7 +130,7 @@ export function loadTimeseries(
   }
 }
 
-export function loadSingleTimeseries(fields: Array<Field<string, number[]>>, refId: string): Feature | undefined {
+export function loadSingleTimeseries(fields: Array<Field<any>>, refId: string): Feature | undefined {
   const timeVector = fields?.[0];
   if (timeVector == null || timeVector.type !== FieldType.time) {
     console.warn('alert-danger', [`Timeseries data - missing Time vector in ${refId}.`]);
@@ -158,9 +158,9 @@ export function loadSingleTimeseries(fields: Array<Field<string, number[]>>, ref
 }
 
 export function loadTimeseriesWithCustomData(
-  tsField: Array<Field<string, number[]>>,
+  tsField: Array<Field<any>>,
   refId: string,
-  tableField: Array<Field<string, any>>
+  tableField: Array<Field<any>>
 ): Feature | undefined {
   const timeVector = tsField?.[0];
   if (timeVector == null || timeVector.type !== FieldType.time) {
@@ -223,7 +223,7 @@ export function loadTimeseriesWithCustomData(
   return newFeature;
 }
 
-function firstValueField(fields: Array<Field<string, number[]>>, startIndex: number) {
+function firstValueField(fields: Array<Field<any>>, startIndex: number) {
   for (let i = startIndex; i < fields.length; i++) {
     if (fields[i].type === 'number') {
       return fields[i];

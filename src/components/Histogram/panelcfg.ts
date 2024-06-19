@@ -5,8 +5,13 @@ import {
   HideableFieldConfig,
   GraphGradientMode,
 } from '@grafana/schema';
+import { ConstantsOptions, LimitOptions, SpcOptions, TimeSeriesOptions } from 'types';
 
 export interface Options extends OptionsWithLegend, OptionsWithTooltip {
+  /**
+   * Bucket count (approx)
+   */
+  bucketCount?: number;
   /**
    * Offset buckets by this amount
    */
@@ -19,11 +24,12 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
    * Combines multiple series into a single histogram
    */
   combine?: boolean;
-}
 
-export const defaultOptions: Partial<Options> = {
-  bucketOffset: 0,
-};
+  limits?: LimitOptions;
+  constants?: ConstantsOptions;
+  timeseries?: TimeSeriesOptions;
+  spc?: SpcOptions;
+}
 
 export interface FieldConfig extends AxisConfig, HideableFieldConfig {
   /**
@@ -45,4 +51,9 @@ export const defaultFieldConfig: Partial<FieldConfig> = {
   fillOpacity: 80,
   gradientMode: GraphGradientMode.None,
   lineWidth: 1,
+};
+
+export const defaultOptions: Partial<Options> = {
+  bucketCount: 30,
+  bucketOffset: 0,
 };

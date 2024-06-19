@@ -2,14 +2,15 @@ import { Button, Dropdown, InlineField, Menu, Select, useStyles2 } from '@grafan
 import React from 'react';
 import { css } from '@emotion/css';
 import { GrafanaTheme2, StandardEditorProps } from '@grafana/data';
-import { ConstantsConfig, PanelOptions, defaultConstantColor } from 'types';
+import { ConstantsOptions, defaultConstantColor } from 'types';
 import { InlineColorField } from 'components/InlineColorField';
 import { difference, uniqBy } from 'lodash';
 import { selectableHalfToTen } from './selectableValues';
 import { SpcParam, allSpcParamsDict, availableSpcParams, availableSpcParamsWithData } from 'data/spcParams';
 import { MenuItem } from './MenuItem';
+import { Options } from 'components/Histogram/panelcfg';
 
-type Props = StandardEditorProps<ConstantsConfig | undefined, any, PanelOptions>;
+type Props = StandardEditorProps<ConstantsOptions | undefined, any, Options>;
 
 export function ConstantsListEditor({ value, onChange, context }: Props) {
   const styles = useStyles2(getStyles);
@@ -23,20 +24,20 @@ export function ConstantsListEditor({ value, onChange, context }: Props) {
       return [];
     }
     if (hasCustomTableData) {
-      const sampleSize = context.options?.spcOptions?.sampleSize ?? 1;
-      const aggregationType = context.options?.spcOptions?.aggregation ?? 'mean';
+      const sampleSize = context.options?.spc?.sampleSize ?? 1;
+      const aggregationType = context.options?.spc?.aggregation ?? 'mean';
       return availableSpcParamsWithData(sampleSize, aggregationType, characteristicKeys);
     }
     if (!hasTableData) {
-      const sampleSize = context.options?.spcOptions?.sampleSize ?? 1;
-      const aggregationType = context.options?.spcOptions?.aggregation ?? 'mean';
+      const sampleSize = context.options?.spc?.sampleSize ?? 1;
+      const aggregationType = context.options?.spc?.aggregation ?? 'mean';
       return availableSpcParams(sampleSize, aggregationType);
     }
     return characteristicKeys;
   }, [
     characteristicKeys,
-    context.options?.spcOptions?.aggregation,
-    context.options?.spcOptions?.sampleSize,
+    context.options?.spc?.aggregation,
+    context.options?.spc?.sampleSize,
     hasCustomTableData,
     hasTableData,
   ]);

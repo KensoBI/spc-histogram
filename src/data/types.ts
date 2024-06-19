@@ -5,8 +5,8 @@ export type Characteristic = {
     [field: string]: any;
   };
   timeseries?: {
-    time: Field<string, number[]>;
-    values: Field<string, number[]>;
+    time: Field<any>;
+    values: Field<any>;
   };
 };
 

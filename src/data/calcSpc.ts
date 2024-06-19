@@ -1,4 +1,4 @@
-import { ConstantsConfig, SpcOptions } from 'types';
+import { ConstantsOptions, SpcOptions } from 'types';
 import { Feature } from './types';
 import { cloneDeep } from 'lodash';
 import {
@@ -12,7 +12,7 @@ import {
 } from './spcCalculations';
 import { SpcParam, filterSpcParams } from './spcParams';
 
-export function calcSpc(feature: Feature, spcOptions?: SpcOptions, constantsConfig?: ConstantsConfig) {
+export function calcSpc(feature: Feature, spcOptions?: SpcOptions, constantsConfig?: ConstantsOptions) {
   const f = cloneDeep(feature);
 
   //first characteristics

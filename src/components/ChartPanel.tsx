@@ -25,7 +25,6 @@ export function ChartPanel(props: ChartPanelProps) {
   const fieldConfig: FieldConfig | undefined =
     fields && valueFieldIndex !== null ? fields[valueFieldIndex].config : undefined;
 
-
   const { features, hasTableData, hasCustomTableData } = React.useMemo(() => parseData(data.series), [data.series]);
 
   const [selectedFeature, selectedCharacteristic] = React.useMemo(() => {
@@ -34,7 +33,7 @@ export function ChartPanel(props: ChartPanelProps) {
     }
     let selectedFeature = features[0];
     if (!hasTableData) {
-      selectedFeature = calcSpc(selectedFeature, options.spcOptions, options.constantsConfig);
+      selectedFeature = calcSpc(selectedFeature, options.spc, options.constants);
     }
     const keys = Object.keys(selectedFeature.characteristics);
     if (keys.length === 0) {
@@ -42,7 +41,7 @@ export function ChartPanel(props: ChartPanelProps) {
     }
     const selectedCharacteristic = selectedFeature.characteristics[keys[0]];
     return [selectedFeature, selectedCharacteristic];
-  }, [features, hasTableData, options.constantsConfig, options.spcOptions]);
+  }, [features, hasTableData, options.constants, options.spc]);
 
   const context = usePanelContext();
   const onInstanceStateChange = context.onInstanceStateChange;
@@ -55,32 +54,32 @@ export function ChartPanel(props: ChartPanelProps) {
   }, [hasTableData, onInstanceStateChange, selectedCharacteristic, selectedFeature, hasCustomTableData]);
 
   const settings: TimeseriesSettings = React.useMemo(() => {
-    const settings = { ...defaultTimeseriesSettings, ...options.timeseriesParams, ...options.spcOptions };
+    const settings = { ...defaultTimeseriesSettings, ...options.timeseries, ...options.spc };
     settings.constantsConfig = {
       items: [],
     };
-    if (options?.limitConfig) {
-      settings.limitConfig = options.limitConfig;
-      if (options.limitConfig.up) {
+    if (options?.limits) {
+      settings.limitConfig = options.limits;
+      if (options.limits.up) {
         settings.constantsConfig.items.push({
-          name: options.limitConfig.up.name,
-          title: options.limitConfig.up.name,
-          color: options.limitConfig.up.color,
+          name: options.limits.up.name,
+          title: options.limits.up.name,
+          color: options.limits.up.color,
           lineWidth: 2,
         });
       }
 
-      if (options.limitConfig.down) {
+      if (options.limits.down) {
         settings.constantsConfig.items.push({
-          name: options.limitConfig.down.name,
-          title: options.limitConfig.down.name,
-          color: options.limitConfig.down.color,
+          name: options.limits.down.name,
+          title: options.limits.down.name,
+          color: options.limits.down.color,
           lineWidth: 2,
         });
       }
     }
-    if (options?.constantsConfig && options.constantsConfig.items.length > 0) {
-      settings.constantsConfig.items.push(...options.constantsConfig.items);
+    if (options?.constants && options.constants.items.length > 0) {
+      settings.constantsConfig.items.push(...options.constants.items);
     }
     return settings;
   }, [options]);
