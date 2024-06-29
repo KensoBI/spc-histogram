@@ -7,6 +7,7 @@ export type TimeseriesSettings = TimeSeriesOptions & {
   spcOptions?: SpcOptions;
 };
 
+//todo duplicate defaultTimeseriesOptions
 export const defaultTimeseriesSettings: TimeseriesSettings = {
   controlName: '',
   fill: 8,

@@ -1,25 +1,89 @@
 import { PanelPlugin, FieldConfigProperty, FieldColorModeId } from '@grafana/data';
 import { commonOptionsBuilder, graphFieldOptions } from '@grafana/ui';
 import { ChartPanel } from './components/ChartPanel';
-import { LimitsEditor } from './components/options/LimitsEditor';
 import { ConstantsListEditor } from 'components/options/ConstantsListEditor';
-import { SimpleParamsEditor } from 'components/options/SimpleParamsEditor';
 import { SpcOptionEditor } from 'components/options/SpcOptionEditor';
 import { parseData } from 'data/parseData';
 import { FieldConfig, Options, defaultOptions } from 'components/Histogram/panelcfg';
 
 export const plugin = new PanelPlugin<Options, FieldConfig>(ChartPanel)
 
+  .setPanelOptions((builder) => {
+    builder
+      .addNumberInput({
+        path: 'bucketCount',
+        name: 'Bucket count',
+        description: 'approximate bucket count',
+        settings: {
+          placeholder: `Default: ${defaultOptions.bucketCount}`,
+          min: 0,
+        },
+        category: ['Histogram'],
+        //showIf: (opts, data) => !originalDataHasHistogram(data),
+      })
+      .addNumberInput({
+        path: 'bucketSize',
+        name: 'Bucket size',
+        settings: {
+          placeholder: 'Auto',
+          min: 0,
+        },
+        defaultValue: defaultOptions.bucketSize,
+        category: ['Histogram'],
+      })
+      .addNumberInput({
+        path: 'bucketOffset',
+        name: 'Bucket offset',
+        description: 'for non-zero-based buckets',
+        settings: {
+          placeholder: `Default: ${defaultOptions.bucketOffset}`,
+          min: 0,
+        },
+        category: ['Histogram'],
+      })
+      .addBooleanSwitch({
+        path: 'combine',
+        name: 'Combine series',
+        description: 'combine all series into a single histogram',
+        defaultValue: defaultOptions.combine,
+        category: ['Histogram'],
+      });
+
+    builder.addCustomEditor({
+      id: 'spcOptions',
+      path: 'spc',
+      name: 'SPC options',
+      description: 'Select options for SPC chart. You can enter a custom sample size value by typing a number.',
+      defaultValue: defaultOptions.spc,
+      editor: SpcOptionEditor,
+      category: ['SPC'],
+      showIf: (_, data) => parseData(data ?? []).hasTableData === false,
+    });
+    builder.addCustomEditor({
+      id: 'constants',
+      path: 'constants',
+      name: 'Constants',
+      description: 'Add constants for the chart',
+      defaultValue: defaultOptions.constants,
+      editor: ConstantsListEditor,
+      category: ['SPC'],
+    });
+    // builder.addCustomEditor({
+    //   id: 'limitOptions',
+    //   path: 'limits',
+    //   name: 'Limits',
+    //   description: 'Upper and lower limits for the chart',
+    //   defaultValue: defaultOptions.limits,
+    //   editor: LimitsEditor,
+    //   category: ['SPC'],
+    // });
+
+    commonOptionsBuilder.addLegendOptions(builder);
+
+    return builder;
+  })
   .useFieldConfig({
-    disableStandardOptions: [
-      FieldConfigProperty.Unit,
-      FieldConfigProperty.NoValue,
-      FieldConfigProperty.Thresholds,
-      FieldConfigProperty.Mappings,
-      FieldConfigProperty.Links,
-      FieldConfigProperty.Color,
-      FieldConfigProperty.Filterable,
-    ],
+    disableStandardOptions: [FieldConfigProperty.Thresholds, FieldConfigProperty.Mappings, FieldConfigProperty.Links],
     standardOptions: {
       [FieldConfigProperty.Color]: {
         settings: {
@@ -60,6 +124,7 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(ChartPanel)
             max: 10,
             step: 1,
           },
+          category: ['Histogram'],
         })
         .addSliderInput({
           path: 'fillOpacity',
@@ -70,6 +135,7 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(ChartPanel)
             max: 100,
             step: 1,
           },
+          category: ['Histogram'],
         })
         .addRadio({
           path: 'gradientMode',
@@ -78,49 +144,9 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(ChartPanel)
           settings: {
             options: graphFieldOptions.fillGradient,
           },
+          category: ['Histogram'],
         });
 
       commonOptionsBuilder.addHideFrom(builder);
     },
-  })
-  .setPanelOptions((builder) => {
-    builder.addCustomEditor({
-      id: 'spcOptions',
-      path: 'spcOptions',
-      name: 'SPC options',
-      description: 'Select options for SPC chart. You can enter a custom sample size value by typing a number.',
-      defaultValue: defaultOptions.spc,
-      editor: SpcOptionEditor,
-      category: ['Chart'],
-      showIf: (_, data) => parseData(data ?? []).hasTableData === false,
-    });
-    builder.addCustomEditor({
-      id: 'constantsConfig',
-      path: 'constantsConfig',
-      name: 'Constants',
-      description: 'Add constants for the chart',
-      defaultValue: defaultOptions.constants,
-      editor: ConstantsListEditor,
-      category: ['Chart'],
-    });
-    builder.addCustomEditor({
-      id: 'limitOptions',
-      path: 'limits',
-      name: 'Limits',
-      description: 'Upper and lower limits for the chart',
-      defaultValue: defaultOptions.limits,
-      editor: LimitsEditor,
-      category: ['Chart'],
-    });
-    builder.addCustomEditor({
-      id: 'timeseriesOptions',
-      path: 'timeseries',
-      name: 'Options',
-      description: 'Timeseries settings',
-      defaultValue: defaultOptions.timeseries,
-      editor: SimpleParamsEditor,
-      category: ['Chart'],
-    });
-
-    return builder;
   });

@@ -12,6 +12,7 @@ import {
 } from './spcCalculations';
 import { SpcParam, filterSpcParams } from './spcParams';
 
+//todo this should take characteristic instead of feature as a function parameter.
 export function calcSpc(feature: Feature, spcOptions?: SpcOptions, constantsConfig?: ConstantsOptions) {
   const f = cloneDeep(feature);
 
@@ -36,8 +37,8 @@ export function calcSpc(feature: Feature, spcOptions?: SpcOptions, constantsConf
 
   //clear obsolate, computed values from config
   //it's important, because otherwise the timeseries plot will be broken
-  characteristic.timeseries.time.config = {};
-  characteristic.timeseries.values.config = {};
+  //characteristic.timeseries.time.config = {};
+  //characteristic.timeseries.values.config = {};
 
   values = characteristic.timeseries.values.values;
   times = characteristic.timeseries.time.values;

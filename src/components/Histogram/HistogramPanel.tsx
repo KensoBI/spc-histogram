@@ -6,14 +6,14 @@ import { useTheme2 } from '@grafana/ui';
 
 import { Histogram, getBucketSize } from './Histogram';
 import { Options } from './panelcfg';
-import { AnnotationEntity, AnnotationsPlugin } from 'components/Histogram/AnnotationPlugin';
+import { ConstantAnnotation, AnnotationsPlugin } from 'components/Histogram/AnnotationPlugin';
 
 type Props = {
   options: Options;
   width: number;
   height: number;
   series: DataFrame[];
-  annotations?: AnnotationEntity[];
+  annotations?: ConstantAnnotation[];
 };
 
 export const HistogramPanel = ({ series, options, width, height, annotations }: Props) => {

@@ -27,6 +27,7 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
 
   limits?: LimitOptions;
   constants?: ConstantsOptions;
+
   timeseries?: TimeSeriesOptions;
   spc?: SpcOptions;
 }

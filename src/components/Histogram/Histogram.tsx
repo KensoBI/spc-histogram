@@ -21,7 +21,7 @@ import {
   UPLOT_AXIS_FONT_SIZE,
 } from '@grafana/ui';
 import { defaultFieldConfig, FieldConfig, Options } from './panelcfg';
-import {  getStackingGroups, preparePlotData2  } from 'utils/utils';
+import { getStackingGroups, preparePlotData2 } from 'utils/utils';
 
 function incrRoundDn(num: number, incr: number) {
   return Math.floor(num / incr) * incr;
@@ -306,7 +306,9 @@ export class Histogram extends React.Component<HistogramProps, State> {
   prepState(props: HistogramProps, withConfig = true): State {
     const { alignedFrame } = props;
 
-    const config = withConfig ? prepConfig(alignedFrame, this.props.theme, this.props.annotationsRange) : this.state.config!;
+    const config = withConfig
+      ? prepConfig(alignedFrame, this.props.theme, this.props.annotationsRange)
+      : this.state.config!;
     const xMinOnly = xMinOnlyFrame(alignedFrame);
     const alignedData = preparePlotData(config, xMinOnly);
 

@@ -6,66 +6,67 @@ import { getTextColorForBackground, UPlotConfigBuilder, useTheme2 } from '@grafa
 
 const DEFAULT_TIMESERIES_FLAG_COLOR = '#03839e';
 
-export type AnnotationInfo = {
+export type AnnotationBase = {
   title?: string;
   color?: string;
   lineWidth?: number;
 };
 
-export type Flag = AnnotationInfo & {
+export type Flag = AnnotationBase & {
   type: 'flag';
   time: number;
 };
 
-export type Region = AnnotationInfo & {
+export type Region = AnnotationBase & {
   type: 'region';
   timeStart?: number;
   timeEnd?: number;
 };
 
-export type AnnotationEntity = Flag | Region;
+export type ConstantAnnotation = Flag | Region;
 
 export type AnnotationsPluginProps = {
   config: UPlotConfigBuilder;
-  annotations: AnnotationEntity[];
+  annotations: ConstantAnnotation[];
 };
 
 type ConditionFunc = {
   func: (xPos: number) => boolean;
-  annotaion: AnnotationEntity;
+  annotaion: ConstantAnnotation;
   x: number;
 };
 type Conditions = ConditionFunc[];
 
 type TooltipState = {
   x: number;
-  annotation: AnnotationEntity;
+  annotation: ConstantAnnotation;
   position: 'left' | 'center' | 'right';
 };
 
-export function isAnnotationEntity(value: any): value is AnnotationEntity {
+export function isConstantAnnotation(value: any): value is ConstantAnnotation {
   return (value?.type === 'flag' && typeof value?.time === 'number') || value?.type === 'region';
 }
 
-export function isAnnotationEntityArray(value: any): value is AnnotationEntity[] {
+export function isConstantAnnotationArray(value: any): value is ConstantAnnotation[] {
   if (!Array.isArray(value)) {
     return false;
   }
   for (const en of value) {
-    if (!isAnnotationEntity(en)) {
+    if (!isConstantAnnotation(en)) {
       return false;
     }
   }
   return true;
 }
 
+//todo rename ConstantAnnotation
 export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotations, config }) => {
   const theme = useTheme2();
 
   const [tooltip, setTooltip] = React.useState<TooltipState | null>(null);
 
   const plotInstance = React.useRef<uPlot>();
-  const annotationsRef = React.useRef<AnnotationEntity[]>();
+  const annotationsRef = React.useRef<ConstantAnnotation[]>();
 
   // Update annotations views when new annotations came
   React.useEffect(() => {
@@ -243,7 +244,7 @@ const rectInRange = (valueStart: number, valueEnd: number, range: number) => (vP
   return vPos >= valueStart - range && vPos <= valueEnd + range;
 };
 
-const typeToValue = (type: AnnotationEntity['type']) => {
+const typeToValue = (type: ConstantAnnotation['type']) => {
   switch (type) {
     case 'flag':
       return 2;

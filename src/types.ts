@@ -1,7 +1,7 @@
 import { PanelProps } from '@grafana/data';
 import { Options } from 'components/Histogram/panelcfg';
 
-export type ConstantConfigItem = {
+export type ConstantItemOptions = {
   name: string;
   color: string;
   title: string;
@@ -28,7 +28,7 @@ export type LimitOptions = {
   down?: LimitConfigItem;
 };
 export type ConstantsOptions = {
-  items: ConstantConfigItem[];
+  items: ConstantItemOptions[];
 };
 
 export type TimeSeriesOptions = {
@@ -40,12 +40,21 @@ export type TimeSeriesOptions = {
   decimals?: number;
 };
 
+export const defaultConstantItem: ConstantItemOptions = {
+  name: '',
+  color: 'rgb(31, 96, 196)',
+  title: '',
+  lineWidth: 2,
+};
+
+//todo remove
 export const defaultTimeseriesColor = 'rgb(31, 96, 196)';
+
 export const defaultTimeseriesOptions: TimeSeriesOptions = {
   fill: 8,
   lineWidth: 2,
   pointSize: 6,
-  lineColor: defaultTimeseriesColor,
+  lineColor: 'rgb(31, 96, 196)',
   showLegend: true,
   decimals: 2,
 };
