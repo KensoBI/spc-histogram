@@ -1,12 +1,12 @@
 import { PanelPlugin, FieldConfigProperty, FieldColorModeId } from '@grafana/data';
 import { commonOptionsBuilder, graphFieldOptions } from '@grafana/ui';
-import { ChartPanel } from './components/ChartPanel';
 import { ConstantsListEditor } from 'components/options/ConstantsListEditor';
 import { SpcOptionEditor } from 'components/options/SpcOptionEditor';
 import { parseData } from 'data/parseData';
 import { FieldConfig, Options, defaultOptions } from 'components/Histogram/panelcfg';
+import { SpcHistogramPanel } from 'components/SpcHistogramPanel';
 
-export const plugin = new PanelPlugin<Options, FieldConfig>(ChartPanel)
+export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
 
   .setPanelOptions((builder) => {
     builder
@@ -50,7 +50,7 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(ChartPanel)
       });
 
     builder.addCustomEditor({
-      id: 'spcOptions',
+      id: 'spc',
       path: 'spc',
       name: 'SPC options',
       description: 'Select options for SPC chart. You can enter a custom sample size value by typing a number.',
@@ -62,8 +62,8 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(ChartPanel)
     builder.addCustomEditor({
       id: 'constants',
       path: 'constants',
-      name: 'Constants',
-      description: 'Add constants for the chart',
+      name: 'Control lines',
+      description: 'A control line indicates thresholds for monitoring process stability.',
       defaultValue: defaultOptions.constants,
       editor: ConstantsListEditor,
       category: ['SPC'],

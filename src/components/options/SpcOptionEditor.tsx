@@ -4,7 +4,7 @@ import { useStyles2, InlineField, Select } from '@grafana/ui';
 import { InputFloat } from 'components/InputFloat';
 import React from 'react';
 import { AggregationType, SpcOptions, defaultSpcOptions } from 'types';
-import { useParseSpcOptions } from './parseOptions';
+import { useParseSpcOptions } from '../../hooks/useParseOptions';
 import { Options } from 'components/Histogram/panelcfg';
 
 const sampleSizeOptions = [...Array(10)]

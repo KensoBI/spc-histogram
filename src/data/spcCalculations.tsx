@@ -1,5 +1,6 @@
 import { AggregationType } from 'types';
 import { getCalcConst } from './calcConst';
+import { NumericRange } from '@grafana/data';
 
 function notNanArray(values: number[]) {
   return values.map((value) => (typeof value === 'number' && !isNaN(value) ? value : 0));
@@ -179,4 +180,20 @@ export function stdDev(values: number[]) {
   const meanSquaredDifferences = calcMeanSquareDifferenceInRange(values, 0, values.length - 1);
   const standardDeviation = Math.sqrt(meanSquaredDifferences);
   return standardDeviation;
+}
+
+export function calculateNumericRange(values: number[]): NumericRange {
+  if (values.length === 0) {
+    return { delta: 0, min: 0, max: 0 };
+  }
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const delta = max - min;
+
+  return {
+    delta,
+    max,
+    min,
+  };
 }

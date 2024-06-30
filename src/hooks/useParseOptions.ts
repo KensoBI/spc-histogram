@@ -58,7 +58,7 @@ export function useParseOptions(options: Options): WithIsVar<Options> {
     () => ({
       value: {
         ...options,
-        spcOptions: {
+        spc: {
           ...options.spc,
           sampleSize,
         },

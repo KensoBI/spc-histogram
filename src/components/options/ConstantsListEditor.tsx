@@ -1,12 +1,18 @@
-import { Button, Dropdown, InlineField, Menu, Select, useStyles2 } from '@grafana/ui';
+import { Button, Dropdown, InlineField, Menu, Select, ValuePicker, useStyles2 } from '@grafana/ui';
 import React from 'react';
 import { css } from '@emotion/css';
-import { GrafanaTheme2, StandardEditorProps } from '@grafana/data';
+import { GrafanaTheme2, SelectableValue, StandardEditorProps } from '@grafana/data';
 import { ConstantsOptions, defaultConstantColor } from 'types';
 import { InlineColorField } from 'components/InlineColorField';
 import { difference, uniqBy } from 'lodash';
 import { selectableHalfToTen } from './selectableValues';
-import { SpcParam, allSpcParamsDict, availableSpcParams, availableSpcParamsWithData } from 'data/spcParams';
+import {
+  SpcParam,
+  allSpcControls,
+  allSpcParamsDict,
+  availableSpcParams,
+  availableSpcParamsWithData,
+} from 'data/spcParams';
 import { MenuItem } from './MenuItem';
 import { Options } from 'components/Histogram/panelcfg';
 
@@ -19,28 +25,21 @@ export function ConstantsListEditor({ value, onChange, context }: Props) {
   const hasCustomTableData = context.instanceState?.hasCustomTableData as boolean | null | undefined;
   const prevAvailableFields = React.useRef<string[] | null>(null);
 
+  const sampleSize = context.options?.spc?.sampleSize ?? 1;
+  const aggregationType = context.options?.spc?.aggregation ?? 'mean';
+
   const availableFields = React.useMemo(() => {
     if (characteristicKeys == null) {
       return [];
     }
     if (hasCustomTableData) {
-      const sampleSize = context.options?.spc?.sampleSize ?? 1;
-      const aggregationType = context.options?.spc?.aggregation ?? 'mean';
       return availableSpcParamsWithData(sampleSize, aggregationType, characteristicKeys);
     }
     if (!hasTableData) {
-      const sampleSize = context.options?.spc?.sampleSize ?? 1;
-      const aggregationType = context.options?.spc?.aggregation ?? 'mean';
       return availableSpcParams(sampleSize, aggregationType);
     }
     return characteristicKeys;
-  }, [
-    characteristicKeys,
-    context.options?.spc?.aggregation,
-    context.options?.spc?.sampleSize,
-    hasCustomTableData,
-    hasTableData,
-  ]);
+  }, [aggregationType, characteristicKeys, hasCustomTableData, hasTableData, sampleSize]);
 
   React.useEffect(() => {
     if (availableFields.length === 0 || !hasTableData) {
@@ -78,6 +77,8 @@ export function ConstantsListEditor({ value, onChange, context }: Props) {
     return difference(availableFields, value?.items?.map((conf) => conf.name) ?? []);
   }, [availableFields, value?.items]);
 
+  function onAddConstant() {}
+
   const menu = React.useMemo(() => {
     return (
       <Menu>
@@ -110,8 +111,35 @@ export function ConstantsListEditor({ value, onChange, context }: Props) {
     return value?.items?.filter((el) => availableFields.includes(el.name)) ?? [];
   }, [availableFields, value?.items]);
 
+  const onControlLineAdd = (selectedControl: SelectableValue<string>) => {
+    console.log('selected control = ' + selectedControl.value);
+  };
+
   return (
     <>
+      <div className={styles.wrapper}>
+        <ValuePicker
+          icon="plus"
+          label="Add control line"
+          variant="secondary"
+          menuPlacement="auto"
+          isFullWidth={true}
+          size="md"
+          options={allSpcControls
+            .filter((control) => {
+              if (sampleSize > 1 && sampleSize <= 10) {
+                if (aggregationType === 'mean') {
+                  // Show all standard types, sbar and rbar
+                  return control.type === 'standard' || control.type === 'sbar' || control.type === 'rbar';
+                }
+              }
+              return control.type === 'standard' || control.type === 'xbar';
+            })
+            .map<SelectableValue<string>>((i) => ({ label: i.label, value: i.name, description: i.description }))}
+          onChange={(selectedControl) => onControlLineAdd(selectedControl)}
+        />
+      </div>
+
       <div className={styles.container}>
         <div className={styles.header}>
           <div className={styles.headerTitle}>
@@ -202,6 +230,11 @@ export function ConstantsListEditor({ value, onChange, context }: Props) {
 
 const getStyles = (theme: GrafanaTheme2) => {
   return {
+    wrapper: css`
+      display: flex;
+      flex-direction: column;
+    `,
+
     container: css`
       background-color: ${theme.colors.background.canvas};
       padding: ${theme.spacing(1)};

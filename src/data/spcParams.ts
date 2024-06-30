@@ -1,5 +1,93 @@
 import { AggregationType } from 'types';
 
+export type SpcControl = {
+  name: string;
+  label: string;
+  description: string;
+  type: string;
+};
+
+export const allSpcControls: SpcControl[] = [
+  {
+    name: 'nominal',
+    label: 'Nominal',
+    description: 'Draws nominal control line.',
+    type: 'standard',
+  },
+  {
+    name: 'lsl',
+    label: 'LSL',
+    description: 'Draws the LCL (Lower Control Limit), marking the lower boundary of the control chart.',
+    type: 'standard',
+  },
+  {
+    name: 'usl',
+    label: 'USL',
+    description: 'Draws the USL (Upper Control Limit), marking the upper boundary of the control chart.',
+    type: 'standard',
+  },
+  {
+    name: 'min',
+    label: 'Min',
+    description: 'Computes and draws the minimum of the sample values.',
+    type: 'standard',
+  },
+  {
+    name: 'max',
+    label: 'Max',
+    description: 'Computes and draws the maximum of the sample values.',
+    type: 'standard',
+  },
+  {
+    name: 'mean',
+    label: 'Mean',
+    description: 'Computes and draws the average (arithmetic mean) of all the sample values.',
+    type: 'standard',
+  },
+  {
+    name: 'range',
+    label: 'Range',
+    description: 'Computes and draws the range (arithmetic range) of all the sample values.',
+    type: 'standard',
+  },
+  {
+    name: 'lcl',
+    label: 'LCL',
+    description: 'Draws the LCL (Lower Control Limit), marking the lower boundary of the control chart.',
+    type: 'xbar',
+  },
+  {
+    name: 'ucl',
+    label: 'UCL',
+    description: 'Draws the USL (Upper Control Limit), marking the upper boundary of the control chart.',
+    type: 'xbar',
+  },
+  {
+    name: 'lcl_rbar',
+    label: 'LCL R-bar',
+    description: 'Draws the LCL (Lower Control Limit), marking the lower boundary of the R-bar chart.',
+    type: 'rbar',
+  },
+  {
+    name: 'ucl_rbar',
+    label: 'UCL R-bar',
+    description: 'Draws the USL (Upper Control Limit), marking the upper boundary of the R-bar chart.',
+    type: 'rbar',
+  },
+  {
+    name: 'lcl_sbar',
+    label: 'LCL S-bar',
+    description: 'Draws the LCL (Lower Control Limit), marking the lower boundary of the S-bar chart.',
+    type: 'sbar',
+  },
+  {
+    name: 'ucl_sbar',
+    label: 'UCL S-bar',
+    description: 'Draws the USL (Upper Control Limit), marking the upper boundary of the S-bar chart.',
+    type: 'sbar',
+  },
+];
+
 export const allSpcParamsDict = {
   nominal: 'Nominal',
   lsl: 'LSL',
