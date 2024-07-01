@@ -9,6 +9,12 @@ export type SpcControl = {
 
 export const allSpcControls: SpcControl[] = [
   {
+    name: 'custom',
+    label: 'Custom',
+    description: 'Draws custom control line.',
+    type: 'standard',
+  },
+  {
     name: 'nominal',
     label: 'Nominal',
     description: 'Draws nominal control line.',
@@ -30,25 +36,25 @@ export const allSpcControls: SpcControl[] = [
     name: 'min',
     label: 'Min',
     description: 'Computes and draws the minimum of the sample values.',
-    type: 'standard',
+    type: 'computed',
   },
   {
     name: 'max',
     label: 'Max',
     description: 'Computes and draws the maximum of the sample values.',
-    type: 'standard',
+    type: 'computed',
   },
   {
     name: 'mean',
     label: 'Mean',
     description: 'Computes and draws the average (arithmetic mean) of all the sample values.',
-    type: 'standard',
+    type: 'computed',
   },
   {
     name: 'range',
     label: 'Range',
     description: 'Computes and draws the range (arithmetic range) of all the sample values.',
-    type: 'standard',
+    type: 'computed',
   },
   {
     name: 'lcl',

@@ -1,7 +1,29 @@
-import { Button, Dropdown, InlineField, Menu, Select, ValuePicker, useStyles2 } from '@grafana/ui';
+import {
+  ActionMeta,
+  Button,
+  ColorPicker,
+  Dropdown,
+  Field,
+  IconButton,
+  InlineField,
+  Input,
+  Menu,
+  RadioButtonGroup,
+  Select,
+  Slider,
+  Stack,
+  ValuePicker,
+  useStyles2,
+} from '@grafana/ui';
 import React from 'react';
 import { css } from '@emotion/css';
-import { GrafanaTheme2, SelectableValue, StandardEditorProps } from '@grafana/data';
+import {
+  GrafanaTheme2,
+  SelectableValue,
+  StandardEditorProps,
+  getFieldDisplayName,
+  getFrameDisplayName,
+} from '@grafana/data';
 import { ConstantsOptions, defaultConstantColor } from 'types';
 import { InlineColorField } from 'components/InlineColorField';
 import { difference, uniqBy } from 'lodash';
@@ -115,9 +137,16 @@ export function ConstantsListEditor({ value, onChange, context }: Props) {
     console.log('selected control = ' + selectedControl.value);
   };
 
+  //todo get labels for all datasets
+  //const label = getFieldDisplayName(field, data[fieldIndex.frameIndex]!, data);
+  // const labell = getFrameDisplayName()
+  // context.data.map((frame, index) => ({
+  //   value: index,
+  //   label: `${getFrameDisplayName(frame, index)} (index: ${index}, rows: ${frame.length})`,
+
   return (
     <>
-      <div className={styles.wrapper}>
+      <div className={styles.addControlwrapper}>
         <ValuePicker
           icon="plus"
           label="Add control line"
@@ -130,14 +159,86 @@ export function ConstantsListEditor({ value, onChange, context }: Props) {
               if (sampleSize > 1 && sampleSize <= 10) {
                 if (aggregationType === 'mean') {
                   // Show all standard types, sbar and rbar
-                  return control.type === 'standard' || control.type === 'sbar' || control.type === 'rbar';
+                  return (
+                    control.type === 'standard' ||
+                    control.type === 'sbar' ||
+                    control.type === 'rbar' ||
+                    control.type === 'computed'
+                  );
                 }
               }
-              return control.type === 'standard' || control.type === 'xbar';
+              return control.type === 'standard' || control.type === 'computed' || control.type === 'xbar';
             })
             .map<SelectableValue<string>>((i) => ({ label: i.label, value: i.name, description: i.description }))}
           onChange={(selectedControl) => onControlLineAdd(selectedControl)}
         />
+      </div>
+      <div className={styles.controlItemWrapper}>
+        <div className={styles.controlHeaderWrapper}>
+          <Stack direction="column" gap={1}>
+            <Stack direction="row" alignItems="center" gap={1}>
+              <IconButton
+                name="angle-down"
+                // name={showPolicyChildren ? 'angle-down' : 'angle-right'}
+                // onClick={togglePolicyChildren}
+                aria-label="Collapse"
+              />{' '}
+              <span className={styles.metadata}>Nominal (A-series)</span>
+              <span className={css({ flex: 1 })} />
+              <Stack direction="row" gap={0.5}>
+                <Button variant="secondary" icon="trash-alt" size="sm" type="button">
+                  Remove control
+                </Button>
+              </Stack>
+            </Stack>
+          </Stack>
+        </div>
+        <Stack direction="row" alignItems="center" gap={1}>
+          <div className={styles.fieldContainer}>
+            <Field label="Name">
+              <Input placeholder={'Name'} value="Name" />
+            </Field>
+            <Field label="Value" description="Numeric position at which the control line is drawn. ">
+              <Input placeholder={'Value'} type="number" step="0.01" />
+            </Field>
+            <Field label="Series" description="Select the series for which to calculate this control.">
+              <Select
+                placeholder="Select series"
+                isClearable={true}
+                options={context.data.map((frame, index) => ({
+                  value: index,
+                  label: `${getFrameDisplayName(frame, index)}`,
+                }))}
+                onChange={function (value: SelectableValue<number>, actionMeta: ActionMeta): void | {} {
+                  throw new Error('Function not implemented.');
+                }}
+              />
+            </Field>
+            <Field label="Line width">
+              <Slider min={1} max={10} step={1} value={1} />
+            </Field>
+            <Field label="Line color">
+              <ColorPicker
+                color={defaultConstantColor}
+                onChange={function (color: string): void {
+                  throw new Error('Function not implemented.');
+                }}
+              ></ColorPicker>
+            </Field>
+            <Field label="Fill">
+              <RadioButtonGroup
+                options={[
+                  { description: 'Left fill', value: 'A', icon: 'arrow-to-right' },
+                  { description: 'No fill', value: 'B', icon: 'eye-slash' },
+                  { description: 'Right fill', value: 'C', icon: 'arrow-from-right' },
+                ]}
+              ></RadioButtonGroup>
+            </Field>
+            <Field label="Fill opacity">
+              <Slider min={0} max={100} step={1} value={0} />
+            </Field>
+          </div>
+        </Stack>
       </div>
 
       <div className={styles.container}>
@@ -161,6 +262,12 @@ export function ConstantsListEditor({ value, onChange, context }: Props) {
 
         {currentItems.map((el, index) => (
           <div key={el.title} className={styles.row}>
+            <Field label="Name">
+              <Input placeholder={'Name'} value={el.title} />
+            </Field>
+            <Field>
+              <Input placeholder={'Value'} type="number" step="0.01" />
+            </Field>
             <div className={styles.fieldName}>{el.title}</div>
             {hasTableData && (
               <div>
@@ -178,6 +285,7 @@ export function ConstantsListEditor({ value, onChange, context }: Props) {
                 />
               </div>
             )}
+
             <div className={styles.rightColumn}>
               <InlineField label={'Line Width'} className={styles.noMargin}>
                 <Select
@@ -230,10 +338,41 @@ export function ConstantsListEditor({ value, onChange, context }: Props) {
 
 const getStyles = (theme: GrafanaTheme2) => {
   return {
-    wrapper: css`
+    addControlwrapper: css`
       display: flex;
       flex-direction: column;
+      padding-bottom: 8px;
     `,
+    controlItemWrapper: css({
+      //padding: theme.spacing(0.5),
+      flex: 1,
+      position: 'relative',
+      background: theme.colors.background.primary,
+      borderRadius: theme.shape.radius.default,
+      //border: `solid 1px ${theme.colors.border.weak}`,
+      borderColor: theme.colors.secondary.borderTransparent,
+    }),
+    controlHeaderWrapper: css({
+      padding: theme.spacing(0.5),
+      flex: 1,
+      position: 'relative',
+      background: theme.colors.background.secondary,
+      borderRadius: theme.shape.radius.default,
+      //border: `solid 1px ${theme.colors.border.weak}`,
+      borderColor: theme.colors.secondary.borderTransparent,
+    }),
+    fieldContainer: css({
+      display: 'flex',
+      flexDirection: 'column',
+      flexGrow: 1,
+      padding: theme.spacing(1),
+      //background: theme.colors.background.canvas,
+    }),
+    metadata: css({
+      color: theme.colors.text.secondary,
+      fontSize: theme.typography.bodySmall.fontSize,
+      fontWeight: theme.typography.bodySmall.fontWeight,
+    }),
 
     container: css`
       background-color: ${theme.colors.background.canvas};
