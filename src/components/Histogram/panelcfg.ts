@@ -24,12 +24,27 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
    * Combines multiple series into a single histogram
    */
   combine?: boolean;
+  sampleSize: number;
+  aggregationType: string;
+  controlLines: ControlLine[];
 
+  //all below are not needed
   limits?: LimitOptions;
   constants?: ConstantsOptions;
-
   timeseries?: TimeSeriesOptions;
   spc?: SpcOptions;
+}
+
+export interface ControlLine {
+  name: string;
+  position: number;
+  seriesIndex: number;
+  lineWidth: number;
+  lineColor: string;
+  fill: number;
+  fillDirection: number;
+  fillOpacity: number;
+  type: string;
 }
 
 export interface FieldConfig extends AxisConfig, HideableFieldConfig {
