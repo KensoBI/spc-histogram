@@ -5,7 +5,7 @@ import {
   HideableFieldConfig,
   GraphGradientMode,
 } from '@grafana/schema';
-import { ConstantsOptions, LimitOptions, SpcOptions, TimeSeriesOptions } from 'types';
+import { AggregationType, ConstantsOptions, SpcChartTyp, SpcOptions, TimeSeriesOptions } from 'types';
 
 export interface Options extends OptionsWithLegend, OptionsWithTooltip {
   /**
@@ -24,12 +24,13 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
    * Combines multiple series into a single histogram
    */
   combine?: boolean;
-  sampleSize: number;
-  aggregationType: string;
+  chartType: SpcChartTyp;
+  subgroupSize: number;
+  aggregationType: AggregationType;
   controlLines: ControlLine[];
 
   //all below are not needed
-  limits?: LimitOptions;
+  //limits?: LimitOptions;
   constants?: ConstantsOptions;
   timeseries?: TimeSeriesOptions;
   spc?: SpcOptions;
@@ -44,7 +45,7 @@ export interface ControlLine {
   fill: number;
   fillDirection: number;
   fillOpacity: number;
-  type: string;
+  reducerId: string;
 }
 
 export interface FieldConfig extends AxisConfig, HideableFieldConfig {

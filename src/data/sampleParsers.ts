@@ -1,36 +1,70 @@
-import { DataFrame, FieldType } from '@grafana/data';
-import { SpcOptions } from 'types';
+import { DataFrame, FieldCalcs, FieldType } from '@grafana/data';
 import { calcTimeSampleSize, calcValueSampleSize, calculateNumericRange } from './spcCalculations';
+import { Options } from 'components/Histogram/panelcfg';
+import { calculateControlCharts, calculateStandardStats } from 'calcs/standard';
+import { controlLineReducers } from './spcReducers';
 
 //apply data aggregations to all series
-export function sampleParser(series: DataFrame[], spcOptions?: SpcOptions): DataFrame[] {
-  //if sample size is not set or is 1 there is nothing for us to calculate here
-  if (!spcOptions || spcOptions.sampleSize === 1) {
-    return series;
-  }
+export function sampleParser(series: DataFrame[], options: Options): DataFrame[] {
+  const subgroupSize = options.subgroupSize < 1 ? 1 : options.subgroupSize;
+  const aggregationType = options.aggregationType ?? 'none';
+  const standardReducers = controlLineReducers.filter((p) => p.isStandard).map((p) => p.name);
 
-  const sampleSize = spcOptions.sampleSize;
-  const aggregation = spcOptions?.aggregation ?? 'mean';
+  return series.map((frame, frameIndex) => {
+    const shouldCalculateStandardStats =
+      options.controlLines.filter((c) => c.seriesIndex === frameIndex && standardReducers.includes(c.name)).length > 0;
 
-  return series.map((frame) => ({
-    ...frame,
-    fields: frame.fields.map((field) => {
-      const updatedField = { ...field };
+    return {
+      ...frame,
+      fields: frame.fields.map((field) => {
+        const updatedField = { ...field };
 
-      if (field.type === FieldType.time) {
-        updatedField.values = calcTimeSampleSize(field.values, sampleSize);
-      } else if (field.type === FieldType.number) {
-        updatedField.values = calcValueSampleSize(field.values, sampleSize, aggregation);
+        //todo check if we need time, maybe just numbers from 1 to field.length and save as not a time field type but a number?
+        if (updatedField.type === FieldType.time) {
+          updatedField.values = calcTimeSampleSize(updatedField.values, subgroupSize);
+        } else if (field.type === FieldType.number) {
+          updatedField.state = updatedField.state || {};
 
-        if (field.state) {
-          updatedField.state = {
-            ...field.state,
-            range: calculateNumericRange(updatedField.values),
+          const fieldCalcs: FieldCalcs = {
+            lcl: null,
+            ucl: null,
+            mean: null,
+          };
+
+          // replace old calculations with a new set since values may have changed due to aggregations,
+          // rendering cached calculations incorrect.
+          updatedField.state.calcs = fieldCalcs;
+
+          //calculate control charts
+          const controlChartData = calculateControlCharts(updatedField, options.chartType, subgroupSize);
+          if (controlChartData) {
+            updatedField.values = controlChartData.data;
+            fieldCalcs.lcl = controlChartData.lowerControlLimit;
+            fieldCalcs.ucl = controlChartData.upperControlLimit;
+            fieldCalcs.mean = controlChartData.centerLine;
+          } else {
+            //calculate other values based on aggregation type
+            updatedField.values = calcValueSampleSize(updatedField.values, subgroupSize, aggregationType);
+          }
+
+          updatedField.state.range = calculateNumericRange(updatedField.values);
+
+          if (shouldCalculateStandardStats) {
+            const standardStats = calculateStandardStats(updatedField);
+
+            updatedField.state.calcs = {
+              ...standardStats,
+            };
+          }
+
+          updatedField.state.calcs = {
+            ...updatedField.state.calcs,
+            ...fieldCalcs,
           };
         }
-      }
 
-      return updatedField;
-    }),
-  }));
+        return updatedField;
+      }),
+    };
+  });
 }

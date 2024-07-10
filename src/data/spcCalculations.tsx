@@ -1,5 +1,5 @@
 import { AggregationType } from 'types';
-import { getCalcConst } from './calcConst';
+import { ControlChartConstants, getControlChartConstant } from './calcConst';
 import { NumericRange } from '@grafana/data';
 
 function notNanArray(values: number[]) {
@@ -97,7 +97,7 @@ const groupingFunctions = {
 };
 
 export function calcValueSampleSize(values: number[], sampleSize: number, aggType: AggregationType) {
-  return sampleSize === 1 ? values : groupingFunctions[aggType](values, sampleSize);
+  return sampleSize === 1 ? values : groupingFunctions['mean'](values, sampleSize); //todo fix this
 }
 
 export function calcTimeSampleSize(time: number[], sampleSize: number) {
@@ -127,17 +127,17 @@ export function calcUcl(values: number[], aggType: AggregationType, sample: numb
 
   switch (aggType) {
     case 'range':
-      const D4 = getCalcConst(sample, 'd4_range_ucl');
+      const D4 = getControlChartConstant(sample, ControlChartConstants.d4_range_ucl);
       const Ucl_range = D4 * calcRange(values);
       return [Ucl_range];
     case 'standardDeviation':
-      const B4 = getCalcConst(sample, 'b4_sigma_ucl');
+      const B4 = getControlChartConstant(sample, ControlChartConstants.b4_sigma_ucl);
       const Ucl_stdDev = B4 * stdDev(values);
       return [Ucl_stdDev];
     default:
     case 'mean':
-      const A2 = getCalcConst(sample, 'a2_xbar_limit_range');
-      const A3 = getCalcConst(sample, 'a3_xbar_limit_sigma');
+      const A2 = getControlChartConstant(sample, ControlChartConstants.a2_xbar_limit_range);
+      const A3 = getControlChartConstant(sample, ControlChartConstants.a3_xbar_limit_sigma);
 
       const mean = calcMean(values);
 
@@ -155,17 +155,17 @@ export function calcLcl(values: number[], aggType: AggregationType, sample: numb
 
   switch (aggType) {
     case 'range':
-      const D3 = getCalcConst(sample, 'd3_range_lcl');
+      const D3 = getControlChartConstant(sample, ControlChartConstants.d3_range_lcl);
       const Lcl_range = D3 * calcRange(values);
       return [Lcl_range];
     case 'standardDeviation':
-      const B3 = getCalcConst(sample, 'b3_sigma_lcl');
+      const B3 = getControlChartConstant(sample, ControlChartConstants.b3_sigma_lcl);
       const Lcl_stdDev = B3 * stdDev(values);
       return [Lcl_stdDev];
     default:
     case 'mean':
-      const A2 = getCalcConst(sample, 'a2_xbar_limit_range');
-      const A3 = getCalcConst(sample, 'a3_xbar_limit_sigma');
+      const A2 = getControlChartConstant(sample, ControlChartConstants.a2_xbar_limit_range);
+      const A3 = getControlChartConstant(sample, ControlChartConstants.a3_xbar_limit_sigma);
 
       const mean = calcMean(values);
 

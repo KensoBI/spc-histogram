@@ -1,9 +1,10 @@
 import { PanelPlugin, FieldConfigProperty, FieldColorModeId } from '@grafana/data';
 import { commonOptionsBuilder, graphFieldOptions } from '@grafana/ui';
-import { ConstantsListEditor } from 'components/options/ConstantsListEditor';
 import { FieldConfig, Options, defaultOptions } from 'components/Histogram/panelcfg';
 import { SpcHistogramPanel } from 'components/SpcHistogramPanel';
+import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor';
 import { ControlLineEditor } from 'components/options/ControlLineEditor';
+import { SpcChartTyp } from 'types';
 
 export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
 
@@ -49,9 +50,30 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
       });
 
     builder.addSelect({
-      path: 'sampleSize',
-      name: 'Sample size',
-      description: 'Define how many values are grouped to form a sample. Allows for custom input.',
+      path: 'chartType',
+      name: 'Chart type',
+      description: 'Choose the type of control chart to generate',
+      settings: {
+        allowCustomValue: false,
+        options: [
+          { label: 'none', value: SpcChartTyp.none },
+          { label: 'X chart (XmR)', value: SpcChartTyp.x_XmR },
+          { label: 'mR chart (XmR)', value: SpcChartTyp.mR_XmR },
+          { label: 'X chart (Xbar-R)', value: SpcChartTyp.x_XbarR },
+          { label: 'R chart (Xbar-R)', value: SpcChartTyp.r_XbarR },
+          { label: 'X chart (Xbar-S)', value: SpcChartTyp.x_XbarS },
+          { label: 'S chart (Xbar-S)', value: SpcChartTyp.s_XbarS },
+        ],
+      },
+
+      defaultValue: SpcChartTyp.none,
+      category: ['SPC'],
+    });
+
+    builder.addSelect({
+      path: 'subgroupSize',
+      name: 'Subgroup size',
+      description: 'The number of measurements taken within a single subgroup. Allows for custom input.',
       settings: {
         allowCustomValue: true,
         options: [
@@ -65,37 +87,56 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
           { value: 8, label: '8' },
           { value: 9, label: '9' },
           { value: 10, label: '10' },
+          { value: 12, label: '11' },
+          { value: 12, label: '12' },
+          { value: 13, label: '13' },
+          { value: 14, label: '14' },
+          { value: 15, label: '15' },
+          { value: 16, label: '16' },
+          { value: 17, label: '17' },
+          { value: 18, label: '18' },
+          { value: 19, label: '19' },
+          { value: 20, label: '20' },
+          { value: 21, label: '21' },
+          { value: 22, label: '22' },
+          { value: 23, label: '23' },
+          { value: 24, label: '24' },
+          { value: 25, label: '25' },
         ],
       },
       defaultValue: 1,
       category: ['SPC'],
     });
-    builder.addSelect({
+    // builder.addSelect({
+    //   path: 'aggregationType',
+    //   name: 'Aggregation type',
+    //   description: 'Define how each subgroup is calculated.',
+    //   settings: {
+    //     allowCustomValue: false,
+    //     options: aggregationOptions.map<SelectableValue<string>>((i) => ({ label: i.name, value: i.id })),
+    //   },
+    //   // settings: {
+    //   //   allowCustomValue: false,
+    //   //   options: aggregationOptions.filter((aggregation) => aggregation.subgroupSize >= option.subgroupSize)
+
+    //   //     .map<SelectableValue<string>>((i) => ({ label: i.name, value: i.id}))
+
+    //   // },
+    //   defaultValue: 'mean',
+    //   //showIf: (option) => option.subgroupSize > 1,
+    //   category: ['SPC'],
+    // });
+
+    builder.addCustomEditor({
+      id: 'aggregationType',
       path: 'aggregationType',
       name: 'Aggregation type',
-      description: 'Define how each sample is calculated.',
-      settings: {
-        allowCustomValue: false,
-        options: [
-          { label: 'Mean', value: 'mean' },
-          { label: 'Range', value: 'range' },
-          { label: 'Standard deviation', value: 'standardDeviation' },
-        ],
-      },
-      defaultValue: 'mean',
-      showIf: (option) => option.sampleSize > 1,
+      description: 'Define how each subgroup is calculated.',
+      editor: AggregationTypeEditor,
+      defaultValue: 'none',
       category: ['SPC'],
     });
-    // builder.addCustomEditor({
-    //   id: 'spc',
-    //   path: 'spc',
-    //   name: 'SPC options',
-    //   description: 'Select options for SPC chart. You can enter a custom sample size value by typing a number.',
-    //   defaultValue: defaultOptions.spc,
-    //   editor: SpcOptionEditor,
-    //   category: ['SPC'],
-    //   showIf: (_, data) => parseData(data ?? []).hasTableData === false,
-    // });
+
     builder.addCustomEditor({
       id: 'controlLines',
       path: 'controlLines',
@@ -105,15 +146,6 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
       defaultValue: [],
       category: ['SPC'],
     });
-    // builder.addCustomEditor({
-    //   id: 'limitOptions',
-    //   path: 'limits',
-    //   name: 'Limits',
-    //   description: 'Upper and lower limits for the chart',
-    //   defaultValue: defaultOptions.limits,
-    //   editor: LimitsEditor,
-    //   category: ['SPC'],
-    // });
 
     commonOptionsBuilder.addLegendOptions(builder);
 

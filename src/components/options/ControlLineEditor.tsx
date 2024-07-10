@@ -16,13 +16,11 @@ import {
 } from '@grafana/ui';
 import { ControlLine, Options } from 'components/Histogram/panelcfg';
 import { defaultConstantColor } from 'types';
-import { SpcControl, allSpcControls } from 'data/spcParams';
+import { ControlLineReducer, ControlLineReducerId, controlLineReducers } from 'data/spcReducers';
 
 export const ControlLineEditor = ({ item, value, onChange, context }: StandardEditorProps<ControlLine[], Options>) => {
   const styles = useStyles2(getStyles);
   const [expandedHandles, setExpandedHandles] = useState<number[]>([]);
-  const sampleSize = context.options?.sampleSize ?? 1;
-  const aggregationType = context.options?.aggregationType;
 
   const addExpandedHandle = (handle: number) => {
     setExpandedHandles([...expandedHandles, handle]);
@@ -45,15 +43,16 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     onChange(newControlLines);
   };
 
-  const addControlLine = (selectedControl: SelectableValue<SpcControl>) => {
+  const addControlLine = (selectedControl: SelectableValue<ControlLineReducer>) => {
     if (!selectedControl.value) {
       throw new Error('Selected SPC control is not valid.');
     }
 
     const selectedSpcControl = selectedControl.value;
 
-    const newControlLine = {
-      name: selectedSpcControl.label,
+    const newControlLine: ControlLine = {
+      reducerId: selectedSpcControl.id,
+      name: selectedSpcControl.name,
       position: 0,
       seriesIndex: 0,
       lineWidth: 1,
@@ -61,7 +60,6 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
       fill: 0,
       fillDirection: 0,
       fillOpacity: 20,
-      type: selectedSpcControl.type,
     };
     const newControlLines = [...value, newControlLine];
     onChange(newControlLines);
@@ -102,22 +100,23 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
           menuPlacement="auto"
           isFullWidth={true}
           size="md"
-          options={allSpcControls
-            .filter((control) => {
-              if (sampleSize > 1 && sampleSize <= 10) {
-                if (aggregationType === 'mean') {
-                  // Show all standard types, sbar and rbar
-                  return (
-                    control.type === 'standard' ||
-                    control.type === 'sbar' ||
-                    control.type === 'rbar' ||
-                    control.type === 'computed'
-                  );
-                }
-              }
-              return control.type === 'standard' || control.type === 'computed' || control.type === 'xbar';
-            })
-            .map<SelectableValue<SpcControl>>((i) => ({ label: i.label, value: i, description: i.description }))}
+          options={controlLineReducers
+            //.filter((control) => control.aggregationTypes.includes(aggregationType))
+            // {
+            //   if (sampleSize > 1 && sampleSize <= 10) {
+            //     if (aggregationType === 'mean') {
+            //       // Show all custom types, sbar and rbar
+            //       return (
+            //         control.type === 'custom' ||
+            //         control.type === 'sbar' ||
+            //         control.type === 'rbar' ||
+            //         control.type === 'computed'
+            //       );
+            //     }
+            //   }
+            //   return control.type === 'custom' || control.type === 'computed' || control.type === 'xbar';
+            // })
+            .map<SelectableValue<ControlLineReducer>>((i) => ({ label: i.name, value: i, description: i.description }))}
           onChange={(selectedControl) => addControlLine(selectedControl)}
         />
       </div>
@@ -159,15 +158,17 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                     onChange={(e) => handleControlLineChange(index, 'name', e.currentTarget.value)}
                   />
                 </Field>
-                <Field label="Position" description="Numeric position at which the control line is drawn. ">
-                  <Input
-                    placeholder={'Value'}
-                    type="number"
-                    step="0.01"
-                    value={controlLine.position}
-                    onChange={(e) => handleControlLineChange(index, 'position', parseFloat(e.currentTarget.value))}
-                  />
-                </Field>
+                {controlLine.reducerId === ControlLineReducerId.custom && (
+                  <Field label="Position" description="Numeric position at which the control line is drawn. ">
+                    <Input
+                      placeholder={'Value'}
+                      type="number"
+                      step="0.01"
+                      value={controlLine.position}
+                      onChange={(e) => handleControlLineChange(index, 'position', parseFloat(e.currentTarget.value))}
+                    />
+                  </Field>
+                )}
                 <Field label="Series" description="Select the series for which to calculate this control.">
                   <Select
                     placeholder="Select series"

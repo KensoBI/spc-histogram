@@ -13,7 +13,58 @@ export type LimitConfigItem = {
   color: string;
 };
 
-export type AggregationType = 'mean' | 'range' | 'standardDeviation';
+export enum SpcChartTyp {
+  none = 'none',
+  x_XmR = 'X-XmR',
+  mR_XmR = 'mR-XmR',
+  x_XbarR = 'X-XbarR',
+  r_XbarR = 'R-XbarR',
+  x_XbarS = 'X-XbarS',
+  s_XbarS = 'S-XbarS',
+}
+
+export type AggregationType = 'none' | 'mean' | 'range' | 'standardDeviation' | 'movingRange';
+
+export type AggregationOption = {
+  id: string;
+  name: string;
+  subgroupSize: number;
+};
+
+export interface ControlChartData {
+  centerLine: number;
+  upperControlLimit: number;
+  lowerControlLimit: number;
+  data: number[];
+}
+
+export const aggregationOptions: AggregationOption[] = [
+  {
+    id: 'none',
+    name: 'No aggregation',
+    subgroupSize: 1,
+  },
+  {
+    id: 'mr',
+    name: 'Moving-range',
+    subgroupSize: 1,
+  },
+  {
+    id: 'mean',
+    name: 'Mean',
+    subgroupSize: 2,
+  },
+  {
+    id: 'range',
+    name: 'Range',
+    subgroupSize: 2,
+  },
+  {
+    id: 'standardDeviation',
+    name: 'Standard deviation',
+    subgroupSize: 2,
+  },
+];
 
 export type SpcOptions = {
   sampleSize: number;
