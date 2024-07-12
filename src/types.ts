@@ -1,7 +1,10 @@
 import { PanelProps } from '@grafana/data';
 import { Options } from 'components/Histogram/panelcfg';
 
-export type ConstantItemOptions = {
+/**
+ * @deprecated This property should only be accessed in the migration from v1 to v2
+ */
+type ConstantItemOptions = {
   name: string;
   color: string;
   title: string;
@@ -25,12 +28,6 @@ export enum SpcChartTyp {
 
 export type AggregationType = 'none' | 'mean' | 'range' | 'standardDeviation' | 'movingRange';
 
-export type AggregationOption = {
-  id: string;
-  name: string;
-  subgroupSize: number;
-};
-
 export interface ControlChartData {
   centerLine: number;
   upperControlLimit: number;
@@ -38,34 +35,9 @@ export interface ControlChartData {
   data: number[];
 }
 
-export const aggregationOptions: AggregationOption[] = [
-  {
-    id: 'none',
-    name: 'No aggregation',
-    subgroupSize: 1,
-  },
-  {
-    id: 'mr',
-    name: 'Moving-range',
-    subgroupSize: 1,
-  },
-  {
-    id: 'mean',
-    name: 'Mean',
-    subgroupSize: 2,
-  },
-  {
-    id: 'range',
-    name: 'Range',
-    subgroupSize: 2,
-  },
-  {
-    id: 'standardDeviation',
-    name: 'Standard deviation',
-    subgroupSize: 2,
-  },
-];
-
+/**
+ * @deprecated This property should only be accessed in the migration from v1 to v2
+ */
 export type SpcOptions = {
   sampleSize: number;
   aggregation?: AggregationType;
@@ -74,14 +46,24 @@ export type SpcOptions = {
   usl?: number;
 };
 
+/**
+ * @deprecated This property should only be accessed in the migration from v1 to v2
+ */
 export type LimitOptions = {
   up?: LimitConfigItem;
   down?: LimitConfigItem;
 };
+
+/**
+ * @deprecated This property should only be accessed in the migration from v1 to v2
+ */
 export type ConstantsOptions = {
   items: ConstantItemOptions[];
 };
 
+/**
+ * @deprecated This property should only be accessed in the migration from v1 to v2
+ */
 export type TimeSeriesOptions = {
   fill?: number;
   lineWidth?: number;
@@ -108,14 +90,6 @@ export const defaultTimeseriesOptions: TimeSeriesOptions = {
   lineColor: 'rgb(31, 96, 196)',
   showLegend: true,
   decimals: 2,
-};
-
-export const defaultSpcOptions: SpcOptions = {
-  sampleSize: 1,
-  aggregation: 'mean',
-  nominal: undefined,
-  lsl: undefined,
-  usl: undefined,
 };
 
 export const defaultConstantColor = '#37872d';

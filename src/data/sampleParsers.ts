@@ -8,11 +8,14 @@ import { controlLineReducers } from './spcReducers';
 export function sampleParser(series: DataFrame[], options: Options): DataFrame[] {
   const subgroupSize = options.subgroupSize < 1 ? 1 : options.subgroupSize;
   const aggregationType = options.aggregationType ?? 'none';
-  const standardReducers = controlLineReducers.filter((p) => p.isStandard).map((p) => p.name);
+  const standardReducers = controlLineReducers.filter((p) => p.isStandard).map((p) => p.id);
+
+  //todo check if structure changed if not, get calcs from useState
 
   return series.map((frame, frameIndex) => {
     const shouldCalculateStandardStats =
-      options.controlLines.filter((c) => c.seriesIndex === frameIndex && standardReducers.includes(c.name)).length > 0;
+      options.controlLines.filter((c) => c.seriesIndex === frameIndex && standardReducers.includes(c.reducerId))
+        .length > 0;
 
     return {
       ...frame,

@@ -15,12 +15,34 @@ import {
   useStyles2,
 } from '@grafana/ui';
 import { ControlLine, Options } from 'components/Histogram/panelcfg';
-import { defaultConstantColor } from 'types';
+import { SpcChartTyp, defaultConstantColor } from 'types';
 import { ControlLineReducer, ControlLineReducerId, controlLineReducers } from 'data/spcReducers';
 
 export const ControlLineEditor = ({ item, value, onChange, context }: StandardEditorProps<ControlLine[], Options>) => {
   const styles = useStyles2(getStyles);
+  const chartType = context.options.chartType ? context.options.chartType : SpcChartTyp.none;
   const [expandedHandles, setExpandedHandles] = useState<number[]>([]);
+  const [selectedChartType, setSelectedChartType] = useState<SpcChartTyp>(chartType);
+
+  if (chartType !== selectedChartType) {
+    //selected chart type option was changed
+    setSelectedChartType(chartType);
+
+    if (chartType === SpcChartTyp.none) {
+      // remove lcl, ucl if they exist
+      const spcControlIds = [ControlLineReducerId.lcl, ControlLineReducerId.ucl];
+      const newControlLines = value.filter((cl) => !spcControlIds.includes(cl.reducerId));
+
+      onChange(newControlLines);
+    } else {
+      // add lcl, ucl, and mean for control charts
+      const spcControls = controlLineReducers.filter(
+        (c) =>
+          c.id === ControlLineReducerId.lcl || c.id === ControlLineReducerId.ucl || c.id === ControlLineReducerId.mean
+      );
+      addControlLines(spcControls);
+    }
+  }
 
   const addExpandedHandle = (handle: number) => {
     setExpandedHandles([...expandedHandles, handle]);
@@ -43,31 +65,14 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     onChange(newControlLines);
   };
 
-  const addControlLine = (selectedControl: SelectableValue<ControlLineReducer>) => {
+  const onControlLineChange = (selectedControl: SelectableValue<ControlLineReducer>) => {
     if (!selectedControl.value) {
       throw new Error('Selected SPC control is not valid.');
     }
-
-    const selectedSpcControl = selectedControl.value;
-
-    const newControlLine: ControlLine = {
-      reducerId: selectedSpcControl.id,
-      name: selectedSpcControl.name,
-      position: 0,
-      seriesIndex: 0,
-      lineWidth: 1,
-      lineColor: selectedSpcControl.color,
-      fill: 0,
-      fillDirection: 0,
-      fillOpacity: 20,
-    };
-    const newControlLines = [...value, newControlLine];
-    onChange(newControlLines);
-
-    setExpandedHandles([newControlLines.length - 1]);
+    addControlLine(selectedControl.value);
   };
 
-  const removeControlLineByName = (controlIndexToRemove: number) => {
+  const onRemoveControlLineByNameClick = (controlIndexToRemove: number) => {
     const newControlLines = value.filter((_, i) => i !== controlIndexToRemove);
     onChange(newControlLines);
 
@@ -77,6 +82,64 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
       .map((handleIndex) => (handleIndex > controlIndexToRemove ? handleIndex - 1 : handleIndex));
     setExpandedHandles(newIndexes);
   };
+
+  function createControlLine(reducer: ControlLineReducer): ControlLine {
+    // if (reducer.computed || reducer.isStandard) {
+    //   //we should only have one of the computed and standard lines for each
+    // }
+
+    return {
+      reducerId: reducer.id,
+      name: reducer.name,
+      position: 0,
+      seriesIndex: 0,
+      lineWidth: 1,
+      lineColor: reducer.color,
+      fill: 0,
+      fillDirection: 0,
+      fillOpacity: 20,
+    };
+  }
+
+  function addControlLine(reducer: ControlLineReducer) {
+    // if (reducer.computed || reducer.isStandard) {
+    //   //we should only have one of the computed and standard lines for each
+    // }
+
+    const newControlLine = createControlLine(reducer);
+    if (!canAddReducer(reducer)) {
+      return;
+    }
+
+    const newControlLines = [...value, newControlLine];
+    onChange(newControlLines);
+
+    setExpandedHandles([newControlLines.length - 1]);
+  }
+
+  function addControlLines(reducers: ControlLineReducer[]) {
+    const controlLines = reducers.filter((reducer) => canAddReducer(reducer)).map((cl) => createControlLine(cl));
+    if (controlLines.length > 0) {
+      const newControlLines = [...value, ...controlLines];
+      onChange(newControlLines);
+      setExpandedHandles([newControlLines.length - 1]);
+    }
+  }
+
+  function canAddReducer(reducer: ControlLineReducer): boolean {
+    if (!reducer.computed && !reducer.isStandard) {
+      //we can add as many constant control lines as we want
+      return true;
+    }
+
+    const existingClr = value.filter((cl) => cl.reducerId === reducer.id);
+
+    if (existingClr.length >= context.data.length) {
+      return false;
+    }
+
+    return true;
+  }
 
   function getControlLineDisplayName(controlLine: ControlLine): string {
     if (context.data && context.data.length > 1 && context.data[controlLine.seriesIndex]) {
@@ -100,24 +163,12 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
           menuPlacement="auto"
           isFullWidth={true}
           size="md"
-          options={controlLineReducers
-            //.filter((control) => control.aggregationTypes.includes(aggregationType))
-            // {
-            //   if (sampleSize > 1 && sampleSize <= 10) {
-            //     if (aggregationType === 'mean') {
-            //       // Show all custom types, sbar and rbar
-            //       return (
-            //         control.type === 'custom' ||
-            //         control.type === 'sbar' ||
-            //         control.type === 'rbar' ||
-            //         control.type === 'computed'
-            //       );
-            //     }
-            //   }
-            //   return control.type === 'custom' || control.type === 'computed' || control.type === 'xbar';
-            // })
-            .map<SelectableValue<ControlLineReducer>>((i) => ({ label: i.name, value: i, description: i.description }))}
-          onChange={(selectedControl) => addControlLine(selectedControl)}
+          options={controlLineReducers.map<SelectableValue<ControlLineReducer>>((i) => ({
+            label: i.name,
+            value: i,
+            description: i.description,
+          }))}
+          onChange={(selectedControl) => onControlLineChange(selectedControl)}
         />
       </div>
 
@@ -140,7 +191,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                     icon="trash-alt"
                     size="sm"
                     type="button"
-                    onClick={() => removeControlLineByName(index)}
+                    onClick={() => onRemoveControlLineByNameClick(index)}
                   >
                     Remove control
                   </Button>

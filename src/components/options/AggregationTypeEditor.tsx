@@ -2,7 +2,40 @@ import React from 'react';
 import { Select } from '@grafana/ui';
 import { SelectableValue, StandardEditorProps } from '@grafana/data';
 import { Options } from 'components/Histogram/panelcfg';
-import { aggregationOptions } from 'types';
+
+type AggregationOption = {
+  id: string;
+  name: string;
+  subgroupSize: number;
+};
+
+const aggregationOptions: AggregationOption[] = [
+  {
+    id: 'none',
+    name: 'No aggregation',
+    subgroupSize: 1,
+  },
+  {
+    id: 'mr',
+    name: 'Moving-range',
+    subgroupSize: 1,
+  },
+  {
+    id: 'mean',
+    name: 'Mean',
+    subgroupSize: 2,
+  },
+  {
+    id: 'range',
+    name: 'Range',
+    subgroupSize: 2,
+  },
+  {
+    id: 'standardDeviation',
+    name: 'Standard deviation',
+    subgroupSize: 2,
+  },
+];
 
 export const AggregationTypeEditor = ({ value, onChange, context }: StandardEditorProps<string, Options>) => {
   return (

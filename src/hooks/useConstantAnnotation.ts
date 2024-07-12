@@ -1,64 +1,64 @@
-import { ConstantAnnotation } from 'components/Histogram/AnnotationPlugin';
-import React from 'react';
+// import { ConstantAnnotation } from 'components/Histogram/AnnotationPlugin';
+// import React from 'react';
 
-//import { css } from '@emotion/css';
-import { usePanelContext } from '@grafana/ui';
-import { parseData } from 'data/parseData';
-//import { PanelPropsProvider } from './PanelPropsProvider';
-//import { TimeseriesSettings, defaultTimeseriesSettings } from './Histogram/types';
-import { calcSpc } from 'data/calcSpc';
+// //import { css } from '@emotion/css';
+// import { usePanelContext } from '@grafana/ui';
+// import { parseData } from 'data/parseData';
+// //import { PanelPropsProvider } from './PanelPropsProvider';
+// //import { TimeseriesSettings, defaultTimeseriesSettings } from './Histogram/types';
+// //import { calcSpc } from 'data/calcSpc';
 
-import { DataFrame } from '@grafana/data';
-import { Options } from 'components/Histogram/panelcfg';
+// import { DataFrame } from '@grafana/data';
+// import { Options } from 'components/Histogram/panelcfg';
 
-export default function useConstantAnnotation(series: DataFrame[], options: Options): ConstantAnnotation[] {
-  const { features, hasTableData, hasCustomTableData } = React.useMemo(() => parseData(series), [series]);
+// export default function useConstantAnnotation(series: DataFrame[], options: Options): ConstantAnnotation[] {
+// const { features, hasTableData, hasCustomTableData } = React.useMemo(() => parseData(series), [series]);
 
-  const [, selectedCharacteristic] = React.useMemo(() => {
-    if (features.length === 0) {
-      return [null, null];
-    }
-    let selectedFeature = features[0];
-    if (!hasTableData) {
-      selectedFeature = calcSpc(selectedFeature, options.spc, options.constants);
-    }
-    const keys = Object.keys(selectedFeature.characteristics);
-    if (keys.length === 0) {
-      return [null, null];
-    }
-    const selectedCharacteristic = selectedFeature.characteristics[keys[0]];
-    return [selectedFeature, selectedCharacteristic];
-  }, [features, hasTableData, options.constants, options.spc]);
+// const [, selectedCharacteristic] = React.useMemo(() => {
+//   if (features.length === 0) {
+//     return [null, null];
+//   }
+//   let selectedFeature = features[0];
+//   if (!hasTableData) {
+//     selectedFeature = calcSpc(selectedFeature, options.spc, options.constants);
+//   }
+//   const keys = Object.keys(selectedFeature.characteristics);
+//   if (keys.length === 0) {
+//     return [null, null];
+//   }
+//   const selectedCharacteristic = selectedFeature.characteristics[keys[0]];
+//   return [selectedFeature, selectedCharacteristic];
+// }, [features, hasTableData, options.constants, options.spc]);
 
-  const context = usePanelContext();
-  React.useEffect(() => {
-    context.onInstanceStateChange?.({
-      characteristicKeys: selectedCharacteristic?.table ? Object.keys(selectedCharacteristic.table) : null,
-      hasTableData,
-      hasCustomTableData,
-    });
-  }, [context, hasTableData, selectedCharacteristic, hasCustomTableData]);
+// const context = usePanelContext();
+// React.useEffect(() => {
+//   context.onInstanceStateChange?.({
+//     characteristicKeys: selectedCharacteristic?.table ? Object.keys(selectedCharacteristic.table) : null,
+//     hasTableData,
+//     hasCustomTableData,
+//   });
+// }, [context, hasTableData, selectedCharacteristic, hasCustomTableData]);
 
-  const annotations: ConstantAnnotation[] = [];
-  const constantItemOptionsList = options.constants?.items;
-  const table = selectedCharacteristic?.table;
+//   const annotations: ConstantAnnotation[] = [];
+//   const constantItemOptionsList = options.controlLines
+//   const table = selectedCharacteristic?.table;
 
-  if (!constantItemOptionsList) {
-    return annotations;
-  }
+//   if (!constantItemOptionsList) {
+//     return annotations;
+//   }
 
-  constantItemOptionsList.map((option) =>
-    annotations.push({
-      color: option.color,
-      time: table ? table[option.name] : undefined,
-      type: 'flag',
-      title: option.title,
-      lineWidth: option.lineWidth,
-    })
-  );
+//   constantItemOptionsList.map((option) =>
+//     annotations.push({
+//       color: option.color,
+//       time: table ? table[option.name] : undefined,
+//       type: 'flag',
+//       title: option.title,
+//       lineWidth: option.lineWidth,
+//     })
+//   );
 
-  return annotations;
-}
+//   return annotations;
+// }
 
 // export default function useConstantAnnotation(
 //   constantItemOptionsList?: ConstantItemOptions[],

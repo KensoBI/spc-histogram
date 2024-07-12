@@ -5,6 +5,7 @@ import {
   HideableFieldConfig,
   GraphGradientMode,
 } from '@grafana/schema';
+import { ControlLineReducerId } from 'data/spcReducers';
 import { AggregationType, ConstantsOptions, SpcChartTyp, SpcOptions, TimeSeriesOptions } from 'types';
 
 export interface Options extends OptionsWithLegend, OptionsWithTooltip {
@@ -29,10 +30,17 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
   aggregationType: AggregationType;
   controlLines: ControlLine[];
 
-  //all below are not needed
-  //limits?: LimitOptions;
+  /**
+   * @deprecated This property was migrated to dimensionFilters and should only be accessed in the migration
+   */
   constants?: ConstantsOptions;
+  /**
+   * @deprecated This property should only be accessed in the migration from v1 to v2
+   */
   timeseries?: TimeSeriesOptions;
+  /**
+   * @deprecated This property should only be accessed in the migration from v1 to v2
+   */
   spc?: SpcOptions;
 }
 
@@ -45,7 +53,7 @@ export interface ControlLine {
   fill: number;
   fillDirection: number;
   fillOpacity: number;
-  reducerId: string;
+  reducerId: ControlLineReducerId;
 }
 
 export interface FieldConfig extends AxisConfig, HideableFieldConfig {

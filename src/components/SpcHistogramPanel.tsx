@@ -7,11 +7,13 @@ import { ChartPanelProps } from 'types';
 import { useParseOptions } from '../hooks/useParseOptions';
 
 import { sampleParser } from 'data/sampleParsers';
+import addCalcsToControlLines from 'hooks/useControlLineBuilder';
 
 export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelProps) => {
   const theme = useTheme2();
   const { value: spcOptions } = useParseOptions(options);
   const samples = sampleParser(data.series, options);
+  const controlLines = addCalcsToControlLines(data.series, options);
   //const annotations = useConstantAnnotation(samples, spcOptions);
 
   const histogram = useMemo(() => {

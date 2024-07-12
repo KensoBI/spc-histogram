@@ -18,7 +18,7 @@ export enum ControlLineReducerId {
 type SpcReducer = (field: Field, subgroupSize: number) => FieldCalcs;
 
 export interface ControlLineReducer {
-  id: string;
+  id: ControlLineReducerId;
   name: string;
   description?: string;
   computed: boolean;
