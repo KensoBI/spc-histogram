@@ -50,7 +50,6 @@ export interface ControlLine {
   seriesIndex: number;
   lineWidth: number;
   lineColor: string;
-  fill: number;
   fillDirection: number;
   fillOpacity: number;
   reducerId: ControlLineReducerId;

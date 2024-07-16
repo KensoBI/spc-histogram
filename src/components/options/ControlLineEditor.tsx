@@ -83,29 +83,28 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     setExpandedHandles(newIndexes);
   };
 
-  function createControlLine(reducer: ControlLineReducer): ControlLine {
-    // if (reducer.computed || reducer.isStandard) {
-    //   //we should only have one of the computed and standard lines for each
-    // }
+  const reducersOptions = controlLineReducers
+    .filter((reducer) => canAddReducer(reducer))
+    .map<SelectableValue<ControlLineReducer>>((i) => ({
+      label: i.name,
+      value: i,
+      description: i.description,
+    }));
 
+  function createControlLine(reducer: ControlLineReducer): ControlLine {
     return {
       reducerId: reducer.id,
       name: reducer.name,
       position: 0,
       seriesIndex: 0,
-      lineWidth: 1,
+      lineWidth: 4,
       lineColor: reducer.color,
-      fill: 0,
       fillDirection: 0,
-      fillOpacity: 20,
+      fillOpacity: 10,
     };
   }
 
   function addControlLine(reducer: ControlLineReducer) {
-    // if (reducer.computed || reducer.isStandard) {
-    //   //we should only have one of the computed and standard lines for each
-    // }
-
     const newControlLine = createControlLine(reducer);
     if (!canAddReducer(reducer)) {
       return;
@@ -163,11 +162,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
           menuPlacement="auto"
           isFullWidth={true}
           size="md"
-          options={controlLineReducers.map<SelectableValue<ControlLineReducer>>((i) => ({
-            label: i.name,
-            value: i,
-            description: i.description,
-          }))}
+          options={reducersOptions}
           onChange={(selectedControl) => onControlLineChange(selectedControl)}
         />
       </div>
@@ -193,7 +188,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                     type="button"
                     onClick={() => onRemoveControlLineByNameClick(index)}
                   >
-                    Remove control
+                    Remove
                   </Button>
                 </Stack>
               </Stack>
@@ -235,7 +230,13 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                   />
                 </Field>
                 <Field label="Line width">
-                  <Slider min={1} max={10} step={1} value={controlLine.lineWidth} />
+                  <Slider
+                    min={1}
+                    max={10}
+                    step={1}
+                    value={controlLine.lineWidth}
+                    onChange={(value) => handleControlLineChange(index, 'lineWidth', value)}
+                  />
                 </Field>
                 <Field label="Line color">
                   <div style={{ width: '18px' }}>
@@ -251,14 +252,14 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                 </Field>
                 <Field label="Fill">
                   <RadioButtonGroup
-                    value={controlLine.fill}
+                    value={controlLine.fillDirection}
                     options={[
                       { description: 'Left fill', value: -1, icon: 'arrow-to-right' },
                       { description: 'No fill', value: 0, icon: 'eye-slash' },
                       { description: 'Right fill', value: 1, icon: 'arrow-from-right' },
                     ]}
                     onChange={(value) => {
-                      handleControlLineChange(index, 'fill', value);
+                      handleControlLineChange(index, 'fillDirection', value);
                     }}
                   ></RadioButtonGroup>
                 </Field>

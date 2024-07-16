@@ -21,6 +21,7 @@ export type Region = AnnotationBase & {
   type: 'region';
   timeStart?: number;
   timeEnd?: number;
+  fillOpacity: number;
 };
 
 export type ConstantAnnotation = Flag | Region;
@@ -142,6 +143,7 @@ export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotation
       if (!ctx) {
         return;
       }
+
       ctx.save();
       ctx.beginPath();
       ctx.rect(u.bbox.left, u.bbox.top, u.bbox.width, u.bbox.height);
@@ -161,12 +163,15 @@ export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotation
         ctx.closePath();
       };
 
-      const renderRect = (valStart: number | undefined, valEnd: number | undefined, color: string) => {
+      const renderRect = (valStart: number | undefined, valEnd: number | undefined, color: string, opacity: number) => {
         const x0 = valStart != null ? u.valToPos(valStart, 'x', true) : u.bbox.left;
         const x1 = valEnd != null ? u.valToPos(valEnd, 'x', true) : u.bbox.left + u.bbox.width;
-        ctx.fillStyle = colorManipulator.alpha(color, 0.1);
+        const fillOpacity = opacity / 100;
+        ctx.beginPath(); // Start a new path for the rectangle
+        ctx.fillStyle = colorManipulator.alpha(color, fillOpacity);
         ctx.rect(x0, u.bbox.top, x1 - x0, u.bbox.height);
         ctx.fill();
+        ctx.closePath(); // Close the path
       };
 
       for (let i = 0; i < annotationsRef.current.length; i++) {
@@ -183,7 +188,7 @@ export const AnnotationsPlugin: React.FC<AnnotationsPluginProps> = ({ annotation
             x: xCssPixelPosition + u.over.offsetLeft,
           });
         } else if (entity.type === 'region') {
-          renderRect(entity.timeStart, entity.timeEnd, lineColor);
+          renderRect(entity.timeStart, entity.timeEnd, lineColor, entity.fillOpacity);
 
           const x0CssPixelPosition = entity.timeStart ? u.valToPos(entity.timeStart, 'x', false) : undefined;
           const x1CssPixelPosition = entity.timeEnd ? u.valToPos(entity.timeEnd, 'x', false) : undefined;
