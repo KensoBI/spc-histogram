@@ -1,6 +1,6 @@
 import { PanelPlugin, FieldConfigProperty, FieldColorModeId } from '@grafana/data';
 import { commonOptionsBuilder, graphFieldOptions } from '@grafana/ui';
-import { FieldConfig, Options, defaultOptions } from 'components/Histogram/panelcfg';
+import { FieldConfig, Options, defaultOptions } from 'panelcfg';
 import { SpcHistogramPanel } from 'components/SpcHistogramPanel';
 import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor';
 import { ControlLineEditor } from 'components/options/ControlLineEditor';

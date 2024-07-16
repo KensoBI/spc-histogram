@@ -14,9 +14,11 @@ import {
   ValuePicker,
   useStyles2,
 } from '@grafana/ui';
-import { ControlLine, Options } from 'components/Histogram/panelcfg';
-import { SpcChartTyp, defaultConstantColor } from 'types';
+import { ControlLine, Options } from 'panelcfg';
+import { SpcChartTyp } from 'types';
 import { ControlLineReducer, ControlLineReducerId, controlLineReducers } from 'data/spcReducers';
+
+const defaultConstantColor = '#37872d';
 
 export const ControlLineEditor = ({ item, value, onChange, context }: StandardEditorProps<ControlLine[], Options>) => {
   const styles = useStyles2(getStyles);

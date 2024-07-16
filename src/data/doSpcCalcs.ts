@@ -1,11 +1,11 @@
 import { DataFrame, FieldCalcs, FieldType } from '@grafana/data';
 import { calcTimeSampleSize, calcValueSampleSize, calculateNumericRange } from './spcCalculations';
-import { Options } from 'components/Histogram/panelcfg';
+import { Options } from 'panelcfg';
 import { calculateControlCharts, calculateStandardStats } from 'calcs/standard';
 import { controlLineReducers } from './spcReducers';
 
 //apply data aggregations to all series
-export function sampleParser(series: DataFrame[], options: Options): DataFrame[] {
+export function doSpcCalcs(series: DataFrame[], options: Options): DataFrame[] {
   const subgroupSize = options.subgroupSize < 1 ? 1 : options.subgroupSize;
   const aggregationType = options.aggregationType ?? 'none';
   const standardReducers = controlLineReducers.filter((p) => p.isStandard).map((p) => p.id);

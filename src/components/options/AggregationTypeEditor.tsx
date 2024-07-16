@@ -1,7 +1,7 @@
 import React from 'react';
 import { Select } from '@grafana/ui';
 import { SelectableValue, StandardEditorProps } from '@grafana/data';
-import { Options } from 'components/Histogram/panelcfg';
+import { Options } from 'panelcfg';
 
 type AggregationOption = {
   id: string;

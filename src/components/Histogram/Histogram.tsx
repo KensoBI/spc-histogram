@@ -20,7 +20,7 @@ import {
   measureText,
   UPLOT_AXIS_FONT_SIZE,
 } from '@grafana/ui';
-import { defaultFieldConfig, FieldConfig, Options } from './panelcfg';
+import { defaultFieldConfig, FieldConfig, Options } from '../../panelcfg';
 import { getStackingGroups, preparePlotData2 } from 'utils/utils';
 
 function incrRoundDn(num: number, incr: number) {

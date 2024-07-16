@@ -1,3 +1,4 @@
+import { PanelProps } from '@grafana/data';
 import {
   AxisConfig,
   OptionsWithLegend,
@@ -6,7 +7,7 @@ import {
   GraphGradientMode,
 } from '@grafana/schema';
 import { ControlLineReducerId } from 'data/spcReducers';
-import { AggregationType, ConstantsOptions, SpcChartTyp, SpcOptions, TimeSeriesOptions } from 'types';
+import { AggregationType, SpcChartTyp } from 'types';
 
 export interface Options extends OptionsWithLegend, OptionsWithTooltip {
   /**
@@ -29,19 +30,6 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
   subgroupSize: number;
   aggregationType: AggregationType;
   controlLines: ControlLine[];
-
-  /**
-   * @deprecated This property was migrated to dimensionFilters and should only be accessed in the migration
-   */
-  constants?: ConstantsOptions;
-  /**
-   * @deprecated This property should only be accessed in the migration from v1 to v2
-   */
-  timeseries?: TimeSeriesOptions;
-  /**
-   * @deprecated This property should only be accessed in the migration from v1 to v2
-   */
-  spc?: SpcOptions;
 }
 
 export interface ControlLine {
@@ -81,3 +69,5 @@ export const defaultOptions: Partial<Options> = {
   bucketCount: 30,
   bucketOffset: 0,
 };
+
+export interface ChartPanelProps extends PanelProps<Options> {}

@@ -1,80 +1,65 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { buildHistogram, getHistogramFields } from '@grafana/data';
 import { histogramFieldsToFrame } from '../data/transform';
 import { useTheme2 } from '@grafana/ui';
 import { Histogram, getBucketSize } from './Histogram/Histogram';
-import { ChartPanelProps } from 'types';
-import { useParseOptions } from '../hooks/useParseOptions';
-
-import { sampleParser } from 'data/sampleParsers';
-
-import useConstantAnnotation from 'hooks/useConstantAnnotation';
-import { AnnotationsPlugin } from './Histogram/AnnotationPlugin';
+import { LimitAnnotations } from './LimitAnnotations/LimitAnnotations';
+import { doSpcCalcs } from 'data/doSpcCalcs';
+import buildLimitAnnotations from './LimitAnnotations/buildLimitAnnotations';
+import { ChartPanelProps } from 'panelcfg';
 
 export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelProps) => {
   const theme = useTheme2();
-  const { value: spcOptions } = useParseOptions(options);
-  const samples = sampleParser(data.series, options);
-  //const controlLines = addCalcsToControlLines(data.series, options);
-  const annotations = useConstantAnnotation(data.series, options);
-  //const annotations = useConstantAnnotation(samples, spcOptions);
+  const { samples, limitAnnotations } = useMemo(() => {
+    const samplesWithCalcs = doSpcCalcs(data.series, options);
+    const limitAnnotationsResult = buildLimitAnnotations(data.series, options);
+    return { samples: samplesWithCalcs, limitAnnotations: limitAnnotationsResult };
+  }, [data.series, options]);
+
+  const stampedSamples = useMemo(() => {
+    return samples.map((frame, frameIndex) => ({
+      ...frame,
+      fields: frame.fields.map((field, fieldIndex) => ({
+        ...field,
+        state: {
+          ...field.state,
+          origin: { frameIndex, fieldIndex },
+        },
+      })),
+    }));
+  }, [samples]);
 
   const histogram = useMemo(() => {
-    if (!samples.length) {
+    if (!stampedSamples.length) {
       return undefined;
     }
 
-    // stamp origins for legend's calcs (from raw values)
-    samples.forEach((frame, frameIndex) => {
-      frame.fields.forEach((field, fieldIndex) => {
-        field.state = {
-          ...field.state,
-          origin: {
-            frameIndex,
-            fieldIndex,
-          },
-        };
-      });
-    });
-
-    if (samples.length === 1) {
-      const info = getHistogramFields(samples[0]);
+    if (stampedSamples.length === 1) {
+      const info = getHistogramFields(stampedSamples[0]);
       if (info) {
         return histogramFieldsToFrame(info);
       }
     }
-    const hist = buildHistogram(samples, spcOptions);
+    const hist = buildHistogram(stampedSamples, options);
     if (!hist) {
       return undefined;
     }
 
     return histogramFieldsToFrame(hist, theme);
-  }, [samples, spcOptions, theme]);
+  }, [stampedSamples, options, theme]);
 
-  const annotationsRange = useMemo(() => {
-    if (annotations == null || annotations.length === 0) {
-      return undefined;
-    }
+  const bucketSize = useMemo(() => {
+    return histogram ? getBucketSize(histogram) : 0;
+  }, [histogram]);
 
-    const values: number[] = [];
-    for (const an of annotations) {
-      if (an.type === 'flag') {
-        values.push(an.time);
-      } else {
-        if (an.timeStart) {
-          values.push(an.timeStart);
-        }
-        if (an.timeEnd) {
-          values.push(an.timeEnd);
-        }
-      }
-    }
-
-    return {
-      max: values.reduce((max, item) => Math.max(max, item), values?.[0]),
-      min: values.reduce((min, item) => Math.min(min, item), values?.[0]),
-    };
-  }, [annotations]);
+  const renderAnnotations = useCallback(
+    (config: any, alignedFrame: any) => {
+      return (
+        <>{limitAnnotations.limits && <LimitAnnotations annotations={limitAnnotations.limits} config={config} />}</>
+      );
+    },
+    [limitAnnotations.limits]
+  );
 
   if (!histogram || !histogram.fields.length) {
     return (
@@ -84,24 +69,20 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
     );
   }
 
-  const bucketSize = getBucketSize(histogram);
-
   return (
     <Histogram
       options={options}
       theme={theme}
       legend={options.legend}
-      rawSeries={samples}
+      rawSeries={stampedSamples}
       structureRev={data.structureRev}
       width={width}
       height={height}
       alignedFrame={histogram}
       bucketSize={bucketSize}
-      annotationsRange={annotationsRange}
+      annotationsRange={{ min: limitAnnotations.minPosition, max: limitAnnotations.maxPosition }}
     >
-      {(config, alignedFrame) => {
-        return <>{annotations && <AnnotationsPlugin annotations={annotations} config={config} />}</>;
-      }}
+      {renderAnnotations}
     </Histogram>
   );
 };

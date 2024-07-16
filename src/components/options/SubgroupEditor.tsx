@@ -1,7 +1,7 @@
 import React from 'react';
 import { Select } from '@grafana/ui';
 import { StandardEditorProps } from '@grafana/data';
-import { Options } from 'components/Histogram/panelcfg';
+import { Options } from 'panelcfg';
 import { SpcChartTyp } from 'types';
 
 function createSubgroupOptions(startIndex: number, endIndex: number): Array<{ label: string; value: number }> {
