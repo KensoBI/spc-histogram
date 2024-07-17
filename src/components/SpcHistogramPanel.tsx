@@ -52,6 +52,13 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
     return histogram ? getBucketSize(histogram) : 0;
   }, [histogram]);
 
+  const annotationsRange = useMemo(() => {
+    if (limitAnnotations.limits.length === 0) {
+      return undefined;
+    }
+    return { min: limitAnnotations.minPosition, max: limitAnnotations.maxPosition };
+  }, [limitAnnotations.limits, limitAnnotations.minPosition, limitAnnotations.maxPosition]);
+
   const renderAnnotations = useCallback(
     (config: any, alignedFrame: any) => {
       return (
@@ -80,7 +87,7 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
       height={height}
       alignedFrame={histogram}
       bucketSize={bucketSize}
-      annotationsRange={{ min: limitAnnotations.minPosition, max: limitAnnotations.maxPosition }}
+      annotationsRange={annotationsRange}
     >
       {renderAnnotations}
     </Histogram>

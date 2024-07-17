@@ -13,6 +13,7 @@ export default function buildLimitAnnotations(series: DataFrame[], options: Opti
     };
   }
 
+  const allIndexes = series.map((_, index) => index);
   const limits: LimitAnnotation[] = [];
   let minPosition = Infinity;
   let maxPosition = -Infinity;
@@ -23,6 +24,10 @@ export default function buildLimitAnnotations(series: DataFrame[], options: Opti
   controlLines.forEach((cl, index) => {
     minPosition = Math.min(minPosition, cl.position);
     maxPosition = Math.max(maxPosition, cl.position);
+
+    if (!allIndexes.includes(cl.seriesIndex)) {
+      return;
+    }
 
     const flag: Flag = {
       type: 'flag',

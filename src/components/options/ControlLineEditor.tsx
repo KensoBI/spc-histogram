@@ -93,12 +93,12 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
       description: i.description,
     }));
 
-  function createControlLine(reducer: ControlLineReducer): ControlLine {
+  function createControlLine(reducer: ControlLineReducer, seriesIndex: number): ControlLine {
     return {
       reducerId: reducer.id,
       name: reducer.name,
       position: 0,
-      seriesIndex: 0,
+      seriesIndex: seriesIndex,
       lineWidth: 4,
       lineColor: reducer.color,
       fillDirection: 0,
@@ -107,8 +107,13 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
   }
 
   function addControlLine(reducer: ControlLineReducer) {
-    const newControlLine = createControlLine(reducer);
-    if (!canAddReducer(reducer)) {
+    const availableIndex = getAvailableSeriesIndexForReducer(reducer.id);
+    if (availableIndex === -1) {
+      return;
+    }
+
+    const newControlLine = createControlLine(reducer, availableIndex);
+    if (!canAddReducer(reducer, availableIndex)) {
       return;
     }
 
@@ -119,7 +124,17 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
   }
 
   function addControlLines(reducers: ControlLineReducer[]) {
-    const controlLines = reducers.filter((reducer) => canAddReducer(reducer)).map((cl) => createControlLine(cl));
+    const controlLines: ControlLine[] = reducers
+      .map((reducer) => {
+        const availableIndex = getAvailableSeriesIndexForReducer(reducer.id);
+
+        if (canAddReducer(reducer, availableIndex)) {
+          return createControlLine(reducer, availableIndex);
+        }
+        return null;
+      })
+      .filter((cl): cl is ControlLine => cl !== null && cl !== undefined);
+
     if (controlLines.length > 0) {
       const newControlLines = [...value, ...controlLines];
       onChange(newControlLines);
@@ -127,10 +142,27 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     }
   }
 
-  function canAddReducer(reducer: ControlLineReducer): boolean {
+  function getAvailableSeriesIndexForReducer(reducer: ControlLineReducerId): number {
+    const usedIndex = value.filter((existingCl) => existingCl.reducerId === reducer).map((i) => i.seriesIndex);
+    const allIndexes = context.data.map((_, index) => index);
+    const availableIndex = allIndexes.filter((i) => !usedIndex.includes(i));
+
+    if (availableIndex.length === 0) {
+      return -1;
+    }
+    return availableIndex[0];
+  }
+
+  function canAddReducer(reducer: ControlLineReducer, seriesIndex?: number): boolean {
     if (!reducer.computed && !reducer.isStandard) {
       //we can add as many constant control lines as we want
       return true;
+    }
+
+    const series = seriesIndex ?? getAvailableSeriesIndexForReducer(reducer.id);
+
+    if (series === -1) {
+      return false;
     }
 
     const existingClr = value.filter((cl) => cl.reducerId === reducer.id);
