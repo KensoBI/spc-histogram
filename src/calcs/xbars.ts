@@ -1,6 +1,6 @@
 import { ControlChartConstants, getControlChartConstant } from 'data/calcConst';
 import { ControlChartData } from 'types';
-import { chunkArray } from './common';
+import { calculateSampleStandardDeviation, chunkArray } from './common';
 
 export function createXbarChartForXbarS(data: number[], subgroupSize: number): ControlChartData {
   if (subgroupSize > 25 || subgroupSize < 2) {
@@ -12,7 +12,7 @@ export function createXbarChartForXbarS(data: number[], subgroupSize: number): C
 
   const xbarMean = xbarValues.reduce((sum, xbar) => sum + xbar, 0) / xbarValues.length;
 
-  const sValues = subgroups.map(calculateStandardDeviation);
+  const sValues = subgroups.map(calculateSampleStandardDeviation);
   const sMean = sValues.reduce((sum, s) => sum + s, 0) / sValues.length;
 
   const A3 = getControlChartConstant(subgroupSize, ControlChartConstants.a3_xbar_limit_sigma);
@@ -31,7 +31,7 @@ export function createSChartForXbarS(data: number[], subgroupSize: number): Cont
   }
 
   const subgroups = chunkArray(data, subgroupSize);
-  const sValues = subgroups.map(calculateStandardDeviation);
+  const sValues = subgroups.map(calculateSampleStandardDeviation);
   const sMean = sValues.reduce((sum, s) => sum + s, 0) / sValues.length;
 
   const B3 = getControlChartConstant(subgroupSize, ControlChartConstants.a3_xbar_limit_sigma);
@@ -43,12 +43,4 @@ export function createSChartForXbarS(data: number[], subgroupSize: number): Cont
     lowerControlLimit: B3 * sMean,
     data: sValues,
   };
-}
-
-function calculateStandardDeviation(subgroup: number[]): number {
-  const mean = subgroup.reduce((sum, value) => sum + value, 0) / subgroup.length;
-  const squaredDifferences = subgroup.map((value) => Math.pow(value - mean, 2));
-  const stdDev = Math.sqrt(squaredDifferences.reduce((sum, value) => sum + value, 0) / (subgroup.length - 1));
-  //todo test stdDev
-  return stdDev;
 }

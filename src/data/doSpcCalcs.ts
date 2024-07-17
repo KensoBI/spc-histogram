@@ -1,16 +1,20 @@
 import { DataFrame, FieldCalcs, FieldType } from '@grafana/data';
-import { calcTimeSampleSize, calcValueSampleSize, calculateNumericRange } from './spcCalculations';
 import { Options } from 'panelcfg';
 import { calculateControlCharts, calculateStandardStats } from 'calcs/standard';
 import { controlLineReducers } from './spcReducers';
+import { AggregationType } from 'types';
+import {
+  calculateMovingRanges,
+  calculateNumericRange,
+  calculateSampleStandardDeviation,
+  chunkArray,
+} from 'calcs/common';
 
-//apply data aggregations to all series
+//apply data aggregations to all series and save results in field state as FieldCalcs
 export function doSpcCalcs(series: DataFrame[], options: Options): DataFrame[] {
   const subgroupSize = options.subgroupSize < 1 ? 1 : options.subgroupSize;
   const aggregationType = options.aggregationType ?? 'none';
   const standardReducers = controlLineReducers.filter((p) => p.isStandard).map((p) => p.id);
-
-  //todo check if structure changed if not, get calcs from useState
 
   return series.map((frame, frameIndex) => {
     const shouldCalculateStandardStats =
@@ -23,8 +27,9 @@ export function doSpcCalcs(series: DataFrame[], options: Options): DataFrame[] {
         const updatedField = { ...field };
 
         //todo check if we need time, maybe just numbers from 1 to field.length and save as not a time field type but a number?
+        //for now, just calculate mean time for each subgroup
         if (updatedField.type === FieldType.time) {
-          updatedField.values = calcTimeSampleSize(updatedField.values, subgroupSize);
+          updatedField.values = aggregateSeries(updatedField.values, subgroupSize, AggregationType.Mean);
         } else if (field.type === FieldType.number) {
           updatedField.state = updatedField.state || {};
 
@@ -46,8 +51,8 @@ export function doSpcCalcs(series: DataFrame[], options: Options): DataFrame[] {
             fieldCalcs.ucl = controlChartData.upperControlLimit;
             fieldCalcs.mean = controlChartData.centerLine;
           } else {
-            //calculate other values based on aggregation type
-            updatedField.values = calcValueSampleSize(updatedField.values, subgroupSize, aggregationType);
+            //calculate series based on aggregation type
+            updatedField.values = aggregateSeries(updatedField.values, subgroupSize, aggregationType);
           }
 
           updatedField.state.range = calculateNumericRange(updatedField.values);
@@ -70,4 +75,32 @@ export function doSpcCalcs(series: DataFrame[], options: Options): DataFrame[] {
       }),
     };
   });
+}
+
+function aggregateSeries(values: number[], subgroupSize: number, aggregationType: AggregationType): number[] {
+  if (subgroupSize === 1) {
+    if (aggregationType === AggregationType.MovingRange) {
+      return calculateMovingRanges(values);
+    }
+    return values;
+  }
+
+  const subgroups = chunkArray(values, subgroupSize);
+
+  if (aggregationType === AggregationType.Range) {
+    //calculate range for each subgroup
+    return subgroups.map((subgroup) => Math.max(...subgroup) - Math.min(...subgroup));
+  }
+
+  if (aggregationType === AggregationType.Mean) {
+    //calculate mean for each subgroup
+    return subgroups.map((subgroup) => subgroup.reduce((sum, value) => sum + value, 0) / subgroup.length);
+  }
+
+  if (aggregationType === AggregationType.StandardDeviation) {
+    //calculate standard deviation for each subgroup
+    return subgroups.map(calculateSampleStandardDeviation);
+  }
+
+  return values;
 }

@@ -1,4 +1,5 @@
 import { ControlChartData } from 'types';
+import { calculateMovingRanges } from './common';
 
 export function createXChartXmR(data: number[]): ControlChartData {
   const xMean = data.reduce((sum, value) => sum + value, 0) / data.length;
@@ -29,12 +30,4 @@ export function createMRChartXmR(data: number[]): ControlChartData {
     lowerControlLimit: D3 * mRBar,
     data: movingRanges,
   };
-}
-
-function calculateMovingRanges(data: number[]): number[] {
-  const movingRanges = [];
-  for (let i = 1; i < data.length; i++) {
-    movingRanges.push(Math.abs(data[i] - data[i - 1]));
-  }
-  return movingRanges;
 }

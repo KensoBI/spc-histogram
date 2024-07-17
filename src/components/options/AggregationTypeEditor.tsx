@@ -2,37 +2,32 @@ import React from 'react';
 import { Select } from '@grafana/ui';
 import { SelectableValue, StandardEditorProps } from '@grafana/data';
 import { Options } from 'panelcfg';
+import { AggregationType } from 'types';
 
 type AggregationOption = {
-  id: string;
-  name: string;
+  name: AggregationType;
   subgroupSize: number;
 };
 
 const aggregationOptions: AggregationOption[] = [
   {
-    id: 'none',
-    name: 'No aggregation',
+    name: AggregationType.none,
     subgroupSize: 1,
   },
   {
-    id: 'mr',
-    name: 'Moving-range',
+    name: AggregationType.MovingRange,
     subgroupSize: 1,
   },
   {
-    id: 'mean',
-    name: 'Mean',
+    name: AggregationType.Mean,
     subgroupSize: 2,
   },
   {
-    id: 'range',
-    name: 'Range',
+    name: AggregationType.Range,
     subgroupSize: 2,
   },
   {
-    id: 'standardDeviation',
-    name: 'Standard deviation',
+    name: AggregationType.StandardDeviation,
     subgroupSize: 2,
   },
 ];
@@ -49,7 +44,7 @@ export const AggregationTypeEditor = ({ value, onChange, context }: StandardEdit
           }
           return context.options.subgroupSize >= aggregation.subgroupSize && aggregation.subgroupSize !== 1;
         })
-        .map<SelectableValue<string>>((i) => ({ label: i.name, value: i.id }))}
+        .map<SelectableValue<string>>((i) => ({ label: i.name, value: i.name }))}
       onChange={(value) => {
         onChange(value.value);
       }}

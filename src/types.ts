@@ -13,7 +13,15 @@ export enum SpcChartTyp {
   s_XbarS = 'S-XbarS',
 }
 
-export type AggregationType = 'none' | 'mean' | 'range' | 'standardDeviation' | 'movingRange';
+//export type AggregationType = 'none' | 'mean' | 'range' | 'standardDeviation' | 'movingRange';
+
+export enum AggregationType {
+  none = 'none',
+  Mean = 'Mean',
+  Range = 'Range',
+  StandardDeviation = 'Standard deviation',
+  MovingRange = 'Moving range',
+}
 
 export interface ControlChartData {
   centerLine: number;
