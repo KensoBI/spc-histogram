@@ -476,7 +476,7 @@
           {
             "fillDirection": 1,
             "fillOpacity": 10,
-            "lineColor": "#FFB357",
+            "lineColor": "#FF9830",
             "lineWidth": 4,
             "name": "Upper warn",
             "position": 0.55,

@@ -333,21 +333,27 @@ export class Histogram extends React.Component<HistogramProps, State> {
   }
 
   componentDidUpdate(prevProps: HistogramProps) {
-    const { structureRev, alignedFrame, bucketSize, bucketCount } = this.props;
+    const { structureRev, alignedFrame, bucketSize, annotationsRange, bucketCount } = this.props;
 
     if (alignedFrame !== prevProps.alignedFrame) {
-      const shouldReconfig =
-        this.state.config == null ||
-        bucketCount !== prevProps.bucketCount ||
-        bucketSize !== prevProps.bucketSize ||
-        this.props.options !== prevProps.options ||
-        this.state.config === undefined ||
-        structureRev !== prevProps.structureRev ||
-        !structureRev;
+      let newState = this.prepState(this.props, false);
 
-      const newState = this.prepState(this.props, shouldReconfig);
+      if (newState) {
+        const shouldReconfig =
+          bucketSize !== prevProps.bucketSize ||
+          bucketCount !== prevProps.bucketCount ||
+          this.props.options !== prevProps.options ||
+          this.state.config === undefined ||
+          structureRev !== prevProps.structureRev ||
+          !structureRev ||
+          annotationsRange !== prevProps.annotationsRange;
 
-      this.setState(newState);
+        if (shouldReconfig) {
+          newState.config = prepConfig(alignedFrame, this.props.theme, this.props.annotationsRange);
+        }
+      }
+
+      newState && this.setState(newState);
     }
   }
 

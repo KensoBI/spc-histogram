@@ -24,7 +24,7 @@ export default function buildLimitAnnotations(series: DataFrame[], options: Opti
   controlLines.forEach((cl, index) => {
     minPosition = Math.min(minPosition, cl.position);
     maxPosition = Math.max(maxPosition, cl.position);
-    //maxPosition = maxPosition + maxPosition * 0.05;
+    maxPosition = maxPosition + maxPosition * 0.05;
 
     if (!allIndexes.includes(cl.seriesIndex)) {
       return;
