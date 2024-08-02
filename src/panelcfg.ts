@@ -1,3 +1,4 @@
+import { PanelProps } from '@grafana/data';
 import {
   AxisConfig,
   OptionsWithLegend,
@@ -5,8 +6,14 @@ import {
   HideableFieldConfig,
   GraphGradientMode,
 } from '@grafana/schema';
+import { ControlLineReducerId } from 'data/spcReducers';
+import { AggregationType, SpcChartTyp } from 'types';
 
 export interface Options extends OptionsWithLegend, OptionsWithTooltip {
+  /**
+   * Bucket count (approx)
+   */
+  bucketCount?: number;
   /**
    * Offset buckets by this amount
    */
@@ -19,11 +26,22 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
    * Combines multiple series into a single histogram
    */
   combine?: boolean;
+  chartType: SpcChartTyp;
+  subgroupSize: number;
+  aggregationType: AggregationType;
+  controlLines: ControlLine[];
 }
 
-export const defaultOptions: Partial<Options> = {
-  bucketOffset: 0,
-};
+export interface ControlLine {
+  name: string;
+  position: number;
+  seriesIndex: number;
+  lineWidth: number;
+  lineColor: string;
+  fillDirection: number;
+  fillOpacity: number;
+  reducerId: ControlLineReducerId;
+}
 
 export interface FieldConfig extends AxisConfig, HideableFieldConfig {
   /**
@@ -46,3 +64,10 @@ export const defaultFieldConfig: Partial<FieldConfig> = {
   gradientMode: GraphGradientMode.None,
   lineWidth: 1,
 };
+
+export const defaultOptions: Partial<Options> = {
+  bucketCount: 30,
+  bucketOffset: 0,
+};
+
+export interface ChartPanelProps extends PanelProps<Options> {}
