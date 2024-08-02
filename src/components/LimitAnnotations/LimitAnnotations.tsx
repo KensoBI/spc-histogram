@@ -68,7 +68,7 @@ export function isLimitAnnotationArray(value: any): value is LimitAnnotation[] {
 export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations, config }) => {
   const theme = useTheme2();
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
-  const plotInstance = useRef<uPlot>();
+  const [plot, setPlot] = useState<uPlot>();
   const annotationsRef = useRef<LimitAnnotation[]>();
   const bboxRef = useRef<DOMRect>();
   const conditions = useMemo<ConditionFunc[]>(() => [], []);
@@ -118,10 +118,10 @@ export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations
 
   useLayoutEffect(() => {
     config.addHook('init', (u) => {
-      plotInstance.current = u;
       u.root.parentElement?.addEventListener('blur', plotLeave);
       u.over.addEventListener('mouseleave', plotLeave);
       u.over.addEventListener('mousemove', onMouseCapture);
+      setPlot(u);
     });
 
     config.addHook('syncRect', (u, rect) => {
@@ -177,13 +177,13 @@ export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations
     });
 
     return () => {
-      if (plotInstance.current) {
-        plotInstance.current.over.removeEventListener('mouseleave', plotLeave);
-        plotInstance.current.root.parentElement?.removeEventListener('blur', plotLeave);
-        plotInstance.current.over.removeEventListener('mousemove', onMouseCapture);
+      if (plot) {
+        plot.over.removeEventListener('mouseleave', plotLeave);
+        plot.root.parentElement?.removeEventListener('blur', plotLeave);
+        plot.over.removeEventListener('mousemove', onMouseCapture);
       }
     };
-  }, [config, theme, onMouseCapture, plotLeave, conditions]);
+  }, [config, conditions, plotLeave, plot, onMouseCapture]);
 
   if (!tooltip) {
     return null;
@@ -202,10 +202,9 @@ export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations
         backgroundColor,
         paddingLeft: 3,
         paddingRight: 3,
-        fontSize: 12,
+        fontSize: theme.typography.fontSize,
         borderRadius: 2,
-        fontFamily:
-          'system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji',
+        fontFamily: theme.typography.fontFamily,
       }}
     >
       {tooltip.annotation.title ?? 'EMPTY'}

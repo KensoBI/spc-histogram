@@ -186,6 +186,15 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     return controlLine.name;
   }
 
+  function isComputed(reducerId: ControlLineReducerId): boolean {
+    const reducer = controlLineReducers.find((r) => r.id === reducerId);
+
+    if (reducer) {
+      return reducer.computed;
+    }
+    return false;
+  }
+
   return (
     <>
       <div className={styles.addControlwrapper}>
@@ -238,7 +247,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                     onChange={(e) => handleControlLineChange(index, 'name', e.currentTarget.value)}
                   />
                 </Field>
-                {controlLine.reducerId === ControlLineReducerId.custom && (
+                {!isComputed(controlLine.reducerId) && (
                   <Field label="Position" description="Numeric position at which the control line is drawn. ">
                     <Input
                       placeholder={'Value'}

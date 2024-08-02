@@ -5,7 +5,7 @@
   "id": "kensobi-spchistogram-panel",
   "info": {
     "keywords": ["panel", "spc", "histogram", "kensobi"],
-    "description": "Create common SPC Histograms",
+    "description": "Distribution of process data with control limits.",
     "author": {
       "name": "Kenso Software",
       "url": "https://kensobi.com"

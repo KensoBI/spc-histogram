@@ -24,6 +24,7 @@ export default function buildLimitAnnotations(series: DataFrame[], options: Opti
   controlLines.forEach((cl, index) => {
     minPosition = Math.min(minPosition, cl.position);
     maxPosition = Math.max(maxPosition, cl.position);
+    //maxPosition = maxPosition + maxPosition * 0.05;
 
     if (!allIndexes.includes(cl.seriesIndex)) {
       return;
@@ -40,7 +41,7 @@ export default function buildLimitAnnotations(series: DataFrame[], options: Opti
 
     const nextControlLine = controlLines[index + 1];
 
-    if (cl.fillDirection === -1) {
+    if (cl.fillDirection === -1 && cl.position > 0) {
       const prevControlLine = controlLines[index - 1];
       // Add region from the left
       const regionLeft: Region = {

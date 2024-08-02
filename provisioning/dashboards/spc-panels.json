@@ -1,0 +1,639 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 5,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 7,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XmR",
+        "controlLines": [
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "position": 0,
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "LCL",
+            "position": 0,
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "UCL",
+            "position": 0,
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1
+      },
+      "title": "X-chart (XmR)",
+      "type": "kensobi-spchistogram-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "mR-XmR",
+        "controlLines": [
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "position": 0,
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "LCL",
+            "position": 0,
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "UCL",
+            "position": 0,
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "queryType": "randomWalk",
+          "refId": "A"
+        }
+      ],
+      "title": "mR chart (XmR)",
+      "type": "kensobi-spchistogram-panel"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 3,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XbarR",
+        "controlLines": [
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "position": 0,
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "LCL",
+            "position": 0,
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "UCL",
+            "position": 0,
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 2
+      },
+      "title": "X-chart (Xbar-R)",
+      "type": "kensobi-spchistogram-panel"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 4,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "R-XbarR",
+        "controlLines": [
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "position": 0,
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "LCL",
+            "position": 0,
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "UCL",
+            "position": 0,
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 2
+      },
+      "title": "R Chart (Xbar-R)",
+      "type": "kensobi-spchistogram-panel"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "id": 5,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XbarS",
+        "controlLines": [
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "position": 0,
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#FA6400",
+            "lineWidth": 4,
+            "name": "LCL",
+            "position": 0,
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#FF780A",
+            "lineWidth": 4,
+            "name": "UCL",
+            "position": 0,
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 5
+      },
+      "title": "X chart (Xbar-S)",
+      "type": "kensobi-spchistogram-panel"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "id": 6,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "S-XbarS",
+        "controlLines": [
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "position": 0,
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "LCL",
+            "position": 0,
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "UCL",
+            "position": 0,
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#FF9830",
+            "lineWidth": 4,
+            "name": "Lower warn",
+            "position": 0.4,
+            "reducerId": "custom",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#FFB357",
+            "lineWidth": 4,
+            "name": "Upper warn",
+            "position": 0.55,
+            "reducerId": "nominal",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 10
+      },
+      "title": "S Chart (Xbar-S)",
+      "type": "kensobi-spchistogram-panel"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 25
+      },
+      "id": 2,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XbarR",
+        "controlLines": [
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "position": 0,
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "LCL",
+            "position": 0,
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "UCL",
+            "position": 0,
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "LCL",
+            "position": 0,
+            "reducerId": "lcl",
+            "seriesIndex": 1
+          },
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "UCL",
+            "position": 0,
+            "reducerId": "ucl",
+            "seriesIndex": 1
+          },
+          {
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "position": 0,
+            "reducerId": "mean",
+            "seriesIndex": 1
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 2
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "queryType": "randomWalk",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "hide": false,
+          "queryType": "randomWalk",
+          "refId": "B"
+        }
+      ],
+      "title": "X-chart (Xbar-R)",
+      "type": "kensobi-spchistogram-panel"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timeRangeUpdatedDuringEditOrView": false,
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "SPC Histograms",
+  "uid": "cds23y6jstgcgd",
+  "version": 1,
+  "weekStart": ""
+}
