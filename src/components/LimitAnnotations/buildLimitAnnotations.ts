@@ -40,7 +40,7 @@ export default function buildLimitAnnotations(series: DataFrame[], options: Opti
 
     const nextControlLine = controlLines[index + 1];
 
-    if (cl.fillDirection === -1 && cl.position > 0) {
+    if (cl.fillDirection === -1) {
       const prevControlLine = controlLines[index - 1];
       // Add region from the left
       const regionLeft: Region = {
