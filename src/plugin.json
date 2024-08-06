@@ -16,11 +16,19 @@
     },
     "links": [
       {
+        "name": "Project site",
+        "url": "https://github.com/KensoBI/spc-histogram"
+      },
+      {
         "name": "Author's site",
         "url": "https://kensobi.com"
       }
     ],
-    "screenshots": [],
+    "screenshots": [
+      { "name": "SPC Histogram", "path": "img/spc-histogram.png" },
+      { "name": "Multi-series", "path": "img/multi-series.png" },
+      { "name": "Editor", "path": "img/editor.png" }
+    ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },

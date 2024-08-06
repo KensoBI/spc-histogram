@@ -24,7 +24,7 @@ Your feedback is always welcome!
 
 ## License
 
-This software is distributed under the [AGPL-3.0-only](./LICENSE).
+This software is distributed under the [AGPL-3.0-only](https://raw.githubusercontent.com/KensoBI/spc-histogram/main/LICENSE).
 
 ## Notes
 
