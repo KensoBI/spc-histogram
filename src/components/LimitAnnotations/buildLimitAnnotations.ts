@@ -104,7 +104,7 @@ function addCalcsToControlLines(series: DataFrame[], options: Options): ControlL
       //take first numeric frame
       const calcs = numericFrames[0].state?.calcs;
       if (!calcs) {
-        //no calcs cached, noting to assign
+        //no calcs cached, nothing to assign
         return;
       }
 

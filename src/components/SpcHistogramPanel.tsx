@@ -7,6 +7,7 @@ import { LimitAnnotations } from './LimitAnnotations/LimitAnnotations';
 import { doSpcCalcs } from 'data/doSpcCalcs';
 import buildLimitAnnotations from './LimitAnnotations/buildLimitAnnotations';
 import { ChartPanelProps } from 'panelcfg';
+import { BellCurve } from './BellCurve/BellCurve';
 
 export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelProps) => {
   const theme = useTheme2();
@@ -62,7 +63,10 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
   const renderAnnotations = useCallback(
     (config: any, alignedFrame: any) => {
       return (
-        <>{limitAnnotations.limits && <LimitAnnotations annotations={limitAnnotations.limits} config={config} />}</>
+        <>
+          {limitAnnotations.limits && <LimitAnnotations annotations={limitAnnotations.limits} config={config} />}
+          {alignedFrame.length > 0 && <BellCurve config={config} data={alignedFrame} />}
+        </>
       );
     },
     [limitAnnotations.limits]

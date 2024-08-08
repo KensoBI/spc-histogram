@@ -4,6 +4,7 @@ import { ControlChartData, SpcChartTyp } from 'types';
 import { createXbarChartForXbarR, createRChartForXbarR } from './xbarr';
 import { createXbarChartForXbarS, createSChartForXbarS } from './xbars';
 import { createXChartXmR, createMRChartXmR } from './xmr';
+import { calculateSampleStandardDeviation } from './common';
 
 export function calculateStandardStats(field: Field): FieldCalcs {
   const calcs: FieldCalcs = {
@@ -59,6 +60,10 @@ export function calculateStandardStats(field: Field): FieldCalcs {
 
   if (calcs.count > 0) {
     calcs.mean = calcs.sum / calcs.count;
+  }
+
+  if (calcs.count > 0) {
+    calcs.stdDev = calculateSampleStandardDeviation(data);
   }
 
   if (calcs.max !== null && calcs.min !== null) {
