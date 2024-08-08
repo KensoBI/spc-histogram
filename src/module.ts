@@ -1,5 +1,5 @@
 import { PanelPlugin, FieldConfigProperty, FieldColorModeId } from '@grafana/data';
-import { commonOptionsBuilder, graphFieldOptions } from '@grafana/ui';
+import { commonOptionsBuilder, graphFieldOptions, GraphGradientMode } from '@grafana/ui';
 import { FieldConfig, Options, defaultOptions } from 'panelcfg';
 import { SpcHistogramPanel } from 'components/SpcHistogramPanel';
 import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor';
@@ -165,7 +165,7 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
           name: 'Gradient mode',
           defaultValue: graphFieldOptions.fillGradient[0].value,
           settings: {
-            options: graphFieldOptions.fillGradient,
+            options: graphFieldOptions.fillGradient.filter((f) => f.value !== GraphGradientMode.Scheme),
           },
           category: ['Histogram'],
         });
