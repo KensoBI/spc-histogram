@@ -28,6 +28,11 @@ jobs:
         id: build
         run: yarn build
 
+      - name: Sign plugin
+        run: |
+          export GRAFANA_ACCESS_POLICY_TOKEN=${{ secrets.GRAFANA_POLICY_TOKEN }}
+          npx @grafana/sign-plugin@latest
+
       - name: Get plugin metadata
         id: metadata
         run: |
