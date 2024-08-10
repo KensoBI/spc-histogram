@@ -5,7 +5,7 @@ import { SpcHistogramPanel } from 'components/SpcHistogramPanel';
 import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor';
 import { ControlLineEditor } from 'components/options/ControlLineEditor';
 import { SubgroupEditor } from 'components/options/SubgroupEditor';
-import { SpcChartTyp } from 'types';
+import { CurveFit, SpcChartTyp } from 'types';
 
 export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
 
@@ -99,6 +99,41 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
       editor: ControlLineEditor,
       defaultValue: [],
       category: ['SPC'],
+    });
+
+    builder.addSelect({
+      path: 'curve.fit',
+      name: 'Curve fit',
+      description: 'Choose how the curve should fit',
+      settings: {
+        allowCustomValue: false,
+        options: [
+          { label: 'No curve', value: CurveFit.none },
+          { label: 'Histogram', value: CurveFit.histogram },
+          { label: 'Gaussian (Normal)', value: CurveFit.gaussian },
+        ],
+      },
+
+      defaultValue: CurveFit.histogram,
+      category: ['Curve'],
+    });
+
+    builder.addColorPicker({
+      path: 'curve.color',
+      name: 'Color',
+      defaultValue: 'dark-blue',
+      category: ['Curve'],
+    });
+    builder.addSliderInput({
+      path: 'curve.lineWidth',
+      name: 'Line width',
+      defaultValue: 5,
+      settings: {
+        min: 1,
+        max: 15,
+        step: 1,
+      },
+      category: ['Curve'],
     });
 
     commonOptionsBuilder.addLegendOptions(builder);

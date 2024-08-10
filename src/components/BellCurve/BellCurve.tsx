@@ -1,6 +1,10 @@
-import { arrayToDataFrame, DataFrame, DataFrameType, Field } from '@grafana/data';
-import { UPlotConfigBuilder } from '@grafana/ui';
+import { DataFrame } from '@grafana/data';
+import { UPlotConfigBuilder, useTheme2 } from '@grafana/ui';
+
+import { CurveOptions } from 'panelcfg';
 import React, { useLayoutEffect, useRef, useState } from 'react';
+import { CurveFit } from 'types';
+import { createGaussianCurve } from './gaussian';
 
 // const BellCurve: React.FC<PlotProps> = ({ data, width, height }) => {
 // 	const histogramData = data[0];
@@ -47,58 +51,17 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 
 export type BellCurveProps = {
   config: UPlotConfigBuilder;
-  data?: DataFrame;
-  color?: string;
-  lineWidth?: number;
+  histogramData: DataFrame;
+  rawSeries: DataFrame[];
+  curveOptions: CurveOptions;
 };
 
-function normalDistribution(x: number, mean: number, stdDev: number): number {
-  const coefficient = 1 / (stdDev * Math.sqrt(2 * Math.PI));
-  const exponent = -Math.pow(x - mean, 2) / (2 * Math.pow(stdDev, 2));
-  return coefficient * Math.exp(exponent);
-}
-
-// Function to generate bell curve data as a DataFrame
-function generateBellCurveData(field: Field, steps: number): DataFrame {
-  const xValues: number[] = [];
-  const yValues: number[] = [];
-
-  const mean = field.state?.calcs?.mean;
-  const stdDev = field.state?.calcs?.stdDev;
-
-  if (mean === undefined || stdDev === undefined) {
-    throw new Error('Mean and standard deviation must be defined');
-  }
-
-  // Ensure field.values is defined and not empty
-  if (!field.values || field.values.length === 0) {
-    throw new Error('Field values must be defined and non-empty');
-  }
-
-  // Define the start and end points based on field.values
-  const start = field.values[0];
-  const end = field.values[field.values.length - 1];
-
-  const step = (end - start) / steps;
-  for (let i = 0; i <= steps; i++) {
-    const x = start + i * step;
-    xValues.push(x);
-    yValues.push(normalDistribution(x, mean, stdDev));
-  }
-
-  const df = arrayToDataFrame(xValues);
-  df.fields.concat(arrayToDataFrame(yValues).fields);
-  return df;
-}
-
-export const BellCurve: React.FC<BellCurveProps> = ({ config, data }) => {
+export const BellCurve: React.FC<BellCurveProps> = ({ config, rawSeries, histogramData, curveOptions }) => {
   const [plot, setPlot] = useState<uPlot>();
-  //const annotationsRef = useRef<LimitAnnotation[]>();
   const bboxRef = useRef<DOMRect>();
-
-  // useEffect(() => {
-  //   annotationsRef.current = annotations.sort((a, b) => typeToValue(b.type) - typeToValue(a.type));
-  // }, [annotations]);
+  const { color, lineWidth, fit } = curveOptions;
+  const theme = useTheme2();
+  const colors = theme.visualization;
 
   useLayoutEffect(() => {
     config.addHook('init', (u) => {
@@ -110,22 +73,35 @@ export const BellCurve: React.FC<BellCurveProps> = ({ config, data }) => {
     });
 
     config.addHook('draw', (u) => {
-      // if (!annotationsRef.current) {
-      //   return;
-      // }
-      if (!data || data.length === 0) {
+      if (histogramData.length === 0 || rawSeries.length === 0) {
         return;
       }
 
       let x: number[] = [];
       let y: number[] = [];
 
-      if (data.meta?.type === DataFrameType.Histogram) {
-        //center line for y-axis
-        const xy = prepXYfromHistogram(data);
+      // if (data.meta?.type === DataFrameType.Histogram) {
+      if (fit === CurveFit.histogram) {
+        if (!histogramData) {
+          throw new Error('No histogram data in data frame.');
+        }
+
+        const xy = createHistogramCurve(histogramData);
         x = xy.x;
         y = xy.y;
+      } else if (fit === CurveFit.gaussian) {
+        if (!rawSeries) {
+          throw new Error('No histogram data in data frame.');
+        }
+
+        const xy = createGaussianCurve(histogramData, rawSeries);
+        x = xy.x;
+        y = xy.y;
+      } else {
+        return;
       }
+
+      //}
 
       const ctx = u.ctx;
       if (!ctx) {
@@ -155,10 +131,10 @@ export const BellCurve: React.FC<BellCurveProps> = ({ config, data }) => {
       // ctx.closePath();
 
       ctx.beginPath();
-      ctx.strokeStyle = 'green';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = color ? colors.getColorByName(color) : 'dark-blue';
+      ctx.lineWidth = lineWidth ? lineWidth : 5;
 
-      const tension = 0.2; //curve's tension
+      const tension = 0.0; //curve's tension
 
       for (let i = 0; i < x.length; i++) {
         const xPos = u.valToPos(x[i], 'x', true);
@@ -186,37 +162,42 @@ export const BellCurve: React.FC<BellCurveProps> = ({ config, data }) => {
 
       ctx.restore();
     });
-  }, [config, data, plot]);
+  }, [color, colors, config, fit, histogramData, lineWidth, plot, rawSeries]);
 
   return null;
 };
 
-const renderLine = (
-  ctx: CanvasRenderingContext2D,
-  u: uPlot,
-  xValue: number,
-  yValue: number,
-  color: string,
-  lineWidth: number
-) => {
-  const x = u.valToPos(xValue, 'x', true);
-  const y = u.valToPos(yValue, 'y', true);
+// const renderLine = (
+//   ctx: CanvasRenderingContext2D,
+//   u: uPlot,
+//   xValue: number,
+//   yValue: number,
+//   color: string,
+//   lineWidth: number
+// ) => {
+//   const x = u.valToPos(xValue, 'x', true);
+//   const y = u.valToPos(yValue, 'y', true);
 
-  ctx.beginPath();
-  ctx.lineWidth = lineWidth;
-  ctx.strokeStyle = color;
-  ctx.moveTo(x, y);
-  ctx.lineTo(x, y + u.bbox.height);
-  ctx.stroke();
-  ctx.closePath();
-};
+//   ctx.beginPath();
+//   ctx.lineWidth = lineWidth;
+//   ctx.strokeStyle = color;
+//   ctx.moveTo(x, y);
+//   ctx.lineTo(x, y + u.bbox.height);
+//   ctx.stroke();
+//   ctx.closePath();
+// };
 
-function prepXYfromHistogram(frame: DataFrame): { x: number[]; y: number[] } {
-  const xMin = frame.fields.find((f) => f.name === 'xMin');
-  const xMax = frame.fields.find((f) => f.name === 'xMax');
-  const counts = frame.fields.find((f) => f.name === 'value');
+function createHistogramCurve(frame: DataFrame): { x: number[]; y: number[] } {
   const x: number[] = [];
   const y: number[] = [];
+
+  if (frame.fields.length !== 3) {
+    return { x, y };
+  }
+
+  const xMin = frame.fields.find((f) => f.name === 'xMin');
+  const xMax = frame.fields.find((f) => f.name === 'xMax');
+  const counts = frame.fields[2];
 
   if (xMin && xMax && counts) {
     for (let i = 0; i < frame.length; i++) {
@@ -229,3 +210,73 @@ function prepXYfromHistogram(frame: DataFrame): { x: number[]; y: number[] } {
 
   return { x, y };
 }
+
+// function normalDistribution(x: number, mean: number, stdDev: number): number {
+//   const coefficient = 1 / (stdDev * Math.sqrt(2 * Math.PI));
+//   const exponent = -Math.pow(x - mean, 2) / (2 * Math.pow(stdDev, 2));
+//   return coefficient * Math.exp(exponent);
+// }
+
+// Function to generate bell curve data as a DataFrame
+// function createGaussianCurve(histogramFrame: DataFrame, rawSeries: DataFrame[] ): { x: number[]; y: number[] } {
+
+//   const x: number[] = [];
+//   const y: number[] = [];
+
+//   const histogramStart = histogramFrame.fields.find((f) => f.name === 'xMin')?.values[0];
+//   const histogramEnd = histogramFrame.fields.find((f) => f.name === 'xMax')?.values!; //todo get last value
+//  const histogramEndValue = histogramEnd[histogramEnd.values.length - 1]
+//   //todo: combine all numeric frames from rawSeries into one
+
+//   //todo: calcule mean and standard deviation of all values
+
+//   const steps =  histogramFrame.fields.find((f) => f.name === 'xMin')?.values.length;
+
+//   const step = (end - start) / steps;
+//   for (let i = 0; i <= steps; i++) {
+//     const x = start + i * step;
+//     x.push(x);
+//     y.push(normalDistribution(x, mean, stdDev));
+//   }
+
+//   return { x, y };
+// }
+
+// function createGaussianCurve(histogramFrame: DataFrame, rawSeries: DataFrame[]): { x: number[]; y: number[] } {
+//   const x: number[] = [];
+//   const y: number[] = [];
+
+//   // Extract histogram start and end
+//   const histogramStart = histogramFrame.fields.find((f) => f.name === 'xMin')?.values[0] as number;
+//   const histogramEndField = histogramFrame.fields.find((f) => f.name === 'xMax')?.values as number[];
+//   const histogramEnd = histogramEndField[histogramEndField.length - 1];
+
+//   // Combine all numeric values from rawSeries
+//   const allValues: number[] = [];
+//   rawSeries.forEach((frame) => {
+//     frame.fields.forEach((field) => {
+//       if (field.type === 'number') {
+//         for (let i = 0; i < field.values.length; i++) {
+//           allValues.push(field.values[i]);
+//         }
+//       }
+//     });
+//   });
+
+//   // Calculate mean and standard deviation of all values
+//   const dataMean = allValues.reduce((sum, v) => sum + v, 0) / allValues.length;
+//   const dataStdDev = calculateSampleStandardDeviation(allValues);
+
+//   // Determine the number of steps (bins) and step size
+//   const steps = histogramFrame.fields.find((f) => f.name === 'xMin')?.values.length || 100;
+//   const stepSize = (histogramEnd - histogramStart) / steps;
+
+//   // Generate Gaussian curve data
+//   for (let i = 0; i <= steps; i++) {
+//     const xValue = histogramStart + i * stepSize;
+//     x.push(xValue);
+//     y.push(normalDistribution(xValue, dataMean, dataStdDev));
+//   }
+
+//   return { x, y };
+// }

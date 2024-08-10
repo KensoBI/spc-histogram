@@ -65,11 +65,18 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
       return (
         <>
           {limitAnnotations.limits && <LimitAnnotations annotations={limitAnnotations.limits} config={config} />}
-          {alignedFrame.length > 0 && <BellCurve config={config} data={alignedFrame} />}
+          {alignedFrame.length > 0 && (
+            <BellCurve
+              config={config}
+              histogramData={alignedFrame}
+              rawSeries={stampedSamples}
+              curveOptions={options.curve}
+            />
+          )}
         </>
       );
     },
-    [limitAnnotations.limits]
+    [limitAnnotations.limits, options.curve, stampedSamples]
   );
 
   if (!histogram || !histogram.fields.length) {

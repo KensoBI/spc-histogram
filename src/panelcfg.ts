@@ -7,7 +7,7 @@ import {
   GraphGradientMode,
 } from '@grafana/schema';
 import { ControlLineReducerId } from 'data/spcReducers';
-import { AggregationType, SpcChartTyp } from 'types';
+import { AggregationType, CurveFit, SpcChartTyp } from 'types';
 
 export interface Options extends OptionsWithLegend, OptionsWithTooltip {
   /**
@@ -30,6 +30,13 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
   subgroupSize: number;
   aggregationType: AggregationType;
   controlLines: ControlLine[];
+  curve: CurveOptions;
+}
+
+export interface CurveOptions {
+  fit: CurveFit;
+  lineWidth: number;
+  color: string;
 }
 
 export interface ControlLine {

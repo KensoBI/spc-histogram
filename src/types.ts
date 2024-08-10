@@ -13,6 +13,12 @@ export enum SpcChartTyp {
   s_XbarS = 'S-XbarS',
 }
 
+export enum CurveFit {
+  none = 'none',
+  histogram = 'Histogram',
+  gaussian = 'Gaussian',
+}
+
 //export type AggregationType = 'none' | 'mean' | 'range' | 'standardDeviation' | 'movingRange';
 
 export enum AggregationType {
