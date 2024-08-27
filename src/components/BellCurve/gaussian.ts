@@ -17,6 +17,7 @@ function gaussianFunction2([amplitude, mean, stdDev]: [number, number, number]):
   return (x: number) => amplitude * Math.exp(-0.5 * ((x - mean) / stdDev) ** 2);
 }
 
+//todo we need to separate by series and calculate curver for each series
 function createGaussianCurve(
   histogramFrame: DataFrame,
   rawSeries: DataFrame[]
@@ -65,6 +66,12 @@ function createGaussianCurve(
 
   // Perform the fit
   const lm = levenbergMarquardt(data, gaussianFunction2, options);
+  // Perform the fit
+  //   const lm = levenbergMarquardt(
+  //     data,
+  //     (x: number, [amplitude, mean, stdDev]: number[]) => gaussianFunction(x, { amplitude, mean, stdDev }),
+  //     options
+  //   );
 
   // Generate the fitted curve
   const fittedParams: GaussianParams = {
