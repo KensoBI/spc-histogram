@@ -8,6 +8,7 @@ import { doSpcCalcs } from 'data/doSpcCalcs';
 import buildLimitAnnotations from './LimitAnnotations/buildLimitAnnotations';
 import { ChartPanelProps } from 'panelcfg';
 import { BellCurve } from './BellCurve/BellCurve';
+import { buildCurve } from './BellCurve/curve';
 
 export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelProps) => {
   const theme = useTheme2();
@@ -48,6 +49,10 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
 
     return histogramFieldsToFrame(hist, theme);
   }, [stampedSamples, options, theme]);
+
+  const curveData = useMemo(() => {
+    return buildCurve(histogram, stampedSamples, options.curve);
+  }, [histogram, options.curve, stampedSamples]);
 
   const bucketSize = useMemo(() => {
     return histogram ? getBucketSize(histogram) : 0;
@@ -92,6 +97,7 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
       options={options}
       theme={theme}
       legend={options.legend}
+      curveData={curveData}
       rawSeries={stampedSamples}
       structureRev={data.structureRev}
       width={width}

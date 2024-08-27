@@ -2,6 +2,7 @@ import React from 'react';
 import uPlot, { AlignedData } from 'uplot';
 import {
   DataFrame,
+  Field,
   FieldType,
   formattedValueToString,
   getFieldColorModeForField,
@@ -22,6 +23,7 @@ import {
 } from '@grafana/ui';
 import { defaultFieldConfig, FieldConfig, Options } from '../../panelcfg';
 import { getStackingGroups, preparePlotData2 } from 'utils/utils';
+import { prepareCurveData } from 'components/BellCurve/curve';
 
 function incrRoundDn(num: number, incr: number) {
   return Math.floor(num / incr) * incr;
@@ -34,6 +36,7 @@ function incrRoundUp(num: number, incr: number) {
 export interface HistogramProps extends Themeable2 {
   options: Options; // used for diff
   alignedFrame: DataFrame; // This could take HistogramFields
+  curveData: Field[] | undefined;
   bucketCount?: number;
   bucketSize: number;
   width: number;
@@ -59,7 +62,12 @@ export function getBucketSize1(frame: DataFrame) {
     : roundDecimals(frame.fields[1].values[1] - frame.fields[0].values[1], 9);
 }
 
-const prepConfig = (frame: DataFrame, theme: GrafanaTheme2, annotationsRange: HistogramProps['annotationsRange']) => {
+const prepConfig = (
+  frame: DataFrame,
+  curveFields: Field[] | undefined,
+  theme: GrafanaTheme2,
+  annotationsRange: HistogramProps['annotationsRange']
+) => {
   // todo: scan all values in BucketMin and BucketMax fields to assert if uniform bucketSize
 
   // since this is x axis range, this should ideally come from xMin or xMax fields, not a count field
@@ -223,7 +231,8 @@ const prepConfig = (frame: DataFrame, theme: GrafanaTheme2, annotationsRange: Hi
   builder.setStackingGroups(stackingGroups);
 
   let pathBuilder = uPlot.paths.bars!({ align: 1, size: [1, Infinity] });
-
+  //let pathBuilder = uPlot.paths.linear!; //({ align: 1, size: [1, Infinity] });
+  //let pathBuilder: uPlot.Series.PathBuilder | null = null;
   let seriesIndex = 0;
 
   // assumes xMin is [0], xMax is [1]
@@ -249,11 +258,12 @@ const prepConfig = (frame: DataFrame, theme: GrafanaTheme2, annotationsRange: Hi
       theme,
       colorMode,
       pathBuilder,
+      //lineInterpolation: LineInterpolation.Smooth,
       //pointsBuilder: config.drawPoints,
       show: !customConfig.hideFrom?.viz,
       gradientMode: customConfig.gradientMode,
       thresholds: field.config.thresholds,
-
+      //lineStyle: { fill: 'dash' },
       hardMin: field.config.min,
       hardMax: field.config.max,
       softMin: customConfig.axisSoftMin,
@@ -262,8 +272,81 @@ const prepConfig = (frame: DataFrame, theme: GrafanaTheme2, annotationsRange: Hi
       // The following properties are not used in the uPlot config, but are utilized as transport for legend config
       dataFrameFieldIndex: field.state.origin,
     });
+
+    // builder.addSeries({
+    //   pathBuilder,
+    //   pointsBuilder: null,
+    //   scaleKey,
+    //   showPoints: undefined,
+    //   pointsFilter: undefined,
+    //   colorMode,
+    //   fillOpacity: customConfig.fillOpacity,
+    //   theme,
+    //   dynamicSeriesColor: undefined,
+    //   drawStyle: customConfig.drawStyle!,
+    //   lineColor: customConfig.lineColor ?? seriesColor,
+    //   lineWidth: customConfig.lineWidth,
+    //   lineInterpolation: customConfig.lineInterpolation,
+    //   lineStyle: customConfig.lineStyle,
+    //   barAlignment: customConfig.barAlignment,
+    //   barWidthFactor: customConfig.barWidthFactor,
+    //   barMaxWidth: customConfig.barMaxWidth,
+    //   pointSize: customConfig.pointSize,
+    //   spanNulls: customConfig.spanNulls || false,
+    //   show: !customConfig.hideFrom?.viz,
+    //   gradientMode: customConfig.gradientMode,
+    //   thresholds: config.thresholds,
+    //   hardMin: field.config.min,
+    //   hardMax: field.config.max,
+    //   softMin: customConfig.axisSoftMin,
+    //   softMax: customConfig.axisSoftMax,
+    //   // The following properties are not used in the uPlot config, but are utilized as transport for legend config
+    //   dataFrameFieldIndex: field.state?.origin,
+    // });
   }
 
+  if (!curveFields) {
+    return builder;
+  }
+  //todo add curve series fied [2] and change above to start from 3
+  //let curvePathBuilder: uPlot.Series.PathBuilder | null = null;
+  for (let i = 0; i < curveFields.length; i++) {
+    const field = curveFields[i];
+
+    field.state = field.state ?? {};
+    field.state.seriesIndex = seriesIndex++;
+
+    const customConfig: FieldConfig = { ...defaultFieldConfig, ...field.config.custom };
+
+    const scaleKey = 'z';
+    const colorMode = getFieldColorModeForField(field);
+    const scaleColor = getFieldSeriesColor(field, theme);
+    const seriesColor = scaleColor.color;
+
+    builder.addSeries({
+      scaleKey,
+      lineWidth: customConfig.lineWidth,
+      lineColor: seriesColor,
+      //lineStyle: customConfig.lineStyle,
+      fillOpacity: customConfig.fillOpacity,
+      theme,
+      colorMode,
+      pathBuilder: null,
+      //lineInterpolation: LineInterpolation.Smooth,
+      //pointsBuilder: config.drawPoints,
+      show: !customConfig.hideFrom?.viz,
+      gradientMode: customConfig.gradientMode,
+      thresholds: field.config.thresholds,
+      lineStyle: { fill: 'dash' },
+      hardMin: field.config.min,
+      hardMax: field.config.max,
+      softMin: customConfig.axisSoftMin,
+      softMax: customConfig.axisSoftMax,
+
+      // The following properties are not used in the uPlot config, but are utilized as transport for legend config
+      dataFrameFieldIndex: { frameIndex: 0, fieldIndex: 3 },
+    });
+  }
   return builder;
 };
 
@@ -304,36 +387,69 @@ export class Histogram extends React.Component<HistogramProps, State> {
   }
 
   prepState(props: HistogramProps, withConfig = true): State {
-    const { alignedFrame } = props;
+    const { alignedFrame, curveData } = props;
 
     const config = withConfig
-      ? prepConfig(alignedFrame, this.props.theme, this.props.annotationsRange)
+      ? prepConfig(alignedFrame, curveData, this.props.theme, this.props.annotationsRange)
       : this.state.config!;
     const xMinOnly = xMinOnlyFrame(alignedFrame);
     const alignedData = preparePlotData(config, xMinOnly);
+    const alignedCurveData = prepareCurveData(curveData, alignedData);
 
     return {
       alignedFrame,
-      alignedData,
+      alignedData: alignedCurveData,
       config,
       xMinOnlyFrame: xMinOnly,
     };
   }
 
   renderLegend(config: UPlotConfigBuilder) {
-    const { legend } = this.props;
+    const { legend, curveData } = this.props;
 
     if (!config || legend.showLegend === false) {
       return null;
     }
 
-    const frames = this.props.options.combine ? [this.props.alignedFrame] : this.props.rawSeries!;
+    //todo add curve series here
+    let frames = this.props.options.combine ? [this.props.alignedFrame] : this.props.rawSeries!;
+
+    // const combinedFreames = this.props.alignedFrame[0].fields.push({
+    //   name: 'curve',
+    //   type: FieldType.number,
+    //   config: {},
+    //   values: [1, 2],
+    //   labels: { name: 'UP' },
+    // });
+    //frame.fields.push(bellField);
+
+    //if (curveData) {
+    // Combine the copied aligned fields with curveData
+    //const combinedFields = [...this.props.alignedFrame.fields, ...curveData];
+
+    // Save it in a constant
+    // frames = {
+    //   ...this.props.alignedFrame,
+    //   fields:  [...this.props.alignedFrame.fields, ...combinedFields] ,
+    // };
+
+    if (curveData) {
+      // Map through each frame and add the curve data to each one
+      frames = frames.map((frame) => {
+        const combinedFields = [...frame.fields, ...curveData];
+        return {
+          ...frame,
+          fields: combinedFields,
+        };
+      });
+    }
+    //}
 
     return <PlotLegend data={frames} config={config} maxHeight="35%" maxWidth="60%" {...legend} />;
   }
 
   componentDidUpdate(prevProps: HistogramProps) {
-    const { structureRev, alignedFrame, bucketSize, annotationsRange, bucketCount } = this.props;
+    const { structureRev, alignedFrame, bucketSize, annotationsRange, bucketCount, curveData } = this.props;
 
     if (alignedFrame !== prevProps.alignedFrame) {
       let newState = this.prepState(this.props, false);
@@ -349,7 +465,7 @@ export class Histogram extends React.Component<HistogramProps, State> {
           annotationsRange !== prevProps.annotationsRange;
 
         if (shouldReconfig) {
-          newState.config = prepConfig(alignedFrame, this.props.theme, this.props.annotationsRange);
+          newState.config = prepConfig(alignedFrame, curveData, this.props.theme, this.props.annotationsRange);
         }
       }
 
