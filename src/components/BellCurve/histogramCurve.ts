@@ -8,8 +8,9 @@ export function createHistogramCurve(frame: DataFrame, seriesIndex: number): { x
     return { x, y };
   }
 
-  const xMin = frame.fields.find((f) => f.name === 'xMin');
-  const xMax = frame.fields.find((f) => f.name === 'xMax');
+  const xMin = frame.fields.find((f) => f.name === 'xMin')?.values.filter((p) => !Number.isNaN(p)) as number[];
+  const xMax = frame.fields.find((f) => f.name === 'xMax')?.values.filter((p) => !Number.isNaN(p)) as number[];
+
   //2 is a starting point becasue of xMina (0) and yMin (1)
   const histogramSeries = 2 + seriesIndex;
 
@@ -21,7 +22,7 @@ export function createHistogramCurve(frame: DataFrame, seriesIndex: number): { x
 
   if (xMin && xMax && counts) {
     for (let i = 0; i < frame.length; i++) {
-      const xMean = (xMin.values[i] + xMax.values[i]) / 2;
+      const xMean = (((xMin[i] as number) + xMax[i]) as number) / 2;
       x.push(xMean);
       y.push(counts.values[i]);
     }
@@ -40,8 +41,9 @@ export function createHistogramCurveFrame(histogramFrame: DataFrame): Field[] | 
   }
 
   const curveFields: Field[] = [];
-  const xMin = histogramFrame.fields.find((f) => f.name === 'xMin');
-  const xMax = histogramFrame.fields.find((f) => f.name === 'xMax');
+  const xMin = histogramFrame.fields.find((f) => f.name === 'xMin')?.values.filter((p) => !Number.isNaN(p)) as number[];
+  const xMax = histogramFrame.fields.find((f) => f.name === 'xMax')?.values.filter((p) => !Number.isNaN(p)) as number[];
+
   if (!xMin || !xMax) {
     return;
   }
@@ -54,7 +56,7 @@ export function createHistogramCurveFrame(histogramFrame: DataFrame): Field[] | 
 
     //calculate bin centers
     for (let x = 0; x < histogramFrame.length; x++) {
-      const xMean = (xMin.values[x] + xMax.values[x]) / 2;
+      const xMean = (xMin[x] + xMax[x]) / 2;
 
       if (counts.values[x] !== null) {
         values.push(xMean);

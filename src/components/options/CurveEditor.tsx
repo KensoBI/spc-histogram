@@ -32,13 +32,6 @@ export const CurveEditor = ({ item, value, onChange, context }: StandardEditorPr
     onChange(newCurves);
   };
 
-  // const onCurveOptionChange = (selectedCurve: SelectableValue<SelectableCurve>) => {
-  //   if (!selectedCurve.value) {
-  //     throw new Error('Selected curve is not valid.');
-  //   }
-  //   addCurve(selectedCurve.value);
-  // };
-
   const onRemoveCurveByNameClick = (curveIndexToRemove: number) => {
     const newCurves = value.filter((_, i) => i !== curveIndexToRemove);
     onChange(newCurves);
@@ -70,69 +63,16 @@ export const CurveEditor = ({ item, value, onChange, context }: StandardEditorPr
     setExpandedHandles([newCurves.length - 1]);
   }
 
-  // function createCurve(selectedCurve: SelectableCurve, seriesIndex: number): CurveOptions {
-  //   return {
-  //     fit: selectedCurve.id,
-  //     name: selectedCurve.id,
-  //     seriesIndex: seriesIndex,
-  //     lineWidth: 4,
-  //     color: selectedCurve.color,
-  //   };
-  // }
-
-  // function addCurve(selectedCurve: SelectableCurve) {
-  //   const availableIndex = getAvailableSeriesIndexForCurve(selectedCurve.id);
-  //   if (availableIndex === -1) {
-  //     return;
-  //   }
-
-  //   if (!canAddCurve(selectedCurve, availableIndex)) {
-  //     return;
-  //   }
-  //   const newCurve = createCurve(selectedCurve, availableIndex);
-  //   const newCurves = [...value, newCurve];
-  //   onChange(newCurves);
-
-  //   setExpandedHandles([newCurves.length - 1]);
-  // }
-
-  // function getAvailableSeriesIndexForCurve(curveFit: CurveFit): number {
-  //   const usedIndex = value.filter((existingCl) => existingCl.fit === curveFit).map((i) => i.seriesIndex);
-  //   const allIndexes = context.data.map((_, index) => index);
-  //   const availableIndex = allIndexes.filter((i) => !usedIndex.includes(i));
-
-  //   if (availableIndex.length === 0) {
-  //     return -1;
-  //   }
-  //   return availableIndex[0];
-  // }
-
-  // function canAddCurve(selectedCurve: SelectableCurve, seriesIndex?: number): boolean {
-  //   const series = seriesIndex ?? getAvailableSeriesIndexForCurve(selectedCurve.id);
-
-  //   if (series === -1) {
-  //     return false;
-  //   }
-
-  //   const existingCurve = value.filter((cl) => cl.fit === selectedCurve.id);
-
-  //   if (existingCurve.length >= context.data.length) {
-  //     return false;
-  //   }
-
-  //   return true;
-  // }
-
   function getCurveDisplayName(curve: CurveOptions): string {
     if (context.data && context.data.length > 1 && context.data[curve.seriesIndex]) {
-      return `${curve.name} (${getFrameDisplayName(context.data[curve.seriesIndex], curve.seriesIndex)})`;
+      return `${curve.fit} (${getFrameDisplayName(context.data[curve.seriesIndex], curve.seriesIndex)})`;
     }
 
     if (context.data && context.data.length <= curve.seriesIndex) {
-      return `${curve.name} (stale series)`;
+      return `${curve.fit} (stale series)`;
     }
 
-    return curve.name;
+    return curve.fit;
   }
 
   return (
@@ -141,16 +81,6 @@ export const CurveEditor = ({ item, value, onChange, context }: StandardEditorPr
         <Button icon="plus" variant="secondary" size="md" fullWidth={true} onClick={handelAddCurveClick}>
           Add curve
         </Button>
-        {/* <ValuePicker
-          icon="plus"
-          label=""
-          variant="secondary"
-          menuPlacement="auto"
-          isFullWidth={true}
-          size="md"
-          options={selectableCurvesOptions}
-          onChange={(selectedCurveOption) => onCurveOptionChange(selectedCurveOption)}
-        /> */}
       </div>
 
       {value.map((curve, index) => (

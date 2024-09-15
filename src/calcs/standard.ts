@@ -87,7 +87,9 @@ export function calculateControlCharts(
   subgroupSize: number
 ): ControlChartData | null {
   // Ignore null and non-number values
-  const values = field.values.filter((value) => value !== null && !Number.isNaN(value));
+  const values = field.values.filter(
+    (value) => value !== null && value !== undefined && typeof value === 'number' && !Number.isNaN(value)
+  );
   const isValidSubgroupSize = (size: number) => size >= 2 && size <= 25;
 
   switch (chartType) {

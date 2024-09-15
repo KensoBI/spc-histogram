@@ -11,6 +11,24 @@ Welcome to the KensoBI SPC Histogram panel for Grafana. This plugin enables you 
 - **Custom Limits:** Add your own limits for more tailored analysis.
 - **Subgrouping:** Group your samples into subgroups and aggregate it.
 - **Aggregation:** Aggregate your data by moving range, range, mean, or standard deviation.
+- **Histogram Bell Curve** Visualize the distribution of your data with a histogram bell curve overlay.
+- **Gaussian Bell Curve** Add a Gaussian (normal) distribution curve to your histogram for comparison and analysis.
+
+## Histogram Curve
+
+![Histogram curve](https://raw.githubusercontent.com/KensoBI/spc-histogram/main/src/img/histogram-curve.png)
+
+The histogram bell curve provides a smoothed visualization of your data distribution, making it easier to observe overall patterns and trends in the dataset. This curve is created by simply connecting the midpoints of each histogram bin, offering a straightforward representation of the data distribution.
+
+## Gaussian Curve
+
+![Gaussian bell curve ](https://raw.githubusercontent.com/KensoBI/spc-histogram/main/src/img/gaussian-curve.png)
+
+The Gaussian bell curve fits a normal distribution to your data, allowing for a direct comparison between actual data and the ideal normal distribution. This highlights deviations from normality, aiding in process analysis and improvement opportunities.
+
+The Gaussian fit is performed using the Levenberg-Marquardt algorithm, a popular method for solving non-linear least squares problems. This algorithm iteratively adjusts the parameters of the Gaussian function (amplitude, mean, and standard deviation) to minimize the difference between the fitted curve and the actual histogram data.
+
+The implementation uses the [ml-levenberg-marquardt](https://github.com/mljs/levenberg-marquardt) library to perform the fitting process, ensuring an accurate representation of the Gaussian distribution that best matches your data.
 
 ## Getting Help
 

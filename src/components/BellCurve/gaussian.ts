@@ -23,7 +23,6 @@ function gaussianFunction2([amplitude, mean, stdDev]: [number, number, number]):
   return (x: number) => amplitude * Math.exp(-0.5 * ((x - mean) / stdDev) ** 2);
 }
 
-//todo we need to separate by series and calculate curver for each series
 function createGaussianCurve(histogramFrame: DataFrame, rawSeries: DataFrame[], seriesIndex: number): GaussianCurve {
   const curve: GaussianCurve = {
     x: [],
@@ -36,9 +35,10 @@ function createGaussianCurve(histogramFrame: DataFrame, rawSeries: DataFrame[], 
   };
 
   // Extract histogram data
-  const xMin = histogramFrame.fields.find((f) => f.name === 'xMin')?.values as number[];
-  const xMax = histogramFrame.fields.find((f) => f.name === 'xMax')?.values as number[];
+  const xMin = histogramFrame.fields.find((f) => f.name === 'xMin')?.values.filter((p) => !Number.isNaN(p)) as number[];
+  const xMax = histogramFrame.fields.find((f) => f.name === 'xMax')?.values.filter((p) => !Number.isNaN(p)) as number[];
   //2 is a starting point becasue of xMina (0) and yMin (1)
+
   const histogramSeries = 2 + seriesIndex;
 
   if (!xMin || !xMax || histogramFrame.fields.length < histogramSeries) {
@@ -58,16 +58,6 @@ function createGaussianCurve(histogramFrame: DataFrame, rawSeries: DataFrame[], 
 
   // Combine all numeric values from rawSeries. Histogram is build from all numeric fields so we need to do the same when calculating the curve values
   const allValues = frame.fields.filter((field) => field.type === 'number').flatMap((field) => field.values);
-
-  // rawSeries.forEach((frame, frameIndex) => {
-  //   if (frameIndex === seriesIndex) {
-  //     frame.fields.forEach((field) => {
-  //       if (field.type === 'number') {
-  //         allValues.push(...field.values);
-  //       }
-  //     });
-  //   }
-  // });
 
   // Calculate initial guess for parameters
   const initialAmplitude = Math.max(...counts);
@@ -91,12 +81,6 @@ function createGaussianCurve(histogramFrame: DataFrame, rawSeries: DataFrame[], 
 
   // Perform the fit
   const lm = levenbergMarquardt(data, gaussianFunction2, options);
-  // Perform the fit
-  //   const lm = levenbergMarquardt(
-  //     data,
-  //     (x: number, [amplitude, mean, stdDev]: number[]) => gaussianFunction(x, { amplitude, mean, stdDev }),
-  //     options
-  //   );
 
   // Generate the fitted curve
   const fittedParams: GaussianParams = {

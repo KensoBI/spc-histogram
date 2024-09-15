@@ -12,7 +12,7 @@ export function createXbarChartForXbarS(data: number[], subgroupSize: number): C
 
   const xbarMean = xbarValues.reduce((sum, xbar) => sum + xbar, 0) / xbarValues.length;
 
-  const sValues = subgroups.map(calculateSampleStandardDeviation);
+  const sValues = subgroups.filter((p) => p.length > 1).map(calculateSampleStandardDeviation);
   const sMean = sValues.reduce((sum, s) => sum + s, 0) / sValues.length;
 
   const A3 = getControlChartConstant(subgroupSize, ControlChartConstants.a3_xbar_limit_sigma);
@@ -31,7 +31,7 @@ export function createSChartForXbarS(data: number[], subgroupSize: number): Cont
   }
 
   const subgroups = chunkArray(data, subgroupSize);
-  const sValues = subgroups.map(calculateSampleStandardDeviation);
+  const sValues = subgroups.filter((p) => p.length > 1).map(calculateSampleStandardDeviation);
   const sMean = sValues.reduce((sum, s) => sum + s, 0) / sValues.length;
 
   const B3 = getControlChartConstant(subgroupSize, ControlChartConstants.a3_xbar_limit_sigma);
