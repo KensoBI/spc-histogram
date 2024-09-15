@@ -30,11 +30,13 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
   subgroupSize: number;
   aggregationType: AggregationType;
   controlLines: ControlLine[];
-  curve: CurveOptions;
+  curves: CurveOptions[];
 }
 
 export interface CurveOptions {
+  name: string;
   fit: CurveFit;
+  seriesIndex: number;
   lineWidth: number;
   color: string;
 }
@@ -78,3 +80,25 @@ export const defaultOptions: Partial<Options> = {
 };
 
 export interface ChartPanelProps extends PanelProps<Options> {}
+
+export interface SelectableCurve {
+  id: CurveFit;
+  name: string;
+  description: string;
+  color: string;
+}
+
+export const selectableCurves: SelectableCurve[] = [
+  {
+    id: CurveFit.histogram,
+    name: CurveFit.histogram,
+    description: 'Creates a line that connects the midpoints of the histogram bins.',
+    color: '#37872d',
+  },
+  {
+    id: CurveFit.gaussian,
+    name: CurveFit.gaussian,
+    description: 'Draws a curve representing the Gaussian (normal) distribution of series values.',
+    color: '#37872d',
+  },
+];

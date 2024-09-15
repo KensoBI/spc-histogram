@@ -19,8 +19,6 @@ export enum CurveFit {
   gaussian = 'Gaussian',
 }
 
-//export type AggregationType = 'none' | 'mean' | 'range' | 'standardDeviation' | 'movingRange';
-
 export enum AggregationType {
   none = 'none',
   Mean = 'Mean',

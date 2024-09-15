@@ -8,6 +8,12 @@ interface GaussianParams {
   stdDev: number;
 }
 
+interface GaussianCurve {
+  x: number[];
+  y: number[];
+  params: GaussianParams;
+}
+
 function gaussianFunction(x: number, params: GaussianParams): number {
   const { amplitude, mean, stdDev } = params;
   return amplitude * Math.exp(-0.5 * ((x - mean) / stdDev) ** 2);
@@ -18,31 +24,50 @@ function gaussianFunction2([amplitude, mean, stdDev]: [number, number, number]):
 }
 
 //todo we need to separate by series and calculate curver for each series
-function createGaussianCurve(
-  histogramFrame: DataFrame,
-  rawSeries: DataFrame[]
-): { x: number[]; y: number[]; params: GaussianParams } {
+function createGaussianCurve(histogramFrame: DataFrame, rawSeries: DataFrame[], seriesIndex: number): GaussianCurve {
+  const curve: GaussianCurve = {
+    x: [],
+    y: [],
+    params: {
+      amplitude: 0,
+      mean: 0,
+      stdDev: 0,
+    },
+  };
+
   // Extract histogram data
   const xMin = histogramFrame.fields.find((f) => f.name === 'xMin')?.values as number[];
   const xMax = histogramFrame.fields.find((f) => f.name === 'xMax')?.values as number[];
+  //2 is a starting point becasue of xMina (0) and yMin (1)
+  const histogramSeries = 2 + seriesIndex;
 
-  if (!xMin || !xMax || histogramFrame.fields.length !== 3) {
+  if (!xMin || !xMax || histogramFrame.fields.length < histogramSeries) {
     throw new Error('Missing histogram data fields');
   }
-  const counts = histogramFrame.fields[2].values as number[];
+
+  if (!rawSeries[seriesIndex]) {
+    return curve;
+  }
+
+  const counts = histogramFrame.fields[histogramSeries].values as number[];
 
   // Calculate bin centers
   const x = xMin.map((min, i) => (min + xMax[i]) / 2);
 
-  // Combine all numeric values from rawSeries
-  const allValues: number[] = [];
-  rawSeries.forEach((frame) => {
-    frame.fields.forEach((field) => {
-      if (field.type === 'number') {
-        allValues.push(...field.values);
-      }
-    });
-  });
+  const frame = rawSeries[seriesIndex];
+
+  // Combine all numeric values from rawSeries. Histogram is build from all numeric fields so we need to do the same when calculating the curve values
+  const allValues = frame.fields.filter((field) => field.type === 'number').flatMap((field) => field.values);
+
+  // rawSeries.forEach((frame, frameIndex) => {
+  //   if (frameIndex === seriesIndex) {
+  //     frame.fields.forEach((field) => {
+  //       if (field.type === 'number') {
+  //         allValues.push(...field.values);
+  //       }
+  //     });
+  //   }
+  // });
 
   // Calculate initial guess for parameters
   const initialAmplitude = Math.max(...counts);

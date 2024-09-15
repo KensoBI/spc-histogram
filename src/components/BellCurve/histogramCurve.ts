@@ -1,16 +1,23 @@
 import { DataFrame, Field, FieldType } from '@grafana/data';
 
-export function createHistogramCurve(frame: DataFrame): { x: number[]; y: number[] } {
+export function createHistogramCurve(frame: DataFrame, seriesIndex: number): { x: number[]; y: number[] } {
   const x: number[] = [];
   const y: number[] = [];
 
-  if (frame.fields.length !== 3) {
+  if (frame.fields.length < 3) {
     return { x, y };
   }
 
   const xMin = frame.fields.find((f) => f.name === 'xMin');
   const xMax = frame.fields.find((f) => f.name === 'xMax');
-  const counts = frame.fields[2];
+  //2 is a starting point becasue of xMina (0) and yMin (1)
+  const histogramSeries = 2 + seriesIndex;
+
+  if (!xMin || !xMax || frame.fields.length < histogramSeries) {
+    throw new Error('Missing histogram data fields');
+  }
+
+  const counts = frame.fields[histogramSeries];
 
   if (xMin && xMax && counts) {
     for (let i = 0; i < frame.length; i++) {

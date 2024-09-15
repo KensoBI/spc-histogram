@@ -70,13 +70,13 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
               config={config}
               histogramData={alignedFrame}
               rawSeries={stampedSamples}
-              curveOptions={options.curve}
+              curveOptions={options.curves}
             />
           )}
         </>
       );
     },
-    [limitAnnotations.limits, options.curve, stampedSamples]
+    [limitAnnotations.limits, options.curves, stampedSamples]
   );
 
   if (!histogram || !histogram.fields.length) {

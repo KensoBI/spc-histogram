@@ -5,7 +5,8 @@ import { SpcHistogramPanel } from 'components/SpcHistogramPanel';
 import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor';
 import { ControlLineEditor } from 'components/options/ControlLineEditor';
 import { SubgroupEditor } from 'components/options/SubgroupEditor';
-import { CurveFit, SpcChartTyp } from 'types';
+import { SpcChartTyp } from 'types';
+import { CurveEditor } from 'components/options/CurveEditor';
 
 export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
 
@@ -101,40 +102,50 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
       category: ['SPC'],
     });
 
-    builder.addSelect({
-      path: 'curve.fit',
-      name: 'Curve fit',
-      description: 'Choose how the curve should fit',
-      settings: {
-        allowCustomValue: false,
-        options: [
-          { label: 'No curve', value: CurveFit.none },
-          { label: 'Histogram', value: CurveFit.histogram },
-          { label: 'Gaussian (Normal)', value: CurveFit.gaussian },
-        ],
-      },
-
-      defaultValue: CurveFit.histogram,
+    builder.addCustomEditor({
+      id: 'curves',
+      path: 'curves',
+      name: 'Add a Bell Curve',
+      description: 'A bell curve represents a symmetrical, bell-shaped distribution centered around the mean.',
+      editor: CurveEditor,
+      defaultValue: [],
       category: ['Curve'],
     });
 
-    builder.addColorPicker({
-      path: 'curve.color',
-      name: 'Color',
-      defaultValue: 'dark-blue',
-      category: ['Curve'],
-    });
-    builder.addSliderInput({
-      path: 'curve.lineWidth',
-      name: 'Line width',
-      defaultValue: 5,
-      settings: {
-        min: 1,
-        max: 15,
-        step: 1,
-      },
-      category: ['Curve'],
-    });
+    // builder.addSelect({
+    //   path: 'curve.fit',
+    //   name: 'Curve fit',
+    //   description: 'Choose how the curve should fit',
+    //   settings: {
+    //     allowCustomValue: false,
+    //     options: [
+    //       { label: 'No curve', value: CurveFit.none },
+    //       { label: 'Histogram', value: CurveFit.histogram },
+    //       { label: 'Gaussian (Normal)', value: CurveFit.gaussian },
+    //     ],
+    //   },
+
+    //   defaultValue: CurveFit.histogram,
+    //   category: ['Curve'],
+    // });
+
+    // builder.addColorPicker({
+    //   path: 'curve.color',
+    //   name: 'Color',
+    //   defaultValue: 'dark-blue',
+    //   category: ['Curve'],
+    // });
+    // builder.addSliderInput({
+    //   path: 'curve.lineWidth',
+    //   name: 'Line width',
+    //   defaultValue: 5,
+    //   settings: {
+    //     min: 1,
+    //     max: 15,
+    //     step: 1,
+    //   },
+    //   category: ['Curve'],
+    // });
 
     commonOptionsBuilder.addLegendOptions(builder);
 
