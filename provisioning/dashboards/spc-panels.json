@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -81,6 +81,15 @@
             "name": "UCL",
             "position": 0,
             "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "curves": [
+          {
+            "color": "yellow",
+            "fit": "Gaussian",
+            "lineWidth": 4,
+            "name": "Histogram",
             "seriesIndex": 0
           }
         ],
@@ -158,6 +167,7 @@
             "seriesIndex": 0
           }
         ],
+        "curves": [],
         "legend": {
           "calcs": [],
           "displayMode": "list",
@@ -242,6 +252,15 @@
             "seriesIndex": 0
           }
         ],
+        "curves": [
+          {
+            "color": "yellow",
+            "fit": "Histogram",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 0
+          }
+        ],
         "legend": {
           "calcs": [],
           "displayMode": "list",
@@ -316,6 +335,7 @@
             "seriesIndex": 0
           }
         ],
+        "curves": [],
         "legend": {
           "calcs": [],
           "displayMode": "list",
@@ -387,6 +407,22 @@
             "name": "UCL",
             "position": 0,
             "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "curves": [
+          {
+            "color": "yellow",
+            "fit": "Histogram",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 0
+          },
+          {
+            "color": "#A352CC",
+            "fit": "Gaussian",
+            "lineWidth": 4,
+            "name": "Histogram",
             "seriesIndex": 0
           }
         ],
@@ -484,6 +520,7 @@
             "seriesIndex": 0
           }
         ],
+        "curves": [],
         "legend": {
           "calcs": [],
           "displayMode": "list",
@@ -589,6 +626,22 @@
             "seriesIndex": 1
           }
         ],
+        "curves": [
+          {
+            "color": "#37872D",
+            "fit": "Histogram",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 0
+          },
+          {
+            "color": "yellow",
+            "fit": "Gaussian",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 1
+          }
+        ],
         "legend": {
           "calcs": [],
           "displayMode": "list",
@@ -629,11 +682,10 @@
     "from": "now-6h",
     "to": "now"
   },
-  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "browser",
   "title": "SPC Histograms",
   "uid": "cds23y6jstgcgd",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
