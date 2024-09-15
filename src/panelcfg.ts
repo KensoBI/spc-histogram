@@ -7,7 +7,7 @@ import {
   GraphGradientMode,
 } from '@grafana/schema';
 import { ControlLineReducerId } from 'data/spcReducers';
-import { AggregationType, SpcChartTyp } from 'types';
+import { AggregationType, CurveFit, SpcChartTyp } from 'types';
 
 export interface Options extends OptionsWithLegend, OptionsWithTooltip {
   /**
@@ -30,6 +30,15 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
   subgroupSize: number;
   aggregationType: AggregationType;
   controlLines: ControlLine[];
+  curves: CurveOptions[];
+}
+
+export interface CurveOptions {
+  name: string;
+  fit: CurveFit;
+  seriesIndex: number;
+  lineWidth: number;
+  color: string;
 }
 
 export interface ControlLine {
@@ -71,3 +80,25 @@ export const defaultOptions: Partial<Options> = {
 };
 
 export interface ChartPanelProps extends PanelProps<Options> {}
+
+export interface SelectableCurve {
+  id: CurveFit;
+  name: string;
+  description: string;
+  color: string;
+}
+
+export const selectableCurves: SelectableCurve[] = [
+  {
+    id: CurveFit.histogram,
+    name: CurveFit.histogram,
+    description: 'Creates a line that connects the midpoints of the histogram bins.',
+    color: '#37872d',
+  },
+  {
+    id: CurveFit.gaussian,
+    name: CurveFit.gaussian,
+    description: 'Draws a curve representing the Gaussian (normal) distribution of series values.',
+    color: '#37872d',
+  },
+];

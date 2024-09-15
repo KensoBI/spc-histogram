@@ -159,6 +159,10 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
       return true;
     }
 
+    if (reducer.computed && chartType === SpcChartTyp.none) {
+      return false;
+    }
+
     const series = seriesIndex ?? getAvailableSeriesIndexForReducer(reducer.id);
 
     if (series === -1) {
@@ -268,6 +272,10 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                       label: `${getFrameDisplayName(frame, index)}`,
                     }))}
                     onChange={(value) => {
+                      if (!value) {
+                        return;
+                      }
+
                       handleControlLineChange(index, 'seriesIndex', value.value);
                     }}
                   />

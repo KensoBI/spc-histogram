@@ -12,7 +12,9 @@ export function createXbarChartForXbarR(data: number[], subgroupSize: number): C
 
   const xbarMean = xbarValues.reduce((sum, xbar) => sum + xbar, 0) / xbarValues.length;
 
-  const rValues = subgroups.map((subgroup) => Math.max(...subgroup) - Math.min(...subgroup));
+  const rValues = subgroups
+    .filter((p) => p.length > 1)
+    .map((subgroup) => Math.max(...subgroup) - Math.min(...subgroup));
   const rMean = rValues.reduce((sum, r) => sum + r, 0) / rValues.length;
 
   const A2 = getControlChartConstant(subgroupSize, ControlChartConstants.a2_xbar_limit_range);
@@ -30,7 +32,9 @@ export function createRChartForXbarR(data: number[], subgroupSize: number): Cont
     throw new Error('Subgroup size must be between 2 and 25.');
   }
   const subgroups = chunkArray(data, subgroupSize);
-  const rValues = subgroups.map((subgroup) => Math.max(...subgroup) - Math.min(...subgroup));
+  const rValues = subgroups
+    .filter((p) => p.length > 1)
+    .map((subgroup) => Math.max(...subgroup) - Math.min(...subgroup));
   const rMean = rValues.reduce((sum, r) => sum + r, 0) / rValues.length;
 
   const D3 = getControlChartConstant(subgroupSize, ControlChartConstants.d3_range_lcl);

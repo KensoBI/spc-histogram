@@ -47,9 +47,9 @@ export function doSpcCalcs(series: DataFrame[], options: Options): DataFrame[] {
           const controlChartData = calculateControlCharts(updatedField, options.chartType, subgroupSize);
           if (controlChartData) {
             updatedField.values = controlChartData.data;
-            fieldCalcs.lcl = controlChartData.lowerControlLimit;
-            fieldCalcs.ucl = controlChartData.upperControlLimit;
-            fieldCalcs.mean = controlChartData.centerLine;
+            updatedField.state.calcs.lcl = controlChartData.lowerControlLimit;
+            updatedField.state.calcs.ucl = controlChartData.upperControlLimit;
+            updatedField.state.calcs.mean = controlChartData.centerLine;
           } else {
             //calculate series based on aggregation type
             updatedField.values = aggregateSeries(updatedField.values, subgroupSize, aggregationType);
@@ -61,14 +61,10 @@ export function doSpcCalcs(series: DataFrame[], options: Options): DataFrame[] {
             const standardStats = calculateStandardStats(updatedField);
 
             updatedField.state.calcs = {
+              ...updatedField.state.calcs,
               ...standardStats,
             };
           }
-
-          updatedField.state.calcs = {
-            ...updatedField.state.calcs,
-            ...fieldCalcs,
-          };
         }
 
         return updatedField;

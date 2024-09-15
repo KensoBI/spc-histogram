@@ -6,6 +6,7 @@ import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor'
 import { ControlLineEditor } from 'components/options/ControlLineEditor';
 import { SubgroupEditor } from 'components/options/SubgroupEditor';
 import { SpcChartTyp } from 'types';
+import { CurveEditor } from 'components/options/CurveEditor';
 
 export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
 
@@ -99,6 +100,16 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
       editor: ControlLineEditor,
       defaultValue: [],
       category: ['SPC'],
+    });
+
+    builder.addCustomEditor({
+      id: 'curves',
+      path: 'curves',
+      name: 'Add a Bell Curve',
+      description: 'A bell curve represents a symmetrical, bell-shaped distribution centered around the mean.',
+      editor: CurveEditor,
+      defaultValue: [],
+      category: ['Curve'],
     });
 
     commonOptionsBuilder.addLegendOptions(builder);

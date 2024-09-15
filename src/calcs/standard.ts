@@ -4,6 +4,7 @@ import { ControlChartData, SpcChartTyp } from 'types';
 import { createXbarChartForXbarR, createRChartForXbarR } from './xbarr';
 import { createXbarChartForXbarS, createSChartForXbarS } from './xbars';
 import { createXChartXmR, createMRChartXmR } from './xmr';
+import { calculateSampleStandardDeviation } from './common';
 
 export function calculateStandardStats(field: Field): FieldCalcs {
   const calcs: FieldCalcs = {
@@ -61,6 +62,10 @@ export function calculateStandardStats(field: Field): FieldCalcs {
     calcs.mean = calcs.sum / calcs.count;
   }
 
+  if (calcs.count > 0) {
+    calcs.stdDev = calculateSampleStandardDeviation(data);
+  }
+
   if (calcs.max !== null && calcs.min !== null) {
     calcs.range = calcs.max - calcs.min;
   }
@@ -82,7 +87,9 @@ export function calculateControlCharts(
   subgroupSize: number
 ): ControlChartData | null {
   // Ignore null and non-number values
-  const values = field.values.filter((value) => value !== null && !Number.isNaN(value));
+  const values = field.values.filter(
+    (value) => value !== null && value !== undefined && typeof value === 'number' && !Number.isNaN(value)
+  );
   const isValidSubgroupSize = (size: number) => size >= 2 && size <= 25;
 
   switch (chartType) {
