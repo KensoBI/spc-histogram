@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { css } from '@emotion/css';
-import { GrafanaTheme2, SelectableValue, StandardEditorProps, getFrameDisplayName } from '@grafana/data';
+import {
+  GrafanaTheme2,
+  SelectableValue,
+  StandardEditorProps,
+  getFieldDisplayName,
+  getFrameDisplayName,
+} from '@grafana/data';
 import {
   Button,
   ColorPicker,
@@ -15,7 +21,7 @@ import {
   useStyles2,
 } from '@grafana/ui';
 import { ControlLine, Options } from 'panelcfg';
-import { SpcChartTyp } from 'types';
+import { PositionInput, SpcChartTyp } from 'types';
 import { ControlLineReducer, ControlLineReducerId, controlLineReducers } from 'data/spcReducers';
 
 const defaultConstantColor = '#37872d';
@@ -97,7 +103,8 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     return {
       reducerId: reducer.id,
       name: reducer.name,
-      position: 0,
+      field: '',
+      positionInput: PositionInput.static,
       seriesIndex: seriesIndex,
       lineWidth: 4,
       lineColor: reducer.color,
@@ -251,17 +258,6 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                     onChange={(e) => handleControlLineChange(index, 'name', e.currentTarget.value)}
                   />
                 </Field>
-                {!isComputed(controlLine.reducerId) && (
-                  <Field label="Position" description="Numeric position at which the control line is drawn. ">
-                    <Input
-                      placeholder={'Value'}
-                      type="number"
-                      step="0.01"
-                      value={controlLine.position}
-                      onChange={(e) => handleControlLineChange(index, 'position', parseFloat(e.currentTarget.value))}
-                    />
-                  </Field>
-                )}
                 <Field label="Series" description="Select the series for which to calculate this control.">
                   <Select
                     placeholder="Select series"
@@ -280,6 +276,57 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                     }}
                   />
                 </Field>
+                {!isComputed(controlLine.reducerId) && (
+                  <>
+                    <Field label="Position input">
+                      <RadioButtonGroup
+                        value={controlLine.positionInput}
+                        options={[
+                          { label: 'Static', description: 'Manual entry', value: PositionInput.static },
+                          { label: 'Series', description: 'Field from series', value: PositionInput.series },
+                        ]}
+                        onChange={(value) => {
+                          handleControlLineChange(index, 'positionInput', value);
+                        }}
+                      ></RadioButtonGroup>
+                    </Field>
+                    {controlLine.positionInput === PositionInput.static && (
+                      <Field label="Position" description="Numeric position at which the control line is drawn. ">
+                        <Input
+                          placeholder={'Value'}
+                          type="number"
+                          step="0.01"
+                          value={controlLine.position}
+                          onChange={(e) =>
+                            handleControlLineChange(index, 'position', parseFloat(e.currentTarget.value))
+                          }
+                        />
+                      </Field>
+                    )}
+                    {controlLine.positionInput === PositionInput.series && (
+                      <Field label="Field" description="Select field for control line position.">
+                        <Select
+                          placeholder="Field"
+                          isClearable={true}
+                          value={controlLine.field}
+                          options={context.data
+                            .find((_f, i) => i === controlLine.seriesIndex)
+                            ?.fields.map((field, index) => ({
+                              value: field.name,
+                              label: field.display?.name ?? `${getFieldDisplayName(field)}`,
+                            }))}
+                          onChange={(value) => {
+                            if (!value) {
+                              return;
+                            }
+
+                            handleControlLineChange(index, 'field', value.value);
+                          }}
+                        />
+                      </Field>
+                    )}
+                  </>
+                )}
                 <Field label="Line width">
                   <Slider
                     min={1}

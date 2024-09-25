@@ -27,6 +27,11 @@ export enum AggregationType {
   MovingRange = 'Moving range',
 }
 
+export enum PositionInput {
+  static = 'Static',
+  series = 'Series',
+}
+
 export interface ControlChartData {
   centerLine: number;
   upperControlLimit: number;
