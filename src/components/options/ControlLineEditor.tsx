@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { css } from '@emotion/css';
 import {
+  DataFrame,
   GrafanaTheme2,
   SelectableValue,
   StandardEditorProps,
@@ -11,6 +12,7 @@ import {
   Button,
   ColorPicker,
   Field,
+  Icon,
   IconButton,
   Input,
   RadioButtonGroup,
@@ -48,7 +50,11 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
         (c) =>
           c.id === ControlLineReducerId.lcl || c.id === ControlLineReducerId.ucl || c.id === ControlLineReducerId.mean
       );
-      addControlLines(spcControls);
+
+      const newControlLines = spcControls.filter((r) => !value.some((cl) => r.id === cl.reducerId));
+      if (newControlLines.length > 0) {
+        addControlLines(newControlLines);
+      }
     }
   }
 
@@ -149,9 +155,25 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     }
   }
 
+  function getFilteredDataFramesForReducer(reducer: ControlLineReducerId): DataFrame[] {
+    if (!isComputed(reducer)) {
+      return context.data;
+    }
+
+    // Filter feature dataframes if reducer is computed
+    const { featureQueryRefIds } = context.options;
+
+    return context.data.filter((frame) => !featureQueryRefIds || !featureQueryRefIds.includes(frame.refId!));
+  }
+
+  function getFilteredDataFrames(): DataFrame[] {
+    const { featureQueryRefIds } = context.options;
+    return context.data.filter((frame) => !featureQueryRefIds || !featureQueryRefIds.includes(frame.refId!));
+  }
+
   function getAvailableSeriesIndexForReducer(reducer: ControlLineReducerId): number {
     const usedIndex = value.filter((existingCl) => existingCl.reducerId === reducer).map((i) => i.seriesIndex);
-    const allIndexes = context.data.map((_, index) => index);
+    const allIndexes = getFilteredDataFramesForReducer(reducer).map((_, index) => index);
     const availableIndex = allIndexes.filter((i) => !usedIndex.includes(i));
 
     if (availableIndex.length === 0) {
@@ -161,8 +183,8 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
   }
 
   function canAddReducer(reducer: ControlLineReducer, seriesIndex?: number): boolean {
-    if (!reducer.computed && !reducer.isStandard) {
-      //we can add as many constant control lines as we want
+    if ((!reducer.computed && !reducer.isStandard) || reducer.isStandard) {
+      //standard and constant control lines are always allowed
       return true;
     }
 
@@ -178,23 +200,38 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
 
     const existingClr = value.filter((cl) => cl.reducerId === reducer.id);
 
-    if (existingClr.length >= context.data.length) {
+    if (existingClr.length >= getFilteredDataFrames().length) {
       return false;
     }
 
     return true;
   }
 
-  function getControlLineDisplayName(controlLine: ControlLine): string {
-    if (context.data && context.data.length > 1 && context.data[controlLine.seriesIndex]) {
-      return `${controlLine.name} (${getFrameDisplayName(context.data[controlLine.seriesIndex], controlLine.seriesIndex)})`;
+  function getControlLineDisplayName(controlLine: ControlLine): React.JSX.Element {
+    const seriesData = getFilteredDataFrames();
+
+    if (seriesData && seriesData.length > 1 && seriesData[controlLine.seriesIndex]) {
+      return (
+        <span>
+          {controlLine.name}
+          <Icon name="angle-right" className={styles.chevron} />
+          {seriesData[controlLine.seriesIndex].refId}
+          <Icon name="angle-right" className={styles.chevron} />
+          {getFrameDisplayName(seriesData[controlLine.seriesIndex], controlLine.seriesIndex)}
+        </span>
+      );
     }
 
-    if (context.data && context.data.length <= controlLine.seriesIndex) {
-      return `${controlLine.name} (stale series)`;
+    if (seriesData && seriesData.length <= controlLine.seriesIndex) {
+      return (
+        <span>
+          {controlLine.name} <Icon name="angle-right" className={styles.chevron} />
+          (stale series)
+        </span>
+      );
     }
 
-    return controlLine.name;
+    return <span>{controlLine.name}</span>;
   }
 
   function isComputed(reducerId: ControlLineReducerId): boolean {
@@ -263,10 +300,22 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                     placeholder="Select series"
                     isClearable={true}
                     value={controlLine.seriesIndex}
-                    options={context.data.map((frame, index) => ({
+                    options={getFilteredDataFramesForReducer(controlLine.reducerId).map((frame, index) => ({
                       value: index,
-                      label: `${getFrameDisplayName(frame, index)}`,
+                      label: `${frame.refId} > ${getFrameDisplayName(frame, index)}`,
                     }))}
+                    formatOptionLabel={(option) => {
+                      const label = option.label || '';
+                      const parts = label.split(' > ');
+
+                      return (
+                        <div>
+                          {parts[0]} {/* frame.refId */}
+                          <Icon name="angle-right" className={styles.chevron} />
+                          {parts[1] || ''} {/* getFrameDisplayName */}
+                        </div>
+                      );
+                    }}
                     onChange={(value) => {
                       if (!value) {
                         return;
@@ -309,7 +358,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                           placeholder="Field"
                           isClearable={true}
                           value={controlLine.field}
-                          options={context.data
+                          options={getFilteredDataFramesForReducer(controlLine.reducerId)
                             .find((_f, i) => i === controlLine.seriesIndex)
                             ?.fields.map((field, index) => ({
                               value: field.name,
@@ -411,6 +460,9 @@ const getStyles = (theme: GrafanaTheme2) => {
       color: theme.colors.text.secondary,
       fontSize: theme.typography.bodySmall.fontSize,
       fontWeight: theme.typography.bodySmall.fontWeight,
+    }),
+    chevron: css({
+      margin: theme.spacing(0, 0.25),
     }),
   };
 };

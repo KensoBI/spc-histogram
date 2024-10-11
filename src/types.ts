@@ -1,3 +1,5 @@
+export const SUBGROUP_SIZE_VARIABLE = 'subgroupsize';
+
 export type LimitConfigItem = {
   name: string;
   color: string;

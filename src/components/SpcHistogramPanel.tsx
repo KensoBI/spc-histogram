@@ -8,14 +8,23 @@ import { doSpcCalcs } from 'data/doSpcCalcs';
 import buildLimitAnnotations from './LimitAnnotations/buildLimitAnnotations';
 import { ChartPanelProps } from 'panelcfg';
 import { BellCurve } from './BellCurve/BellCurve';
+import { useSubgroupSizeOptions } from './options/useSubgroupSize';
 
 export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelProps) => {
   const theme = useTheme2();
+  const optionsWithVars = useSubgroupSizeOptions(options).options;
+
   const { samples, limitAnnotations } = useMemo(() => {
-    const samplesWithCalcs = doSpcCalcs(data.series, options);
-    const limitAnnotationsResult = buildLimitAnnotations(data.series, options);
+    let samplesWithCalcs = doSpcCalcs(data.series, optionsWithVars);
+    const limitAnnotationsResult = buildLimitAnnotations(samplesWithCalcs, optionsWithVars);
+
+    if (optionsWithVars.featureQueryRefIds) {
+      // Remove feature queries
+      samplesWithCalcs = samplesWithCalcs.filter((frame) => !optionsWithVars.featureQueryRefIds.includes(frame.refId!));
+    }
+
     return { samples: samplesWithCalcs, limitAnnotations: limitAnnotationsResult };
-  }, [data.series, options]);
+  }, [data.series, optionsWithVars]);
 
   const stampedSamples = useMemo(() => {
     return samples.map((frame, frameIndex) => ({
@@ -24,7 +33,7 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
         ...field,
         state: {
           ...field.state,
-          origin: { frameIndex, fieldIndex },
+          origin: { frameIndex, fieldIndex, refId: frame.refId },
         },
       })),
     }));
@@ -41,13 +50,13 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
         return histogramFieldsToFrame(info);
       }
     }
-    const hist = buildHistogram(stampedSamples, options);
+    const hist = buildHistogram(stampedSamples, optionsWithVars);
     if (!hist) {
       return undefined;
     }
 
     return histogramFieldsToFrame(hist, theme);
-  }, [stampedSamples, options, theme]);
+  }, [stampedSamples, optionsWithVars, theme]);
 
   const bucketSize = useMemo(() => {
     return histogram ? getBucketSize(histogram) : 0;
@@ -70,13 +79,13 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
               config={config}
               histogramData={alignedFrame}
               rawSeries={stampedSamples}
-              curveOptions={options.curves}
+              curveOptions={optionsWithVars.curves}
             />
           )}
         </>
       );
     },
-    [limitAnnotations.limits, options.curves, stampedSamples]
+    [limitAnnotations.limits, optionsWithVars.curves, stampedSamples]
   );
 
   if (!histogram || !histogram.fields.length) {
@@ -89,9 +98,9 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
 
   return (
     <Histogram
-      options={options}
+      options={optionsWithVars}
       theme={theme}
-      legend={options.legend}
+      legend={optionsWithVars.legend}
       rawSeries={stampedSamples}
       structureRev={data.structureRev}
       width={width}

@@ -31,6 +31,7 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
   aggregationType: AggregationType;
   controlLines: ControlLine[];
   curves: CurveOptions[];
+  featureQueryRefIds: string[];
 }
 
 export interface CurveOptions {

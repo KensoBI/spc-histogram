@@ -73,6 +73,10 @@ export default function buildLimitAnnotations(series: DataFrame[], options: Opti
     }
   });
 
+  const range = maxPosition - minPosition;
+  minPosition = minPosition - range * 0.05;
+  maxPosition = maxPosition + range * 0.05;
+
   return {
     minPosition,
     maxPosition,
@@ -97,28 +101,30 @@ function addComputedControlLines(series: DataFrame[], options: Options): Control
     return [];
   }
 
-  series.map((frame, frameIndex) => {
-    const seriesControlLines = controlLines.filter((c) => c.seriesIndex === frameIndex);
-    if (seriesControlLines.length === 0) {
+  computedControlLines.forEach((cl) => {
+    let data = series.filter((frame) => {
+      return !options.featureQueryRefIds || !options.featureQueryRefIds.includes(frame.refId!);
+    });
+
+    if (cl.seriesIndex === undefined || cl.seriesIndex < 0 || cl.seriesIndex >= data.length) {
       return;
     }
 
+    const frame = data[cl.seriesIndex];
     const numericFrames = frame.fields.filter((field) => field.type === FieldType.number && field.state?.calcs);
+
     if (numericFrames.length > 0) {
-      //take first numeric frame
+      // take first numeric frame
       const calcs = numericFrames[0].state?.calcs;
       if (!calcs) {
-        //no calcs cached, nothing to assign
+        // no calcs cached, nothing to assign
         return;
       }
 
-      seriesControlLines.forEach((cl) => {
-        // if this control line was computed, grab computed vaule from calcs
-        // this check should never be false but just to be sure we dont ever overwrite existing static position value provided by user
-        if (computedReducers.includes(cl.reducerId)) {
-          cl.position = calcs[cl.reducerId];
-        }
-      });
+      // if this control line was computed, grab computed value from calcs
+      if (computedReducers.includes(cl.reducerId)) {
+        cl.position = calcs[cl.reducerId];
+      }
     }
   });
 
