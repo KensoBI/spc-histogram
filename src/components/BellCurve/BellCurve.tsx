@@ -71,7 +71,8 @@ export const BellCurve: React.FC<BellCurveProps> = ({ config, rawSeries, histogr
     });
 
     config.addHook('draw', (u) => {
-      if (histogramData.length === 0 || rawSeries.length === 0 || !curveOptions) {
+      // we need at least 2 points
+      if (histogramData.length < 2 || rawSeries.length === 0 || !curveOptions) {
         return;
       }
 

@@ -1,3 +1,5 @@
+export const SUBGROUP_SIZE_VARIABLE = 'subgroupsize';
+
 export type LimitConfigItem = {
   name: string;
   color: string;
@@ -25,6 +27,11 @@ export enum AggregationType {
   Range = 'Range',
   StandardDeviation = 'Standard deviation',
   MovingRange = 'Moving range',
+}
+
+export enum PositionInput {
+  static = 'Static',
+  series = 'Series',
 }
 
 export interface ControlChartData {

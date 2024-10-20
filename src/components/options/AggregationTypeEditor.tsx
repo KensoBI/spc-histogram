@@ -3,6 +3,7 @@ import { Select } from '@grafana/ui';
 import { SelectableValue, StandardEditorProps } from '@grafana/data';
 import { Options } from 'panelcfg';
 import { AggregationType } from 'types';
+import { useSubgroupSize } from './useSubgroupSize';
 
 type AggregationOption = {
   name: AggregationType;
@@ -33,18 +34,25 @@ const aggregationOptions: AggregationOption[] = [
 ];
 
 export const AggregationTypeEditor = ({ value, onChange, context }: StandardEditorProps<string, Options>) => {
+  const { subgroupSize } = useSubgroupSize(context.options.subgroupSize, context.options.chartType);
+
+  // filter aggregation options based on the subgroup size
+  const selectOptions = aggregationOptions.filter((aggregation) =>
+    subgroupSize === 1
+      ? aggregation.subgroupSize === 1
+      : subgroupSize >= aggregation.subgroupSize && aggregation.subgroupSize !== 1
+  );
+
+  // if the current value is not in the filtered options, set it to the first available option
+  if (!selectOptions.some((option) => option.name === value)) {
+    onChange(selectOptions[0].name);
+  }
+
   return (
     <Select
       isClearable={false}
       value={value}
-      options={aggregationOptions
-        .filter((aggregation) => {
-          if (context.options.subgroupSize === 1) {
-            return aggregation.subgroupSize === 1;
-          }
-          return context.options.subgroupSize >= aggregation.subgroupSize && aggregation.subgroupSize !== 1;
-        })
-        .map<SelectableValue<string>>((i) => ({ label: i.name, value: i.name }))}
+      options={selectOptions.map<SelectableValue<string>>((i) => ({ label: i.name, value: i.name }))}
       onChange={(value) => {
         onChange(value.value);
       }}

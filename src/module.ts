@@ -7,6 +7,7 @@ import { ControlLineEditor } from 'components/options/ControlLineEditor';
 import { SubgroupEditor } from 'components/options/SubgroupEditor';
 import { SpcChartTyp } from 'types';
 import { CurveEditor } from 'components/options/CurveEditor';
+import { FeatureQueryEditor } from 'components/options/FeatureQueryEditor';
 
 export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
 
@@ -50,6 +51,16 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
         defaultValue: defaultOptions.combine,
         category: ['Histogram'],
       });
+
+    builder.addCustomEditor({
+      id: 'featureQueryRefIds',
+      path: 'featureQueryRefIds',
+      name: 'Feature Queries',
+      description: 'Select the series that will act as a reference-only dataset, excluded from histogram computations.',
+      editor: FeatureQueryEditor,
+      defaultValue: null,
+      category: ['Histogram'],
+    });
 
     builder.addSelect({
       path: 'chartType',
