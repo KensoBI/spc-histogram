@@ -1,0 +1,793 @@
+{
+	"annotations": {
+	  "list": [
+		{
+		  "builtIn": 1,
+		  "datasource": {
+			"type": "grafana",
+			"uid": "-- Grafana --"
+		  },
+		  "enable": true,
+		  "hide": true,
+		  "iconColor": "rgba(0, 211, 255, 1)",
+		  "name": "Annotations & Alerts",
+		  "type": "dashboard"
+		}
+	  ]
+	},
+	"editable": true,
+	"fiscalYearStartMonth": 0,
+	"graphTooltip": 0,
+	"links": [],
+	"panels": [
+	  {
+		"datasource": {
+		  "type": "datasource",
+		  "uid": "grafana"
+		},
+		"fieldConfig": {
+		  "defaults": {
+			"color": {
+			  "mode": "palette-classic"
+			},
+			"custom": {
+			  "gradientMode": "none",
+			  "hideFrom": {
+				"legend": false,
+				"tooltip": false,
+				"viz": false
+			  }
+			}
+		  },
+		  "overrides": []
+		},
+		"gridPos": {
+		  "h": 9,
+		  "w": 12,
+		  "x": 0,
+		  "y": 0
+		},
+		"id": 7,
+		"options": {
+		  "aggregationType": "none",
+		  "chartType": "X-XmR",
+		  "controlLines": [
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#1F60C4",
+			  "lineWidth": 4,
+			  "name": "Mean",
+			  "position": 0,
+			  "reducerId": "mean",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "LCL",
+			  "position": 0,
+			  "reducerId": "lcl",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "UCL",
+			  "position": 0,
+			  "reducerId": "ucl",
+			  "seriesIndex": 0
+			}
+		  ],
+		  "curves": [
+			{
+			  "color": "yellow",
+			  "fit": "Gaussian",
+			  "lineWidth": 4,
+			  "name": "Histogram",
+			  "seriesIndex": 0
+			}
+		  ],
+		  "legend": {
+			"calcs": [],
+			"displayMode": "list",
+			"placement": "bottom",
+			"showLegend": true
+		  },
+		  "subgroupSize": 1
+		},
+		"title": "X-chart (XmR)",
+		"type": "kensobi-spchistogram-panel"
+	  },
+	  {
+		"datasource": {
+		  "type": "grafana",
+		  "uid": "grafana"
+		},
+		"fieldConfig": {
+		  "defaults": {
+			"color": {
+			  "mode": "palette-classic"
+			},
+			"custom": {
+			  "gradientMode": "none",
+			  "hideFrom": {
+				"legend": false,
+				"tooltip": false,
+				"viz": false
+			  }
+			}
+		  },
+		  "overrides": []
+		},
+		"gridPos": {
+		  "h": 9,
+		  "w": 12,
+		  "x": 12,
+		  "y": 0
+		},
+		"id": 1,
+		"options": {
+		  "aggregationType": "none",
+		  "chartType": "mR-XmR",
+		  "controlLines": [
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#1F60C4",
+			  "lineWidth": 4,
+			  "name": "Mean",
+			  "position": 0,
+			  "reducerId": "mean",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "LCL",
+			  "position": 0,
+			  "reducerId": "lcl",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "UCL",
+			  "position": 0,
+			  "reducerId": "ucl",
+			  "seriesIndex": 0
+			}
+		  ],
+		  "curves": [],
+		  "legend": {
+			"calcs": [],
+			"displayMode": "list",
+			"placement": "bottom",
+			"showLegend": true
+		  },
+		  "subgroupSize": 1
+		},
+		"targets": [
+		  {
+			"datasource": {
+			  "type": "datasource",
+			  "uid": "grafana"
+			},
+			"queryType": "randomWalk",
+			"refId": "A"
+		  }
+		],
+		"title": "mR chart (XmR)",
+		"type": "kensobi-spchistogram-panel"
+	  },
+	  {
+		"datasource": {
+		  "type": "datasource",
+		  "uid": "grafana"
+		},
+		"fieldConfig": {
+		  "defaults": {
+			"color": {
+			  "mode": "palette-classic"
+			},
+			"custom": {
+			  "gradientMode": "none",
+			  "hideFrom": {
+				"legend": false,
+				"tooltip": false,
+				"viz": false
+			  }
+			}
+		  },
+		  "overrides": []
+		},
+		"gridPos": {
+		  "h": 8,
+		  "w": 12,
+		  "x": 0,
+		  "y": 9
+		},
+		"id": 3,
+		"options": {
+		  "aggregationType": "none",
+		  "chartType": "X-XbarR",
+		  "controlLines": [
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#1F60C4",
+			  "lineWidth": 4,
+			  "name": "Mean",
+			  "position": 0,
+			  "reducerId": "mean",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": -1,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "LCL",
+			  "position": 0,
+			  "reducerId": "lcl",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 1,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "UCL",
+			  "position": 0,
+			  "reducerId": "ucl",
+			  "seriesIndex": 0
+			}
+		  ],
+		  "curves": [
+			{
+			  "color": "yellow",
+			  "fit": "Histogram",
+			  "lineWidth": 4,
+			  "name": "Histogram",
+			  "seriesIndex": 0
+			}
+		  ],
+		  "legend": {
+			"calcs": [],
+			"displayMode": "list",
+			"placement": "bottom",
+			"showLegend": true
+		  },
+		  "subgroupSize": 2
+		},
+		"title": "X-chart (Xbar-R)",
+		"type": "kensobi-spchistogram-panel"
+	  },
+	  {
+		"datasource": {
+		  "type": "datasource",
+		  "uid": "grafana"
+		},
+		"fieldConfig": {
+		  "defaults": {
+			"color": {
+			  "mode": "palette-classic"
+			},
+			"custom": {
+			  "gradientMode": "none",
+			  "hideFrom": {
+				"legend": false,
+				"tooltip": false,
+				"viz": false
+			  }
+			}
+		  },
+		  "overrides": []
+		},
+		"gridPos": {
+		  "h": 8,
+		  "w": 12,
+		  "x": 12,
+		  "y": 9
+		},
+		"id": 4,
+		"options": {
+		  "aggregationType": "none",
+		  "chartType": "R-XbarR",
+		  "controlLines": [
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#1F60C4",
+			  "lineWidth": 4,
+			  "name": "Mean",
+			  "position": 0,
+			  "reducerId": "mean",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "LCL",
+			  "position": 0,
+			  "reducerId": "lcl",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "UCL",
+			  "position": 0,
+			  "reducerId": "ucl",
+			  "seriesIndex": 0
+			}
+		  ],
+		  "curves": [],
+		  "legend": {
+			"calcs": [],
+			"displayMode": "list",
+			"placement": "bottom",
+			"showLegend": true
+		  },
+		  "subgroupSize": 2
+		},
+		"title": "R Chart (Xbar-R)",
+		"type": "kensobi-spchistogram-panel"
+	  },
+	  {
+		"datasource": {
+		  "type": "datasource",
+		  "uid": "grafana"
+		},
+		"fieldConfig": {
+		  "defaults": {
+			"color": {
+			  "mode": "palette-classic"
+			},
+			"custom": {
+			  "gradientMode": "none",
+			  "hideFrom": {
+				"legend": false,
+				"tooltip": false,
+				"viz": false
+			  }
+			}
+		  },
+		  "overrides": []
+		},
+		"gridPos": {
+		  "h": 8,
+		  "w": 12,
+		  "x": 0,
+		  "y": 17
+		},
+		"id": 5,
+		"options": {
+		  "aggregationType": "none",
+		  "chartType": "X-XbarS",
+		  "controlLines": [
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#1F60C4",
+			  "lineWidth": 4,
+			  "name": "Mean",
+			  "position": 0,
+			  "reducerId": "mean",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": -1,
+			  "fillOpacity": 10,
+			  "lineColor": "#FA6400",
+			  "lineWidth": 4,
+			  "name": "LCL",
+			  "position": 0,
+			  "reducerId": "lcl",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 1,
+			  "fillOpacity": 10,
+			  "lineColor": "#FF780A",
+			  "lineWidth": 4,
+			  "name": "UCL",
+			  "position": 0,
+			  "reducerId": "ucl",
+			  "seriesIndex": 0
+			}
+		  ],
+		  "curves": [
+			{
+			  "color": "yellow",
+			  "fit": "Histogram",
+			  "lineWidth": 4,
+			  "name": "Histogram",
+			  "seriesIndex": 0
+			},
+			{
+			  "color": "#A352CC",
+			  "fit": "Gaussian",
+			  "lineWidth": 4,
+			  "name": "Histogram",
+			  "seriesIndex": 0
+			}
+		  ],
+		  "legend": {
+			"calcs": [],
+			"displayMode": "list",
+			"placement": "bottom",
+			"showLegend": true
+		  },
+		  "subgroupSize": 5
+		},
+		"title": "X chart (Xbar-S)",
+		"type": "kensobi-spchistogram-panel"
+	  },
+	  {
+		"datasource": {
+		  "type": "datasource",
+		  "uid": "grafana"
+		},
+		"fieldConfig": {
+		  "defaults": {
+			"color": {
+			  "mode": "palette-classic"
+			},
+			"custom": {
+			  "gradientMode": "none",
+			  "hideFrom": {
+				"legend": false,
+				"tooltip": false,
+				"viz": false
+			  }
+			}
+		  },
+		  "overrides": []
+		},
+		"gridPos": {
+		  "h": 8,
+		  "w": 12,
+		  "x": 12,
+		  "y": 17
+		},
+		"id": 6,
+		"options": {
+		  "aggregationType": "none",
+		  "chartType": "S-XbarS",
+		  "controlLines": [
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#1F60C4",
+			  "lineWidth": 4,
+			  "name": "Mean",
+			  "position": 0,
+			  "reducerId": "mean",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": -1,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "LCL",
+			  "position": 0,
+			  "reducerId": "lcl",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 1,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "UCL",
+			  "position": 0,
+			  "reducerId": "ucl",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": -1,
+			  "fillOpacity": 10,
+			  "lineColor": "#FF9830",
+			  "lineWidth": 4,
+			  "name": "Lower warn",
+			  "position": 0.4,
+			  "reducerId": "custom",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 1,
+			  "fillOpacity": 10,
+			  "lineColor": "#FF9830",
+			  "lineWidth": 4,
+			  "name": "Upper warn",
+			  "position": 0.55,
+			  "reducerId": "nominal",
+			  "seriesIndex": 0
+			}
+		  ],
+		  "curves": [],
+		  "legend": {
+			"calcs": [],
+			"displayMode": "list",
+			"placement": "bottom",
+			"showLegend": true
+		  },
+		  "subgroupSize": 10
+		},
+		"title": "S Chart (Xbar-S)",
+		"type": "kensobi-spchistogram-panel"
+	  },
+	  {
+		"datasource": {
+		  "type": "datasource",
+		  "uid": "grafana"
+		},
+		"description": "",
+		"fieldConfig": {
+		  "defaults": {
+			"color": {
+			  "mode": "palette-classic"
+			},
+			"custom": {
+			  "gradientMode": "none",
+			  "hideFrom": {
+				"legend": false,
+				"tooltip": false,
+				"viz": false
+			  }
+			}
+		  },
+		  "overrides": []
+		},
+		"gridPos": {
+		  "h": 8,
+		  "w": 12,
+		  "x": 0,
+		  "y": 25
+		},
+		"id": 2,
+		"options": {
+		  "aggregationType": "none",
+		  "chartType": "X-XbarR",
+		  "controlLines": [
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#1F60C4",
+			  "lineWidth": 4,
+			  "name": "Mean",
+			  "position": 0,
+			  "reducerId": "mean",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "LCL",
+			  "position": 0,
+			  "reducerId": "lcl",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "UCL",
+			  "position": 0,
+			  "reducerId": "ucl",
+			  "seriesIndex": 0
+			},
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "LCL",
+			  "position": 0,
+			  "reducerId": "lcl",
+			  "seriesIndex": 1
+			},
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#F2495C",
+			  "lineWidth": 4,
+			  "name": "UCL",
+			  "position": 0,
+			  "reducerId": "ucl",
+			  "seriesIndex": 1
+			},
+			{
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#1F60C4",
+			  "lineWidth": 4,
+			  "name": "Mean",
+			  "position": 0,
+			  "reducerId": "mean",
+			  "seriesIndex": 1
+			}
+		  ],
+		  "curves": [
+			{
+			  "color": "#37872D",
+			  "fit": "Histogram",
+			  "lineWidth": 4,
+			  "name": "Histogram",
+			  "seriesIndex": 0
+			},
+			{
+			  "color": "yellow",
+			  "fit": "Gaussian",
+			  "lineWidth": 4,
+			  "name": "Histogram",
+			  "seriesIndex": 1
+			}
+		  ],
+		  "legend": {
+			"calcs": [],
+			"displayMode": "list",
+			"placement": "bottom",
+			"showLegend": true
+		  },
+		  "subgroupSize": 2
+		},
+		"targets": [
+		  {
+			"datasource": {
+			  "type": "datasource",
+			  "uid": "grafana"
+			},
+			"queryType": "randomWalk",
+			"refId": "A"
+		  },
+		  {
+			"datasource": {
+			  "type": "datasource",
+			  "uid": "grafana"
+			},
+			"hide": false,
+			"queryType": "randomWalk",
+			"refId": "B"
+		  }
+		],
+		"title": "X-chart (Xbar-R)",
+		"type": "kensobi-spchistogram-panel"
+	  },
+	  {
+		"datasource": {
+		  "default": false,
+		  "type": "datasource",
+		  "uid": "-- Mixed --"
+		},
+		"fieldConfig": {
+		  "defaults": {
+			"color": {
+			  "mode": "palette-classic"
+			},
+			"custom": {
+			  "gradientMode": "none",
+			  "hideFrom": {
+				"legend": false,
+				"tooltip": false,
+				"viz": false
+			  }
+			}
+		  },
+		  "overrides": []
+		},
+		"gridPos": {
+		  "h": 8,
+		  "w": 12,
+		  "x": 12,
+		  "y": 25
+		},
+		"id": 8,
+		"options": {
+		  "aggregationType": "none",
+		  "chartType": "none",
+		  "controlLines": [
+			{
+			  "field": "nominal",
+			  "fillDirection": 0,
+			  "fillOpacity": 10,
+			  "lineColor": "#37872d",
+			  "lineWidth": 4,
+			  "name": "Nominal",
+			  "positionInput": "Series",
+			  "reducerId": "nominal",
+			  "seriesIndex": 0
+			},
+			{
+			  "field": "usl",
+			  "fillDirection": 1,
+			  "fillOpacity": 10,
+			  "lineColor": "#C4162A",
+			  "lineWidth": 4,
+			  "name": "USL",
+			  "positionInput": "Series",
+			  "reducerId": "custom",
+			  "seriesIndex": 0
+			},
+			{
+			  "field": "lsl",
+			  "fillDirection": -1,
+			  "fillOpacity": 10,
+			  "lineColor": "#C4162A",
+			  "lineWidth": 4,
+			  "name": "LSL",
+			  "positionInput": "Series",
+			  "reducerId": "custom",
+			  "seriesIndex": 0
+			}
+		  ],
+		  "curves": [],
+		  "featureQueryRefIds": [
+			"A"
+		  ],
+		  "legend": {
+			"calcs": [],
+			"displayMode": "list",
+			"placement": "bottom",
+			"showLegend": true
+		  },
+		  "subgroupSize": 1
+		},
+		"pluginVersion": "11.2.0-pre",
+		"targets": [
+		  {
+			"csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,5,-4,1.2\r\n",
+			"datasource": {
+			  "type": "grafana-testdata-datasource",
+			  "uid": "grafana"
+			},
+			"refId": "A",
+			"scenarioId": "csv_content"
+		  },
+		  {
+			"csvContent": "time,value\r\n2024-10-01T00:00:00Z,2.1\r\n2024-10-01T01:00:00Z,1.8\r\n2024-10-01T02:00:00Z,-3.5\r\n2024-10-01T03:00:00Z,3.4\r\n2024-10-01T04:00:00Z,-2.8\r\n2024-10-01T05:00:00Z,4.2\r\n2024-10-01T06:00:00Z,2.9\r\n2024-10-01T07:00:00Z,-0.5\r\n2024-10-01T08:00:00Z,1.2\r\n2024-10-01T09:00:00Z,5.5\r\n2024-10-01T10:00:00Z,2.4\r\n2024-10-01T11:00:00Z,-3.9\r\n2024-10-01T12:00:00Z,3.1\r\n2024-10-01T13:00:00Z,-3.1\r\n2024-10-01T14:00:00Z,4.7\r\n2024-10-01T15:00:00Z,0.2\r\n2024-10-01T16:00:00Z,-4.5\r\n2024-10-01T17:00:00Z,-3.0\r\n2024-10-01T18:00:00Z,3.8\r\n2024-10-01T19:00:00Z,4.0\r\n2024-10-01T20:00:00Z,-1.8\r\n2024-10-01T21:00:00Z,2.7\r\n2024-10-01T22:00:00Z,-0.2\r\n2024-10-01T23:00:00Z,1.5\r\n2024-10-02T00:00:00Z,6.2\r\n2024-10-02T01:00:00Z,2.0\r\n2024-10-02T02:00:00Z,0.5\r\n2024-10-02T03:00:00Z,-2.5\r\n2024-10-02T04:00:00Z,-4.7\r\n2024-10-02T05:00:00Z,3.3\r\n2024-10-02T06:00:00Z,2.3\r\n2024-10-02T07:00:00Z,-3.2\r\n2024-10-02T08:00:00Z,4.9\r\n2024-10-02T09:00:00Z,-4.2\r\n2024-10-02T10:00:00Z,5.9\r\n2024-10-02T11:00:00Z,1.3\r\n2024-10-02T12:00:00Z,0.8\r\n2024-10-02T13:00:00Z,4.5\r\n2024-10-02T14:00:00Z,-3.8\r\n2024-10-02T15:00:00Z,2.6\r\n2024-10-02T16:00:00Z,-0.9\r\n2024-10-02T17:00:00Z,2.8\r\n2024-10-02T18:00:00Z,-1.3\r\n2024-10-02T19:00:00Z,3.7\r\n2024-10-02T20:00:00Z,-5.1\r\n2024-10-02T21:00:00Z,5.7\r\n2024-10-02T22:00:00Z,0.4\r\n2024-10-02T23:00:00Z,2.2\r\n",
+			"datasource": {
+			  "type": "grafana-testdata-datasource",
+			  "uid": "grafana"
+			},
+			"refId": "B",
+			"scenarioId": "csv_content"
+		  }
+		],
+		"title": "Hide feature series",
+		"type": "kensobi-spchistogram-panel"
+	  }
+	],
+	"schemaVersion": 39,
+	"tags": [],
+	"templating": {
+	  "list": []
+	},
+	"time": {
+	  "from": "now-6h",
+	  "to": "now"
+	},
+	"timepicker": {},
+	"timezone": "browser",
+	"title": "SPC Histograms",
+	"uid": "cds23y6jstgcgd",
+	"version": 5,
+	"weekStart": ""
+  }

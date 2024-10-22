@@ -1,8 +1,9 @@
 import React from 'react';
-import { Select } from '@grafana/ui';
+import { Input, Select } from '@grafana/ui';
 import { StandardEditorProps } from '@grafana/data';
 import { Options } from 'panelcfg';
 import { SpcChartTyp } from 'types';
+import { useSubgroupSize } from './useSubgroupSize';
 
 function createSubgroupOptions(startIndex: number, endIndex: number): Array<{ label: string; value: number }> {
   return Array.from({ length: endIndex - startIndex + 1 }, (_, i) => ({
@@ -12,37 +13,31 @@ function createSubgroupOptions(startIndex: number, endIndex: number): Array<{ la
 }
 
 export const SubgroupEditor = ({ item, value, onChange, context }: StandardEditorProps<number, Options>) => {
-  const chartType = context.options.chartType ? context.options.chartType : SpcChartTyp.none;
-  const allowCustomValue = chartType === SpcChartTyp.none;
-  let startFrom = 2;
-  let isDisabled = false;
+  const chartType = context.options.chartType || SpcChartTyp.none;
+  const { subgroupSize, isDashboardVariable } = useSubgroupSize(value, chartType);
 
-  if (chartType === SpcChartTyp.none) {
-    startFrom = 1;
-  } else if (chartType === SpcChartTyp.mR_XmR || chartType === SpcChartTyp.x_XmR) {
-    startFrom = 1;
-    isDisabled = true;
-    if (value !== 1) {
-      onChange(1);
-    }
-  } else {
-    if (value === 1) {
-      onChange(2);
-    }
-  }
+  // Set whether the input should be disabled based on chart type and dashboard variable
+  const isDisabled = isDashboardVariable || chartType === SpcChartTyp.mR_XmR || chartType === SpcChartTyp.x_XmR;
 
+  // Set the starting point of options
+  const startFrom = chartType === SpcChartTyp.none ? 1 : 2;
+
+  // Generate subgroup options for the Select component
   const subgroupOptions = createSubgroupOptions(startFrom, 25);
 
   return (
-    <Select
-      isClearable={false}
-      disabled={isDisabled}
-      allowCustomValue={allowCustomValue}
-      value={value}
-      options={subgroupOptions}
-      onChange={(value) => {
-        onChange(value.value);
-      }}
-    />
+    <div>
+      {isDisabled ? (
+        <Input value={subgroupSize} disabled={true} />
+      ) : (
+        <Select
+          isClearable={false}
+          allowCustomValue={chartType === SpcChartTyp.none} // Allow custom value only for 'none' chart type
+          value={subgroupSize}
+          options={subgroupOptions}
+          onChange={(selected) => onChange(selected.value)}
+        />
+      )}
+    </div>
   );
 };

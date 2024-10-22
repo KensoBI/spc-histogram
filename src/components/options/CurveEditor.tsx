@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { css } from '@emotion/css';
-import { GrafanaTheme2, SelectableValue, StandardEditorProps, getFrameDisplayName } from '@grafana/data';
-import { Button, ColorPicker, Field, IconButton, Select, Slider, Stack, useStyles2 } from '@grafana/ui';
+import { DataFrame, GrafanaTheme2, SelectableValue, StandardEditorProps, getFrameDisplayName } from '@grafana/data';
+import { Button, ColorPicker, Field, Icon, IconButton, Select, Slider, Stack, useStyles2 } from '@grafana/ui';
 import { CurveOptions, Options, selectableCurves } from 'panelcfg';
 import { CurveFit } from 'types';
 
@@ -63,16 +63,36 @@ export const CurveEditor = ({ item, value, onChange, context }: StandardEditorPr
     setExpandedHandles([newCurves.length - 1]);
   }
 
-  function getCurveDisplayName(curve: CurveOptions): string {
-    if (context.data && context.data.length > 1 && context.data[curve.seriesIndex]) {
-      return `${curve.fit} (${getFrameDisplayName(context.data[curve.seriesIndex], curve.seriesIndex)})`;
+  function getFilteredDataFrames(): DataFrame[] {
+    const { featureQueryRefIds } = context.options;
+    return context.data.filter((frame) => !featureQueryRefIds || !featureQueryRefIds.includes(frame.refId!));
+  }
+
+  function getCurveDisplayName(curve: CurveOptions): React.JSX.Element {
+    const seriesData = getFilteredDataFrames();
+
+    if (seriesData && seriesData.length > 1 && seriesData[curve.seriesIndex]) {
+      return (
+        <span>
+          {curve.fit}
+          <Icon name="angle-right" className={styles.chevron} />
+          {seriesData[curve.seriesIndex].refId}
+          <Icon name="angle-right" className={styles.chevron} />
+          {getFrameDisplayName(seriesData[curve.seriesIndex], curve.seriesIndex)}
+        </span>
+      );
     }
 
-    if (context.data && context.data.length <= curve.seriesIndex) {
-      return `${curve.fit} (stale series)`;
+    if (seriesData && seriesData.length <= curve.seriesIndex) {
+      return (
+        <span>
+          {curve.fit} <Icon name="angle-right" className={styles.chevron} />
+          (stale series)
+        </span>
+      );
     }
 
-    return curve.fit;
+    return <span>{curve.fit}</span>;
   }
 
   return (
@@ -136,12 +156,32 @@ export const CurveEditor = ({ item, value, onChange, context }: StandardEditorPr
                     placeholder="Select series"
                     isClearable={true}
                     value={curve.seriesIndex}
-                    options={context.data.map((frame, index) => ({
-                      value: index,
-                      label: `${getFrameDisplayName(frame, index)}`,
-                    }))}
+                    options={context.data
+                      .filter((frame) => {
+                        return (
+                          !context.options.featureQueryRefIds ||
+                          !context.options.featureQueryRefIds.includes(frame.refId!)
+                        );
+                      })
+                      .map((frame, index) => ({
+                        refId: frame.refId,
+                        value: index,
+                        label: `${frame.refId} > ${getFrameDisplayName(frame, index)}`,
+                      }))}
                     onChange={(value) => {
-                      handleCurveOptionChange(index, 'seriesIndex', value.value);
+                      handleCurveOptionChange(index, 'seriesIndex', value?.value);
+                    }}
+                    formatOptionLabel={(option) => {
+                      const label = option.label || '';
+                      const parts = label.split(' > ');
+
+                      return (
+                        <div>
+                          {parts[0]} {/* frame.refId */}
+                          <Icon name="angle-right" className={styles.chevron} />
+                          {parts[1] || ''} {/* getFrameDisplayName */}
+                        </div>
+                      );
                     }}
                   />
                 </Field>
@@ -207,6 +247,9 @@ const getStyles = (theme: GrafanaTheme2) => {
       color: theme.colors.text.secondary,
       fontSize: theme.typography.bodySmall.fontSize,
       fontWeight: theme.typography.bodySmall.fontWeight,
+    }),
+    chevron: css({
+      margin: theme.spacing(0, 0.25),
     }),
   };
 };

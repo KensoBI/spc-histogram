@@ -1,0 +1,900 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 4,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "default": false,
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Two table data sources. Series A designated as Feature. It should not show up in histogram. It can only be used as a reference table to pull control limits from field.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "none",
+        "controlLines": [
+          {
+            "field": "nominal",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#37872d",
+            "lineWidth": 4,
+            "name": "Nominal",
+            "positionInput": "Series",
+            "reducerId": "nominal",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "USL",
+            "positionInput": "Series",
+            "reducerId": "custom",
+            "seriesIndex": 0
+          },
+          {
+            "field": "lsl",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "LSL",
+            "positionInput": "Series",
+            "reducerId": "custom",
+            "seriesIndex": 0
+          }
+        ],
+        "curves": [
+          {
+            "color": "yellow",
+            "fit": "Gaussian",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 0
+          }
+        ],
+        "featureQueryRefIds": [
+          "A"
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1
+      },
+      "pluginVersion": "11.2.0-pre",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,3,-3,0.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "csvContent": "time,value\r\n2024-10-01T00:00:00Z,0.3\r\n2024-10-01T01:00:00Z,-0.1\r\n2024-10-01T02:00:00Z,1.5\r\n2024-10-01T03:00:00Z,0.7\r\n2024-10-01T04:00:00Z,-1.3\r\n2024-10-01T05:00:00Z,2.1\r\n2024-10-01T06:00:00Z,-0.8\r\n2024-10-01T07:00:00Z,0.4\r\n2024-10-01T08:00:00Z,1.2\r\n2024-10-01T09:00:00Z,0.9\r\n2024-10-01T10:00:00Z,-0.4\r\n2024-10-01T11:00:00Z,-2.2\r\n2024-10-01T12:00:00Z,0.6\r\n2024-10-01T13:00:00Z,-1.6\r\n2024-10-01T14:00:00Z,1.9\r\n2024-10-01T15:00:00Z,0.3\r\n2024-10-01T16:00:00Z,-0.7\r\n2024-10-01T17:00:00Z,2.5\r\n2024-10-01T18:00:00Z,-1.1\r\n2024-10-01T19:00:00Z,1.4\r\n2024-10-01T20:00:00Z,-0.9\r\n2024-10-01T21:00:00Z,0.8\r\n2024-10-01T22:00:00Z,-0.3\r\n2024-10-01T23:00:00Z,1.1\r\n2024-10-02T00:00:00Z,5.2 \r\n2024-10-02T01:00:00Z,-3.5\r\n2024-10-02T02:00:00Z,0.5\r\n2024-10-02T03:00:00Z,-0.6\r\n2024-10-02T04:00:00Z,2.3\r\n2024-10-02T05:00:00Z,-0.8\r\n2024-10-02T06:00:00Z,0.7\r\n2024-10-02T07:00:00Z,1.8\r\n2024-10-02T08:00:00Z,4.9 \r\n2024-10-02T09:00:00Z,-4.0\r\n2024-10-02T10:00:00Z,0.2\r\n2024-10-02T11:00:00Z,1.5\r\n2024-10-02T12:00:00Z,-1.4\r\n2024-10-02T13:00:00Z,0.9\r\n2024-10-02T14:00:00Z,-2.5 \r\n2024-10-02T15:00:00Z,2.6\r\n2024-10-02T16:00:00Z,0.1\r\n2024-10-02T17:00:00Z,1.7\r\n2024-10-02T18:00:00Z,-0.5\r\n2024-10-02T19:00:00Z,4.0\r\n2024-10-02T20:00:00Z,-0.4\r\n2024-10-02T21:00:00Z,0.3\r\n2024-10-02T22:00:00Z,1.6\r\n2024-10-02T23:00:00Z,0.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "refId": "B",
+          "scenarioId": "csv_content"
+        }
+      ],
+      "title": "Raw histogram with limit lookup",
+      "type": "kensobi-spchistogram-panel"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Two table data sources. Series A designated as Feature. It should not show up in histogram. LSL, USL and nominal are pulled from reference query. Mean is a computed value from time series query (B).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "none",
+        "controlLines": [
+          {
+            "field": "nominal",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#37872d",
+            "lineWidth": 4,
+            "name": "Nominal",
+            "positionInput": "Series",
+            "reducerId": "nominal",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "USL",
+            "positionInput": "Series",
+            "reducerId": "custom",
+            "seriesIndex": 0
+          },
+          {
+            "field": "lsl",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "LSL",
+            "positionInput": "Series",
+            "reducerId": "custom",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          }
+        ],
+        "curves": [
+          {
+            "color": "yellow",
+            "fit": "Gaussian",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 0
+          }
+        ],
+        "featureQueryRefIds": [
+          "A"
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1
+      },
+      "pluginVersion": "11.2.0-pre",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,3,-3,0.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "csvContent": "time,value\r\n2024-10-01T00:00:00Z,0.3\r\n2024-10-01T01:00:00Z,-0.1\r\n2024-10-01T02:00:00Z,1.5\r\n2024-10-01T03:00:00Z,0.7\r\n2024-10-01T04:00:00Z,-1.3\r\n2024-10-01T05:00:00Z,2.1\r\n2024-10-01T06:00:00Z,-0.8\r\n2024-10-01T07:00:00Z,0.4\r\n2024-10-01T08:00:00Z,1.2\r\n2024-10-01T09:00:00Z,0.9\r\n2024-10-01T10:00:00Z,-0.4\r\n2024-10-01T11:00:00Z,-2.2\r\n2024-10-01T12:00:00Z,0.6\r\n2024-10-01T13:00:00Z,-1.6\r\n2024-10-01T14:00:00Z,1.9\r\n2024-10-01T15:00:00Z,0.3\r\n2024-10-01T16:00:00Z,-0.7\r\n2024-10-01T17:00:00Z,2.5\r\n2024-10-01T18:00:00Z,-1.1\r\n2024-10-01T19:00:00Z,1.4\r\n2024-10-01T20:00:00Z,-0.9\r\n2024-10-01T21:00:00Z,0.8\r\n2024-10-01T22:00:00Z,-0.3\r\n2024-10-01T23:00:00Z,1.1\r\n2024-10-02T00:00:00Z,5.2 \r\n2024-10-02T01:00:00Z,-3.5\r\n2024-10-02T02:00:00Z,0.5\r\n2024-10-02T03:00:00Z,-0.6\r\n2024-10-02T04:00:00Z,2.3\r\n2024-10-02T05:00:00Z,-0.8\r\n2024-10-02T06:00:00Z,0.7\r\n2024-10-02T07:00:00Z,1.8\r\n2024-10-02T08:00:00Z,4.9 \r\n2024-10-02T09:00:00Z,-4.0\r\n2024-10-02T10:00:00Z,0.2\r\n2024-10-02T11:00:00Z,1.5\r\n2024-10-02T12:00:00Z,-1.4\r\n2024-10-02T13:00:00Z,0.9\r\n2024-10-02T14:00:00Z,-2.5 \r\n2024-10-02T15:00:00Z,2.6\r\n2024-10-02T16:00:00Z,0.1\r\n2024-10-02T17:00:00Z,1.7\r\n2024-10-02T18:00:00Z,-0.5\r\n2024-10-02T19:00:00Z,4.0\r\n2024-10-02T20:00:00Z,-0.4\r\n2024-10-02T21:00:00Z,0.3\r\n2024-10-02T22:00:00Z,1.6\r\n2024-10-02T23:00:00Z,0.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "refId": "B",
+          "scenarioId": "csv_content"
+        }
+      ],
+      "title": "Raw histogram with limit lookup and calculated field",
+      "type": "kensobi-spchistogram-panel"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Two table data sources. Series A designated as Feature. It should not show up in histogram. LSL, USL and nominal are pulled from reference query. Mean, UCL and LCL are computed value from time series query (B).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "id": 6,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XbarR",
+        "controlLines": [
+          {
+            "field": "nominal",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#37872d",
+            "lineWidth": 4,
+            "name": "Nominal",
+            "positionInput": "Series",
+            "reducerId": "nominal",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "USL",
+            "positionInput": "Series",
+            "reducerId": "custom",
+            "seriesIndex": 0
+          },
+          {
+            "field": "lsl",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "LSL",
+            "positionInput": "Series",
+            "reducerId": "custom",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#FF7383",
+            "lineWidth": 4,
+            "name": "LCL",
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#FF7383",
+            "lineWidth": 4,
+            "name": "UCL",
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "curves": [
+          {
+            "color": "yellow",
+            "fit": "Gaussian",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 0
+          }
+        ],
+        "featureQueryRefIds": [
+          "A"
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1
+      },
+      "pluginVersion": "11.2.0-pre",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,3,-3,0.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "csvContent": "time,value\r\n2024-10-01T00:00:00Z,0.3\r\n2024-10-01T01:00:00Z,-0.1\r\n2024-10-01T02:00:00Z,1.5\r\n2024-10-01T03:00:00Z,0.7\r\n2024-10-01T04:00:00Z,-1.3\r\n2024-10-01T05:00:00Z,2.1\r\n2024-10-01T06:00:00Z,-0.8\r\n2024-10-01T07:00:00Z,0.4\r\n2024-10-01T08:00:00Z,1.2\r\n2024-10-01T09:00:00Z,0.9\r\n2024-10-01T10:00:00Z,-0.4\r\n2024-10-01T11:00:00Z,-2.2\r\n2024-10-01T12:00:00Z,0.6\r\n2024-10-01T13:00:00Z,-1.6\r\n2024-10-01T14:00:00Z,1.9\r\n2024-10-01T15:00:00Z,0.3\r\n2024-10-01T16:00:00Z,-0.7\r\n2024-10-01T17:00:00Z,2.5\r\n2024-10-01T18:00:00Z,-1.1\r\n2024-10-01T19:00:00Z,1.4\r\n2024-10-01T20:00:00Z,-0.9\r\n2024-10-01T21:00:00Z,0.8\r\n2024-10-01T22:00:00Z,-0.3\r\n2024-10-01T23:00:00Z,1.1\r\n2024-10-02T00:00:00Z,5.2 \r\n2024-10-02T01:00:00Z,-3.5\r\n2024-10-02T02:00:00Z,0.5\r\n2024-10-02T03:00:00Z,-0.6\r\n2024-10-02T04:00:00Z,2.3\r\n2024-10-02T05:00:00Z,-0.8\r\n2024-10-02T06:00:00Z,0.7\r\n2024-10-02T07:00:00Z,1.8\r\n2024-10-02T08:00:00Z,4.9 \r\n2024-10-02T09:00:00Z,-4.0\r\n2024-10-02T10:00:00Z,0.2\r\n2024-10-02T11:00:00Z,1.5\r\n2024-10-02T12:00:00Z,-1.4\r\n2024-10-02T13:00:00Z,0.9\r\n2024-10-02T14:00:00Z,-2.5 \r\n2024-10-02T15:00:00Z,2.6\r\n2024-10-02T16:00:00Z,0.1\r\n2024-10-02T17:00:00Z,1.7\r\n2024-10-02T18:00:00Z,-0.5\r\n2024-10-02T19:00:00Z,4.0\r\n2024-10-02T20:00:00Z,-0.4\r\n2024-10-02T21:00:00Z,0.3\r\n2024-10-02T22:00:00Z,1.6\r\n2024-10-02T23:00:00Z,0.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "refId": "B",
+          "scenarioId": "csv_content"
+        }
+      ],
+      "title": "X-Bar X histogram with LSL, USL, Nominal lookup and calculated LCL UCL and mean",
+      "type": "kensobi-spchistogram-panel"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Two table data sources. Series A designated as Feature. It should not show up in histogram. LSL, USL and nominal are pulled from reference query. Mean, UCL and LCL are computed value from time series query (B).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 5,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XmR",
+        "controlLines": [
+          {
+            "field": "nominal",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#37872d",
+            "lineWidth": 4,
+            "name": "Nominal",
+            "positionInput": "Series",
+            "reducerId": "nominal",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "USL",
+            "positionInput": "Series",
+            "reducerId": "custom",
+            "seriesIndex": 0
+          },
+          {
+            "field": "lsl",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "LSL",
+            "positionInput": "Series",
+            "reducerId": "custom",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "LCL",
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "UCL",
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "curves": [
+          {
+            "color": "yellow",
+            "fit": "Gaussian",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 0
+          }
+        ],
+        "featureQueryRefIds": [
+          "A"
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1
+      },
+      "pluginVersion": "11.2.0-pre",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,3,-3,0.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "csvContent": "time,value\r\n2024-10-01T00:00:00Z,0.3\r\n2024-10-01T01:00:00Z,-0.1\r\n2024-10-01T02:00:00Z,1.5\r\n2024-10-01T03:00:00Z,0.7\r\n2024-10-01T04:00:00Z,-1.3\r\n2024-10-01T05:00:00Z,2.1\r\n2024-10-01T06:00:00Z,-0.8\r\n2024-10-01T07:00:00Z,0.4\r\n2024-10-01T08:00:00Z,1.2\r\n2024-10-01T09:00:00Z,0.9\r\n2024-10-01T10:00:00Z,-0.4\r\n2024-10-01T11:00:00Z,-2.2\r\n2024-10-01T12:00:00Z,0.6\r\n2024-10-01T13:00:00Z,-1.6\r\n2024-10-01T14:00:00Z,1.9\r\n2024-10-01T15:00:00Z,0.3\r\n2024-10-01T16:00:00Z,-0.7\r\n2024-10-01T17:00:00Z,2.5\r\n2024-10-01T18:00:00Z,-1.1\r\n2024-10-01T19:00:00Z,1.4\r\n2024-10-01T20:00:00Z,-0.9\r\n2024-10-01T21:00:00Z,0.8\r\n2024-10-01T22:00:00Z,-0.3\r\n2024-10-01T23:00:00Z,1.1\r\n2024-10-02T00:00:00Z,5.2 \r\n2024-10-02T01:00:00Z,-3.5\r\n2024-10-02T02:00:00Z,0.5\r\n2024-10-02T03:00:00Z,-0.6\r\n2024-10-02T04:00:00Z,2.3\r\n2024-10-02T05:00:00Z,-0.8\r\n2024-10-02T06:00:00Z,0.7\r\n2024-10-02T07:00:00Z,1.8\r\n2024-10-02T08:00:00Z,4.9 \r\n2024-10-02T09:00:00Z,-4.0\r\n2024-10-02T10:00:00Z,0.2\r\n2024-10-02T11:00:00Z,1.5\r\n2024-10-02T12:00:00Z,-1.4\r\n2024-10-02T13:00:00Z,0.9\r\n2024-10-02T14:00:00Z,-2.5 \r\n2024-10-02T15:00:00Z,2.6\r\n2024-10-02T16:00:00Z,0.1\r\n2024-10-02T17:00:00Z,1.7\r\n2024-10-02T18:00:00Z,-0.5\r\n2024-10-02T19:00:00Z,4.0\r\n2024-10-02T20:00:00Z,-0.4\r\n2024-10-02T21:00:00Z,0.3\r\n2024-10-02T22:00:00Z,1.6\r\n2024-10-02T23:00:00Z,0.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "refId": "B",
+          "scenarioId": "csv_content"
+        }
+      ],
+      "title": "XmR (X) histogram with LSL, USL, Nominal lookup and calculated LCL UCL and mean",
+      "type": "kensobi-spchistogram-panel"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Lab data"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Cd"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Inline"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 2,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "none",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "nominal",
+            "fillDirection": 0,
+            "fillOpacity": 5,
+            "lineColor": "#37872d",
+            "lineWidth": 5,
+            "name": "Nominal",
+            "positionInput": "Series",
+            "reducerId": "nominal",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "LSL",
+            "position": -5,
+            "positionInput": "Static",
+            "reducerId": "lsl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "USL",
+            "position": 6,
+            "positionInput": "Static",
+            "reducerId": "usl",
+            "seriesIndex": 0
+          }
+        ],
+        "curves": [
+          {
+            "color": "#96D98D",
+            "fit": "Gaussian",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 0
+          },
+          {
+            "color": "#FFF899",
+            "fit": "Gaussian",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 1
+          }
+        ],
+        "featureQueryRefIds": [
+          "A"
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1
+      },
+      "pluginVersion": "11.2.0-pre",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,5,-4,1.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "hide": false,
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "csvContent": "time,value\r\n2024-10-01T00:00:00Z,2.1\r\n2024-10-01T01:00:00Z,1.8\r\n2024-10-01T02:00:00Z,-3.5\r\n2024-10-01T03:00:00Z,3.4\r\n2024-10-01T04:00:00Z,-2.8\r\n2024-10-01T05:00:00Z,4.2\r\n2024-10-01T06:00:00Z,2.9\r\n2024-10-01T07:00:00Z,-0.5\r\n2024-10-01T08:00:00Z,1.2\r\n2024-10-01T09:00:00Z,5.5\r\n2024-10-01T10:00:00Z,2.4\r\n2024-10-01T11:00:00Z,-3.9\r\n2024-10-01T12:00:00Z,3.1\r\n2024-10-01T13:00:00Z,-3.1\r\n2024-10-01T14:00:00Z,4.7\r\n2024-10-01T15:00:00Z,0.2\r\n2024-10-01T16:00:00Z,-4.5\r\n2024-10-01T17:00:00Z,-3.0\r\n2024-10-01T18:00:00Z,3.8\r\n2024-10-01T19:00:00Z,4.0\r\n2024-10-01T20:00:00Z,-1.8\r\n2024-10-01T21:00:00Z,2.7\r\n2024-10-01T22:00:00Z,-0.2\r\n2024-10-01T23:00:00Z,1.5\r\n2024-10-02T00:00:00Z,6.2\r\n2024-10-02T01:00:00Z,2.0\r\n2024-10-02T02:00:00Z,0.5\r\n2024-10-02T03:00:00Z,-2.5\r\n2024-10-02T04:00:00Z,-4.7\r\n2024-10-02T05:00:00Z,3.3\r\n2024-10-02T06:00:00Z,2.3\r\n2024-10-02T07:00:00Z,-3.2\r\n2024-10-02T08:00:00Z,4.9\r\n2024-10-02T09:00:00Z,-4.2\r\n2024-10-02T10:00:00Z,5.9\r\n2024-10-02T11:00:00Z,1.3\r\n2024-10-02T12:00:00Z,0.8\r\n2024-10-02T13:00:00Z,4.5\r\n2024-10-02T14:00:00Z,-3.8\r\n2024-10-02T15:00:00Z,2.6\r\n2024-10-02T16:00:00Z,-0.9\r\n2024-10-02T17:00:00Z,2.8\r\n2024-10-02T18:00:00Z,-1.3\r\n2024-10-02T19:00:00Z,3.7\r\n2024-10-02T20:00:00Z,-5.1\r\n2024-10-02T21:00:00Z,5.7\r\n2024-10-02T22:00:00Z,0.4\r\n2024-10-02T23:00:00Z,2.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "hide": false,
+          "refId": "B",
+          "scenarioId": "csv_content"
+        },
+        {
+          "csvContent": "time,value\r\n2024-10-01T00:00:00Z,3.49\r\n2024-10-01T01:00:00Z,1.59\r\n2024-10-01T02:00:00Z,3.94\r\n2024-10-01T03:00:00Z,6.44\r\n2024-10-01T04:00:00Z,1.30\r\n2024-10-01T05:00:00Z,1.30\r\n2024-10-01T06:00:00Z,6.74\r\n2024-10-01T07:00:00Z,4.30\r\n2024-10-01T08:00:00Z,0.59\r\n2024-10-01T09:00:00Z,3.63\r\n2024-10-01T10:00:00Z,0.61\r\n2024-10-01T11:00:00Z,0.60\r\n2024-10-01T12:00:00Z,2.73\r\n2024-10-01T13:00:00Z,-3.74\r\n2024-10-01T14:00:00Z,-3.17\r\n2024-10-01T15:00:00Z,0.31\r\n2024-10-01T16:00:00Z,-1.04\r\n2024-10-01T17:00:00Z,2.94\r\n2024-10-01T18:00:00Z,-0.72\r\n2024-10-01T19:00:00Z,-2.24\r\n2024-10-01T20:00:00Z,6.40\r\n2024-10-01T21:00:00Z,1.32\r\n2024-10-01T22:00:00Z,2.20\r\n2024-10-01T23:00:00Z,-2.27\r\n2024-10-02T00:00:00Z,0.37\r\n2024-10-02T01:00:00Z,2.33\r\n2024-10-02T02:00:00Z,6.11\r\n2024-10-02T03:00:00Z,3.13\r\n2024-10-02T04:00:00Z,0.20\r\n2024-10-02T05:00:00Z,-4.90\r\n2024-10-02T06:00:00Z,0.19\r\n2024-10-02T07:00:00Z,-4.48\r\n2024-10-02T08:00:00Z,1.96\r\n2024-10-02T09:00:00Z,-1.17\r\n2024-10-02T10:00:00Z,4.47\r\n2024-10-02T11:00:00Z,-1.66\r\n2024-10-02T12:00:00Z,6.20\r\n2024-10-02T13:00:00Z,-3.88\r\n2024-10-02T14:00:00Z,-1.98\r\n2024-10-02T15:00:00Z,2.59\r\n2024-10-02T16:00:00Z,4.22\r\n2024-10-02T17:00:00Z,2.51\r\n2024-10-02T18:00:00Z,1.65\r\n2024-10-02T19:00:00Z,1.10\r\n2024-10-02T20:00:00Z,-2.44\r\n2024-10-02T21:00:00Z,-0.16\r\n2024-10-02T22:00:00Z,0.62\r\n2024-10-02T23:00:00Z,5.17\r\n2024-10-03T00:00:00Z,3.03\r\n2024-10-03T01:00:00Z,-3.29\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "hide": false,
+          "refId": "Cd",
+          "scenarioId": "csv_content"
+        }
+      ],
+      "title": "2 series and a reference table. Raw data. Calculated Mean. Nominal value from reference table. Static upper and lower limits",
+      "type": "kensobi-spchistogram-panel"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Lab data"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Cd"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Inline"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 7,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XbarR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 4,
+            "name": "Mean",
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "LCL",
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 4,
+            "name": "UCL",
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "nominal",
+            "fillDirection": 0,
+            "fillOpacity": 5,
+            "lineColor": "#37872d",
+            "lineWidth": 5,
+            "name": "Nominal",
+            "positionInput": "Series",
+            "reducerId": "nominal",
+            "seriesIndex": 0
+          }
+        ],
+        "curves": [
+          {
+            "color": "#96D98D",
+            "fit": "Gaussian",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 0
+          },
+          {
+            "color": "#FFF899",
+            "fit": "Gaussian",
+            "lineWidth": 4,
+            "name": "Histogram",
+            "seriesIndex": 1
+          }
+        ],
+        "featureQueryRefIds": [
+          "A"
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1
+      },
+      "pluginVersion": "11.2.0-pre",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,5,-4,1.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "hide": false,
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "csvContent": "time,value\r\n2024-10-01T00:00:00Z,2.1\r\n2024-10-01T01:00:00Z,1.8\r\n2024-10-01T02:00:00Z,-3.5\r\n2024-10-01T03:00:00Z,3.4\r\n2024-10-01T04:00:00Z,-2.8\r\n2024-10-01T05:00:00Z,4.2\r\n2024-10-01T06:00:00Z,2.9\r\n2024-10-01T07:00:00Z,-0.5\r\n2024-10-01T08:00:00Z,1.2\r\n2024-10-01T09:00:00Z,5.5\r\n2024-10-01T10:00:00Z,2.4\r\n2024-10-01T11:00:00Z,-3.9\r\n2024-10-01T12:00:00Z,3.1\r\n2024-10-01T13:00:00Z,-3.1\r\n2024-10-01T14:00:00Z,4.7\r\n2024-10-01T15:00:00Z,0.2\r\n2024-10-01T16:00:00Z,-4.5\r\n2024-10-01T17:00:00Z,-3.0\r\n2024-10-01T18:00:00Z,3.8\r\n2024-10-01T19:00:00Z,4.0\r\n2024-10-01T20:00:00Z,-1.8\r\n2024-10-01T21:00:00Z,2.7\r\n2024-10-01T22:00:00Z,-0.2\r\n2024-10-01T23:00:00Z,1.5\r\n2024-10-02T00:00:00Z,6.2\r\n2024-10-02T01:00:00Z,2.0\r\n2024-10-02T02:00:00Z,0.5\r\n2024-10-02T03:00:00Z,-2.5\r\n2024-10-02T04:00:00Z,-4.7\r\n2024-10-02T05:00:00Z,3.3\r\n2024-10-02T06:00:00Z,2.3\r\n2024-10-02T07:00:00Z,-3.2\r\n2024-10-02T08:00:00Z,4.9\r\n2024-10-02T09:00:00Z,-4.2\r\n2024-10-02T10:00:00Z,5.9\r\n2024-10-02T11:00:00Z,1.3\r\n2024-10-02T12:00:00Z,0.8\r\n2024-10-02T13:00:00Z,4.5\r\n2024-10-02T14:00:00Z,-3.8\r\n2024-10-02T15:00:00Z,2.6\r\n2024-10-02T16:00:00Z,-0.9\r\n2024-10-02T17:00:00Z,2.8\r\n2024-10-02T18:00:00Z,-1.3\r\n2024-10-02T19:00:00Z,3.7\r\n2024-10-02T20:00:00Z,-5.1\r\n2024-10-02T21:00:00Z,5.7\r\n2024-10-02T22:00:00Z,0.4\r\n2024-10-02T23:00:00Z,2.2\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "hide": false,
+          "refId": "B",
+          "scenarioId": "csv_content"
+        },
+        {
+          "csvContent": "time,value\r\n2024-10-01T00:00:00Z,3.49\r\n2024-10-01T01:00:00Z,1.59\r\n2024-10-01T02:00:00Z,3.94\r\n2024-10-01T03:00:00Z,6.44\r\n2024-10-01T04:00:00Z,1.30\r\n2024-10-01T05:00:00Z,1.30\r\n2024-10-01T06:00:00Z,6.74\r\n2024-10-01T07:00:00Z,4.30\r\n2024-10-01T08:00:00Z,0.59\r\n2024-10-01T09:00:00Z,3.63\r\n2024-10-01T10:00:00Z,0.61\r\n2024-10-01T11:00:00Z,0.60\r\n2024-10-01T12:00:00Z,2.73\r\n2024-10-01T13:00:00Z,-3.74\r\n2024-10-01T14:00:00Z,-3.17\r\n2024-10-01T15:00:00Z,0.31\r\n2024-10-01T16:00:00Z,-1.04\r\n2024-10-01T17:00:00Z,2.94\r\n2024-10-01T18:00:00Z,-0.72\r\n2024-10-01T19:00:00Z,-2.24\r\n2024-10-01T20:00:00Z,6.40\r\n2024-10-01T21:00:00Z,1.32\r\n2024-10-01T22:00:00Z,2.20\r\n2024-10-01T23:00:00Z,-2.27\r\n2024-10-02T00:00:00Z,0.37\r\n2024-10-02T01:00:00Z,2.33\r\n2024-10-02T02:00:00Z,6.11\r\n2024-10-02T03:00:00Z,3.13\r\n2024-10-02T04:00:00Z,0.20\r\n2024-10-02T05:00:00Z,-4.90\r\n2024-10-02T06:00:00Z,0.19\r\n2024-10-02T07:00:00Z,-4.48\r\n2024-10-02T08:00:00Z,1.96\r\n2024-10-02T09:00:00Z,-1.17\r\n2024-10-02T10:00:00Z,4.47\r\n2024-10-02T11:00:00Z,-1.66\r\n2024-10-02T12:00:00Z,6.20\r\n2024-10-02T13:00:00Z,-3.88\r\n2024-10-02T14:00:00Z,-1.98\r\n2024-10-02T15:00:00Z,2.59\r\n2024-10-02T16:00:00Z,4.22\r\n2024-10-02T17:00:00Z,2.51\r\n2024-10-02T18:00:00Z,1.65\r\n2024-10-02T19:00:00Z,1.10\r\n2024-10-02T20:00:00Z,-2.44\r\n2024-10-02T21:00:00Z,-0.16\r\n2024-10-02T22:00:00Z,0.62\r\n2024-10-02T23:00:00Z,5.17\r\n2024-10-03T00:00:00Z,3.03\r\n2024-10-03T01:00:00Z,-3.29\r\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "grafana"
+          },
+          "hide": false,
+          "refId": "Cd",
+          "scenarioId": "csv_content"
+        }
+      ],
+      "title": "2 series and reference table with calculated LCL, UCL and Mean. Nominal value from reference table.",
+      "type": "kensobi-spchistogram-panel"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Variable limits",
+  "uid": "ee0b2tcchayv4a",
+  "version": 17,
+  "weekStart": ""
+}

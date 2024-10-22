@@ -18,8 +18,7 @@ export function doSpcCalcs(series: DataFrame[], options: Options): DataFrame[] {
 
   return series.map((frame, frameIndex) => {
     const shouldCalculateStandardStats =
-      options.controlLines.filter((c) => c.seriesIndex === frameIndex && standardReducers.includes(c.reducerId))
-        .length > 0;
+      options.controlLines.filter((c) => standardReducers.includes(c.reducerId)).length > 0;
 
     return {
       ...frame,
