@@ -16,6 +16,10 @@
     },
     "links": [
       {
+        "name": "Documentation",
+        "url": "https://docs.kensobi.com/panels/spc-histogram"
+      },
+      {
         "name": "Project site",
         "url": "https://github.com/KensoBI/spc-histogram"
       },
@@ -25,9 +29,10 @@
       }
     ],
     "screenshots": [
-      { "name": "SPC Histogram", "path": "img/spc-histogram.png" },
+      { "name": "SPC Histogram", "path": "img/spc-histogram-release.gif" },
       { "name": "Multi-series", "path": "img/multi-series.png" },
-      { "name": "Editor", "path": "img/editor.png" }
+      { "name": "Gaussian", "path": "img/gaussian-curve.png" },
+      { "name": "Editor", "path": "img/histogram-feature.gif" }
     ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
