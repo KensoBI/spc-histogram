@@ -120,8 +120,13 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
   }
 
   function addControlLine(reducer: ControlLineReducer) {
-    const availableIndex = getAvailableSeriesIndexForReducer(reducer.id);
-    if (availableIndex === -1) {
+    let availableIndex = getAvailableSeriesIndexForReducer(reducer.id);
+
+    if ((!reducer.computed && !reducer.isStandard) || reducer.isStandard) {
+      if (availableIndex === -1) {
+        availableIndex = 0;
+      }
+    } else if (availableIndex === -1) {
       return;
     }
 
