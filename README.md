@@ -16,6 +16,7 @@ Welcome to the KensoBI SPC Histogram panel for Grafana. This plugin enables you 
 - **Gaussian Bell Curve:** Add a Gaussian (normal) distribution curve to your histogram for comparison and analysis.
 - **Gaussian Peak (µ) Control Line:** Display the peak of the fitted Gaussian curve as a control line, using the Levenberg-Marquardt fitted mean.
 - **Interactive Tooltips:** Hover over histogram bins to see bucket range and series counts. Control line tooltips show name and value. Gaussian curve fitted values are included in the bucket tooltip.
+- **Export to CSV:** Export calculated statistics, control lines, and histogram data to a CSV file. Available from the download icon in the statistics table or by right-clicking the panel.
 
 ## Histogram Curve
 

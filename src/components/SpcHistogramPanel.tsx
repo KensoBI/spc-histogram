@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { buildHistogram, FieldType, getHistogramFields } from '@grafana/data';
 import { histogramFieldsToFrame } from '../data/transform';
-import { useTheme2 } from '@grafana/ui';
+import { ContextMenu, MenuItem, useTheme2 } from '@grafana/ui';
 import { Histogram, getBucketSize } from './Histogram/Histogram';
 import { LimitAnnotations } from './LimitAnnotations/LimitAnnotations';
 import { doSpcCalcs } from 'data/doSpcCalcs';
@@ -172,6 +172,16 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
     downloadCsv(csv, generateExportFilename());
   }, [samples, optionsWithVars, allSamplesWithGaussianCalcs, histogram]);
 
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      setContextMenu({ x: e.clientX, y: e.clientY });
+    },
+    []
+  );
+
   if (!histogram || !histogram.fields.length) {
     return (
       <div className="panel-empty">
@@ -185,7 +195,21 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
   const histogramHeight = height - tableHeight;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height }} onContextMenu={handleContextMenu}>
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onClose={() => setContextMenu(null)}
+          renderMenuItems={() => (
+            <MenuItem
+              label="Download CSV"
+              icon="download-alt"
+              onClick={handleExport}
+            />
+          )}
+        />
+      )}
       <Histogram
         options={optionsWithVars}
         theme={theme}
