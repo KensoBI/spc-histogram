@@ -1,31 +1,33 @@
 import React, { useCallback, useMemo } from 'react';
-import { buildHistogram, getHistogramFields } from '@grafana/data';
+import { buildHistogram, FieldType, getHistogramFields } from '@grafana/data';
 import { histogramFieldsToFrame } from '../data/transform';
 import { useTheme2 } from '@grafana/ui';
 import { Histogram, getBucketSize } from './Histogram/Histogram';
 import { LimitAnnotations } from './LimitAnnotations/LimitAnnotations';
 import { doSpcCalcs } from 'data/doSpcCalcs';
+import { ControlLineReducerId } from 'data/spcReducers';
 import buildLimitAnnotations from './LimitAnnotations/buildLimitAnnotations';
 import { ChartPanelProps } from 'panelcfg';
 import { BellCurve } from './BellCurve/BellCurve';
+import { createGaussianCurve } from './BellCurve/gaussian';
 import { useSubgroupSizeOptions } from './options/useSubgroupSize';
 import { StatisticsTable } from './StatisticsTable/StatisticsTable';
+import { CurveFit } from 'types';
 
 export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelProps) => {
   const theme = useTheme2();
   const optionsWithVars = useSubgroupSizeOptions(options).options;
 
-  const { samples, limitAnnotations } = useMemo(() => {
-    let samplesWithCalcs = doSpcCalcs(data.series, optionsWithVars);
-    const limitAnnotationsResult = buildLimitAnnotations(samplesWithCalcs, optionsWithVars);
-
-    if (optionsWithVars.featureQueryRefIds) {
-      // Remove feature queries
-      samplesWithCalcs = samplesWithCalcs.filter((frame) => !optionsWithVars.featureQueryRefIds.includes(frame.refId!));
-    }
-
-    return { samples: samplesWithCalcs, limitAnnotations: limitAnnotationsResult };
+  const allSamplesWithCalcs = useMemo(() => {
+    return doSpcCalcs(data.series, optionsWithVars);
   }, [data.series, optionsWithVars]);
+
+  const samples = useMemo(() => {
+    if (optionsWithVars.featureQueryRefIds) {
+      return allSamplesWithCalcs.filter((frame) => !optionsWithVars.featureQueryRefIds.includes(frame.refId!));
+    }
+    return allSamplesWithCalcs;
+  }, [allSamplesWithCalcs, optionsWithVars.featureQueryRefIds]);
 
   const stampedSamples = useMemo(() => {
     return samples.map((frame, frameIndex) => ({
@@ -58,6 +60,70 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
 
     return histogramFieldsToFrame(hist, theme);
   }, [stampedSamples, optionsWithVars, theme]);
+
+  // Compute Gaussian fitted params and store µ in calcs for gaussianPeak control lines
+  const allSamplesWithGaussianCalcs = useMemo(() => {
+    const hasGaussianPeakLine = optionsWithVars.controlLines?.some(
+      (cl) => cl.reducerId === ControlLineReducerId.gaussianPeak
+    );
+
+    if (!hasGaussianPeakLine || !histogram || !optionsWithVars.curves) {
+      return allSamplesWithCalcs;
+    }
+
+    const gaussianCurves = optionsWithVars.curves.filter((c) => c.fit === CurveFit.gaussian);
+    if (gaussianCurves.length === 0) {
+      return allSamplesWithCalcs;
+    }
+
+    // Compute fitted µ for each Gaussian curve's series
+    const fittedMeans = new Map<number, number>();
+    gaussianCurves.forEach((curve) => {
+      try {
+        const result = createGaussianCurve(histogram, stampedSamples, curve.seriesIndex);
+        if (result.params.mean) {
+          fittedMeans.set(curve.seriesIndex, result.params.mean);
+        }
+      } catch {
+        // Gaussian fitting may fail for insufficient data
+      }
+    });
+
+    if (fittedMeans.size === 0) {
+      return allSamplesWithCalcs;
+    }
+
+    // Write fitted µ into field.state.calcs.gaussianPeak
+    return allSamplesWithCalcs.map((frame, frameIndex) => {
+      const fittedMean = fittedMeans.get(frameIndex);
+      if (fittedMean === undefined) {
+        return frame;
+      }
+
+      return {
+        ...frame,
+        fields: frame.fields.map((field) => {
+          if (field.type !== FieldType.number || !field.state?.calcs) {
+            return field;
+          }
+          return {
+            ...field,
+            state: {
+              ...field.state,
+              calcs: {
+                ...field.state.calcs,
+                [ControlLineReducerId.gaussianPeak]: fittedMean,
+              },
+            },
+          };
+        }),
+      };
+    });
+  }, [allSamplesWithCalcs, histogram, stampedSamples, optionsWithVars.controlLines, optionsWithVars.curves]);
+
+  const limitAnnotations = useMemo(() => {
+    return buildLimitAnnotations(allSamplesWithGaussianCalcs, optionsWithVars);
+  }, [allSamplesWithGaussianCalcs, optionsWithVars]);
 
   const bucketSize = useMemo(() => {
     return histogram ? getBucketSize(histogram) : 0;

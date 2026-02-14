@@ -13,6 +13,7 @@ export enum ControlLineReducerId {
   ucl = 'ucl',
   stdDev = 'stdDev',
   variance = 'variance',
+  gaussianPeak = 'gaussianPeak',
 }
 
 type SpcReducer = (field: Field, subgroupSize: number) => FieldCalcs;
@@ -107,5 +108,13 @@ export const controlLineReducers: ControlLineReducer[] = [
     computed: true,
     isStandard: false,
     color: '#F2495C',
+  },
+  {
+    id: ControlLineReducerId.gaussianPeak,
+    name: 'Gaussian Peak (µ)',
+    description: 'Draws a line at the peak of the fitted Gaussian curve (µ).',
+    computed: true,
+    isStandard: false,
+    color: 'yellow',
   },
 ];

@@ -14,6 +14,7 @@ Welcome to the KensoBI SPC Histogram panel for Grafana. This plugin enables you 
 - **Statistics Table:** View descriptive statistics, control limits, and process capability indices (Cp, Cpk, Pp, Ppk) in a table below the histogram.
 - **Histogram Bell Curve:** Visualize the distribution of your data with a histogram bell curve overlay.
 - **Gaussian Bell Curve:** Add a Gaussian (normal) distribution curve to your histogram for comparison and analysis.
+- **Gaussian Peak (µ) Control Line:** Display the peak of the fitted Gaussian curve as a control line, using the Levenberg-Marquardt fitted mean.
 
 ## Histogram Curve
 

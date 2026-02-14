@@ -30,6 +30,7 @@
     ],
     "screenshots": [
       { "name": "SPC Histogram", "path": "img/spc-histogram-release.gif" },
+      { "name": "Stat table", "path": "img/stat-table.png" },
       { "name": "Multi-series", "path": "img/multi-series.png" },
       { "name": "Gaussian", "path": "img/gaussian-curve.png" },
       { "name": "Editor", "path": "img/histogram-feature.gif" }
