@@ -153,6 +153,7 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
           <HistogramTooltip
             config={config}
             histogramFrame={alignedFrame}
+            annotations={limitAnnotations.limits}
             curveOptions={optionsWithVars.curves}
             rawSeries={stampedSamples}
           />

@@ -1,23 +1,27 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { DataFrame, formattedValueToString, getFieldSeriesColor, GrafanaTheme2 } from '@grafana/data';
-import { UPlotConfigBuilder, useStyles2, useTheme2, SeriesTable } from '@grafana/ui';
+import { DataFrame, FieldType, formattedValueToString, getDisplayProcessor, getFieldSeriesColor, GrafanaTheme2 } from '@grafana/data';
+import { UPlotConfigBuilder, useStyles2, useTheme2, SeriesTable, SeriesTableRow } from '@grafana/ui';
 import { css } from '@emotion/css';
 import { CurveOptions } from 'panelcfg';
 import { CurveFit } from 'types';
 import { createGaussianCurve, gaussianFunction, GaussianParams } from '../BellCurve/gaussian';
+import { LimitAnnotation } from '../LimitAnnotations/LimitAnnotations';
 
 const TOOLTIP_OFFSET = 10;
+const CONTROL_LINE_HOVER_RANGE = 30;
 
 export type HistogramTooltipProps = {
   config: UPlotConfigBuilder;
   histogramFrame: DataFrame;
+  annotations?: LimitAnnotation[];
   curveOptions?: CurveOptions[];
   rawSeries?: DataFrame[];
 };
 
 type TooltipState = {
-  bucketIndex: number;
+  bucketIndex: number | null;
+  annotation: LimitAnnotation | null;
   clientX: number;
   clientY: number;
 };
@@ -41,6 +45,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
 export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
   config,
   histogramFrame,
+  annotations,
   curveOptions,
   rawSeries,
 }) => {
@@ -50,6 +55,23 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
   const plotRef = useRef<uPlot>();
   const frameRef = useRef(histogramFrame);
   frameRef.current = histogramFrame;
+  const annotationsRef = useRef(annotations);
+  annotationsRef.current = annotations;
+
+  // Get value formatter from the first numeric field in raw series (respects Standard Options > Decimals)
+  const formatValue = useMemo(() => {
+    if (rawSeries) {
+      for (const frame of rawSeries) {
+        for (const field of frame.fields) {
+          if (field.type === FieldType.number) {
+            const display = field.display ?? getDisplayProcessor({ field, theme });
+            return (v: number) => formattedValueToString(display(v));
+          }
+        }
+      }
+    }
+    return (v: number) => String(v);
+  }, [rawSeries, theme]);
 
   // Pre-compute Gaussian params for each curve so we can evaluate on hover
   const gaussianParamsRef = useRef<Map<number, GaussianParams>>(new Map());
@@ -90,10 +112,35 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
       return;
     }
 
-    const xVal = u.posToVal(left, 'x');
+    const clientX = u.rect.left + left;
+    const clientY = u.rect.top + top;
+
+    // Find closest control line annotation
+    let hoveredAnnotation: LimitAnnotation | null = null;
+    const currentAnnotations = annotationsRef.current;
+    if (currentAnnotations && currentAnnotations.length > 0) {
+      const cursorCssX = left;
+      for (const annotation of currentAnnotations) {
+        if (annotation.type === 'flag' && annotation.time != null) {
+          const lineX = u.valToPos(annotation.time, 'x', false);
+          if (Math.abs(cursorCssX - lineX) <= CONTROL_LINE_HOVER_RANGE) {
+            hoveredAnnotation = annotation;
+            break;
+          }
+        } else if (annotation.type === 'region') {
+          const x0 = annotation.timeStart != null ? u.valToPos(annotation.timeStart, 'x', false) : 0;
+          const x1 = annotation.timeEnd != null ? u.valToPos(annotation.timeEnd, 'x', false) : u.over.clientWidth;
+          if (cursorCssX >= x0 - CONTROL_LINE_HOVER_RANGE && cursorCssX <= x1 + CONTROL_LINE_HOVER_RANGE) {
+            hoveredAnnotation = annotation;
+            break;
+          }
+        }
+      }
+    }
 
     // Find which bucket the cursor falls in
-    let bucketIndex = -1;
+    const xVal = u.posToVal(left, 'x');
+    let bucketIndex: number | null = null;
     for (let i = 0; i < xMin.length; i++) {
       if (xVal >= xMin[i] && xVal < xMax[i]) {
         bucketIndex = i;
@@ -101,17 +148,12 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
       }
     }
 
-    if (bucketIndex === -1) {
+    if (hoveredAnnotation == null && bucketIndex == null) {
       setTooltip(null);
       return;
     }
 
-    // Convert to viewport coordinates using u.rect (same approach as Grafana's TooltipPlugin2)
-    setTooltip({
-      bucketIndex,
-      clientX: u.rect.left + left,
-      clientY: u.rect.top + top,
-    });
+    setTooltip({ annotation: hoveredAnnotation, bucketIndex, clientX, clientY });
   }, []);
 
   const onMouseLeave = useCallback(() => {
@@ -138,14 +180,87 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
     return null;
   }
 
-  const { bucketIndex, clientX, clientY } = tooltip;
+  const annotationContent = tooltip.annotation
+    ? renderAnnotationTooltip(tooltip.annotation, formatValue)
+    : null;
+  const bucketContent = tooltip.bucketIndex != null
+    ? renderBucketTooltip(tooltip.bucketIndex, histogramFrame, curveOptions, theme, gaussianParamsRef.current, formatValue)
+    : null;
+
+  if (!annotationContent && !bucketContent) {
+    return null;
+  }
+
+  const content = (
+    <>
+      {annotationContent}
+      {annotationContent && bucketContent && <hr style={{ margin: '4px 0', border: 'none', borderTop: `1px solid ${theme.colors.border.weak}` }} />}
+      {bucketContent}
+    </>
+  );
+
+  const tooltipEl = (
+    <div
+      className={styles.tooltip}
+      style={{
+        transform: `translateX(${tooltip.clientX + TOOLTIP_OFFSET}px) translateY(${tooltip.clientY + TOOLTIP_OFFSET}px)`,
+      }}
+    >
+      {content}
+    </div>
+  );
+
+  return createPortal(tooltipEl, document.body);
+};
+
+function renderAnnotationTooltip(annotation: LimitAnnotation, formatValue: (v: number) => string): React.ReactNode {
+  const title = annotation.title ?? 'EMPTY';
+  if (annotation.type === 'flag' && annotation.time != null) {
+    return (
+      <SeriesTable
+        series={[{
+          color: annotation.color ?? '#03839e',
+          label: title,
+          value: formatValue(annotation.time),
+        }]}
+      />
+    );
+  }
+  if (annotation.type === 'region') {
+    const parts: string[] = [];
+    if (annotation.timeStart != null) {
+      parts.push(formatValue(annotation.timeStart));
+    }
+    if (annotation.timeEnd != null) {
+      parts.push(formatValue(annotation.timeEnd));
+    }
+    return (
+      <SeriesTable
+        series={[{
+          color: annotation.color ?? '#03839e',
+          label: title,
+          value: parts.join(' \u2013 '),
+        }]}
+      />
+    );
+  }
+  return <SeriesTableRow label={title} color={annotation.color ?? '#03839e'} value="" />;
+}
+
+function renderBucketTooltip(
+  bucketIndex: number,
+  histogramFrame: DataFrame,
+  curveOptions: CurveOptions[] | undefined,
+  theme: any,
+  gaussianParams: Map<number, GaussianParams>,
+  formatValue: (v: number) => string
+): React.ReactNode {
   const xMinField = histogramFrame.fields[0];
   const xMaxField = histogramFrame.fields[1];
   const fmt = xMinField.display!;
 
   const bucketLabel = `Bucket ${formattedValueToString(fmt(xMinField.values[bucketIndex]))} \u2013 ${formattedValueToString(fmt(xMaxField.values[bucketIndex]))}`;
 
-  // Build series rows for each count field (fields[2+])
   const seriesRows: Array<{ color: string; label: string; value: string; isActive?: boolean }> = [];
 
   for (let i = 2; i < histogramFrame.fields.length; i++) {
@@ -154,7 +269,6 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
     if (count == null) {
       continue;
     }
-
     const seriesColor = getFieldSeriesColor(field, theme).color;
     seriesRows.push({
       color: seriesColor,
@@ -163,7 +277,6 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
     });
   }
 
-  // Add Gaussian bell curve values
   if (curveOptions) {
     const binCenter = (xMinField.values[bucketIndex] + xMaxField.values[bucketIndex]) / 2;
     const colors = theme.visualization;
@@ -172,7 +285,7 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
       if (opt.fit !== CurveFit.gaussian) {
         return;
       }
-      const params = gaussianParamsRef.current.get(opt.seriesIndex);
+      const params = gaussianParams.get(opt.seriesIndex);
       if (!params) {
         return;
       }
@@ -181,7 +294,7 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
       seriesRows.push({
         color,
         label: opt.name || `Gaussian (series ${opt.seriesIndex})`,
-        value: curveValue.toFixed(1),
+        value: formatValue(curveValue),
       });
     });
   }
@@ -190,16 +303,5 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
     return null;
   }
 
-  const tooltipContent = (
-    <div
-      className={styles.tooltip}
-      style={{
-        transform: `translateX(${clientX + TOOLTIP_OFFSET}px) translateY(${clientY + TOOLTIP_OFFSET}px)`,
-      }}
-    >
-      <SeriesTable timestamp={bucketLabel} series={seriesRows} />
-    </div>
-  );
-
-  return createPortal(tooltipContent, document.body);
-};
+  return <SeriesTable timestamp={bucketLabel} series={seriesRows} />;
+}
