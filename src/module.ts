@@ -1,4 +1,4 @@
-import { PanelPlugin, FieldConfigProperty, FieldColorModeId } from '@grafana/data';
+import { PanelPlugin, FieldConfigProperty, FieldColorModeId, SelectFieldConfigSettings } from '@grafana/data';
 import { commonOptionsBuilder, graphFieldOptions, GraphGradientMode } from '@grafana/ui';
 import { FieldConfig, Options, defaultOptions } from 'panelcfg';
 import { SpcHistogramPanel } from 'components/SpcHistogramPanel';
@@ -121,6 +121,39 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
       editor: CurveEditor,
       defaultValue: [],
       category: ['Curve'],
+    });
+
+    builder.addBooleanSwitch({
+      path: 'showStatisticsTable',
+      name: 'Show statistics table',
+      description: 'Display a table with SPC statistics below the histogram',
+      defaultValue: true,
+      category: ['Statistics Table'],
+    });
+
+    builder.addMultiSelect<string, SelectFieldConfigSettings<string>>({
+      path: 'statisticsTableColumns',
+      name: 'Visible columns',
+      description: 'Choose which columns to display in the statistics table',
+      settings: {
+        allowCustomValue: false,
+        options: [
+          { label: 'n', value: 'n' },
+          { label: 'Mean', value: 'mean' },
+          { label: 'Std Dev', value: 'stdDev' },
+          { label: 'Min', value: 'min' },
+          { label: 'Max', value: 'max' },
+          { label: 'LCL', value: 'lcl' },
+          { label: 'UCL', value: 'ucl' },
+          { label: 'Cp', value: 'cp' },
+          { label: 'Cpk', value: 'cpk' },
+          { label: 'Pp', value: 'pp' },
+          { label: 'Ppk', value: 'ppk' },
+        ],
+      },
+      defaultValue: defaultOptions.statisticsTableColumns as any,
+      showIf: (option) => option.showStatisticsTable === true,
+      category: ['Statistics Table'],
     });
 
     commonOptionsBuilder.addLegendOptions(builder);

@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   grafana:
-    image: grafana/grafana:latest
+    image: ${GRAFANA_IMAGE:-grafana/grafana}:${GRAFANA_VERSION:-latest}
     container_name: 'kensobi-spchistogram-panel'
     ports:
       - 3000:3000/tcp

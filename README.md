@@ -11,8 +11,12 @@ Welcome to the KensoBI SPC Histogram panel for Grafana. This plugin enables you 
 - **Custom Limits:** Add your own limits for more tailored analysis.
 - **Subgrouping:** Group your samples into subgroups and aggregate it.
 - **Aggregation:** Aggregate your data by moving range, range, mean, or standard deviation.
-- **Histogram Bell Curve** Visualize the distribution of your data with a histogram bell curve overlay.
-- **Gaussian Bell Curve** Add a Gaussian (normal) distribution curve to your histogram for comparison and analysis.
+- **Statistics Table:** View descriptive statistics, control limits, and process capability indices (Cp, Cpk, Pp, Ppk) in a table below the histogram.
+- **Histogram Bell Curve:** Visualize the distribution of your data with a histogram bell curve overlay.
+- **Gaussian Bell Curve:** Add a Gaussian (normal) distribution curve to your histogram for comparison and analysis.
+- **Gaussian Peak (µ) Control Line:** Display the peak of the fitted Gaussian curve as a control line, using the Levenberg-Marquardt fitted mean.
+- **Interactive Tooltips:** Hover over histogram bins to see bucket range and series counts. Control line tooltips show name and value. Gaussian curve fitted values are included in the bucket tooltip.
+- **Export to CSV:** Export calculated statistics, control lines, and histogram data to a CSV file. Available from the download icon in the statistics table or by right-clicking the panel.
 
 ## Histogram Curve
 
