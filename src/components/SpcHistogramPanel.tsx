@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { buildHistogram, FieldType, getHistogramFields } from '@grafana/data';
 import { histogramFieldsToFrame } from '../data/transform';
-import { ContextMenu, MenuItem, useTheme2 } from '@grafana/ui';
+import { ContextMenu, MenuItem, useSplitter, useTheme2 } from '@grafana/ui';
 import { Histogram, getBucketSize } from './Histogram/Histogram';
 import { LimitAnnotations } from './LimitAnnotations/LimitAnnotations';
 import { doSpcCalcs } from 'data/doSpcCalcs';
@@ -172,6 +172,31 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
     downloadCsv(csv, generateExportFilename());
   }, [samples, optionsWithVars, allSamplesWithGaussianCalcs, histogram]);
 
+  const showTable = optionsWithVars.showStatisticsTable !== false;
+
+  const [histogramHeight, setHistogramHeight] = useState(Math.round(height * 0.75));
+
+  const { containerProps, primaryProps, secondaryProps, splitterProps } = useSplitter({
+    direction: 'column',
+    initialSize: 0.75,
+  });
+
+  // Track the actual pixel height of the primary pane via ResizeObserver
+  // so the histogram size is correct on initial render (not just after drag).
+  useEffect(() => {
+    const el = primaryProps.ref.current;
+    if (!el) {
+      return;
+    }
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setHistogramHeight(Math.round(entry.contentRect.height));
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [primaryProps.ref]);
+
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
 
   const handleContextMenu = useCallback(
@@ -190,48 +215,78 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
     );
   }
 
-  const showTable = optionsWithVars.showStatisticsTable !== false;
-  const tableHeight = showTable ? 100 : 0;
-  const histogramHeight = height - tableHeight;
+  if (!showTable) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height }} onContextMenu={handleContextMenu}>
+        {contextMenu && (
+          <ContextMenu
+            x={contextMenu.x}
+            y={contextMenu.y}
+            onClose={() => setContextMenu(null)}
+            renderMenuItems={() => (
+              <MenuItem label="Download CSV" icon="download-alt" onClick={handleExport} />
+            )}
+          />
+        )}
+        <Histogram
+          options={optionsWithVars}
+          theme={theme}
+          legend={optionsWithVars.legend}
+          rawSeries={stampedSamples}
+          structureRev={data.structureRev}
+          width={width}
+          height={height}
+          alignedFrame={histogram}
+          bucketSize={bucketSize}
+          annotationsRange={annotationsRange}
+        >
+          {renderAnnotations}
+        </Histogram>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height }} onContextMenu={handleContextMenu}>
+    <div
+      {...containerProps}
+      style={{ height, width }}
+      onContextMenu={handleContextMenu}
+    >
       {contextMenu && (
         <ContextMenu
           x={contextMenu.x}
           y={contextMenu.y}
           onClose={() => setContextMenu(null)}
           renderMenuItems={() => (
-            <MenuItem
-              label="Download CSV"
-              icon="download-alt"
-              onClick={handleExport}
-            />
+            <MenuItem label="Download CSV" icon="download-alt" onClick={handleExport} />
           )}
         />
       )}
-      <Histogram
-        options={optionsWithVars}
-        theme={theme}
-        legend={optionsWithVars.legend}
-        rawSeries={stampedSamples}
-        structureRev={data.structureRev}
-        width={width}
-        height={histogramHeight}
-        alignedFrame={histogram}
-        bucketSize={bucketSize}
-        annotationsRange={annotationsRange}
-      >
-        {renderAnnotations}
-      </Histogram>
-      {showTable && (
+      <div {...primaryProps} style={{ ...primaryProps.style, overflow: 'hidden', minHeight: 0 }}>
+        <Histogram
+          options={optionsWithVars}
+          theme={theme}
+          legend={optionsWithVars.legend}
+          rawSeries={stampedSamples}
+          structureRev={data.structureRev}
+          width={width}
+          height={histogramHeight}
+          alignedFrame={histogram}
+          bucketSize={bucketSize}
+          annotationsRange={annotationsRange}
+        >
+          {renderAnnotations}
+        </Histogram>
+      </div>
+      <div {...splitterProps} />
+      <div {...secondaryProps} style={{ ...secondaryProps.style, overflow: 'auto', display: 'flex', justifyContent: 'center', minHeight: 0 }}>
         <StatisticsTable
           series={samples}
           options={optionsWithVars}
           theme={theme}
           onExport={handleExport}
         />
-      )}
+      </div>
     </div>
   );
 };

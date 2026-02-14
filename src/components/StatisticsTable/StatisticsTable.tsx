@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { DataFrame, FieldType, getDisplayProcessor, formattedValueToString, GrafanaTheme2 } from '@grafana/data';
 import { IconButton, InteractiveTable } from '@grafana/ui';
 import { CellProps } from 'react-table';
@@ -59,7 +59,10 @@ export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, option
   const showControlLimits = options.chartType !== SpcChartTyp.none;
   const hasCapabilityData = statistics.some((s) => s.cp != null);
   const selectedColumns = options.statisticsTableColumns;
-  const isColumnVisible = (id: string) => !selectedColumns || selectedColumns.length === 0 || selectedColumns.includes(id);
+  const isColumnVisible = useCallback(
+    (id: string) => !selectedColumns || selectedColumns.length === 0 || selectedColumns.includes(id),
+    [selectedColumns]
+  );
 
   const columns = useMemo(
     () => [
@@ -154,7 +157,7 @@ export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, option
   }
 
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       {onExport && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 4px' }}>
           <IconButton name="download-alt" tooltip="Export statistics to CSV" onClick={onExport} size="sm" />
