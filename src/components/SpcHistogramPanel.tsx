@@ -9,6 +9,7 @@ import buildLimitAnnotations from './LimitAnnotations/buildLimitAnnotations';
 import { ChartPanelProps } from 'panelcfg';
 import { BellCurve } from './BellCurve/BellCurve';
 import { useSubgroupSizeOptions } from './options/useSubgroupSize';
+import { StatisticsTable } from './StatisticsTable/StatisticsTable';
 
 export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelProps) => {
   const theme = useTheme2();
@@ -96,20 +97,33 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
     );
   }
 
+  const showTable = optionsWithVars.showStatisticsTable !== false;
+  const tableHeight = showTable ? 100 : 0;
+  const histogramHeight = height - tableHeight;
+
   return (
-    <Histogram
-      options={optionsWithVars}
-      theme={theme}
-      legend={optionsWithVars.legend}
-      rawSeries={stampedSamples}
-      structureRev={data.structureRev}
-      width={width}
-      height={height}
-      alignedFrame={histogram}
-      bucketSize={bucketSize}
-      annotationsRange={annotationsRange}
-    >
-      {renderAnnotations}
-    </Histogram>
+    <div style={{ display: 'flex', flexDirection: 'column', height }}>
+      <Histogram
+        options={optionsWithVars}
+        theme={theme}
+        legend={optionsWithVars.legend}
+        rawSeries={stampedSamples}
+        structureRev={data.structureRev}
+        width={width}
+        height={histogramHeight}
+        alignedFrame={histogram}
+        bucketSize={bucketSize}
+        annotationsRange={annotationsRange}
+      >
+        {renderAnnotations}
+      </Histogram>
+      {showTable && (
+        <StatisticsTable
+          series={samples}
+          options={optionsWithVars}
+          theme={theme}
+        />
+      )}
+    </div>
   );
 };

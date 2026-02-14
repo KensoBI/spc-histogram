@@ -123,6 +123,14 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
       category: ['Curve'],
     });
 
+    builder.addBooleanSwitch({
+      path: 'showStatisticsTable',
+      name: 'Show statistics table',
+      description: 'Display a table with SPC statistics below the histogram',
+      defaultValue: true,
+      category: ['Statistics Table'],
+    });
+
     commonOptionsBuilder.addLegendOptions(builder);
 
     return builder;
