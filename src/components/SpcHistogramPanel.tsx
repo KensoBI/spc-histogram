@@ -13,6 +13,8 @@ import { HistogramTooltip } from './HistogramTooltip/HistogramTooltip';
 import { createGaussianCurve } from './BellCurve/gaussian';
 import { useSubgroupSizeOptions } from './options/useSubgroupSize';
 import { StatisticsTable } from './StatisticsTable/StatisticsTable';
+import { calculateSeriesStatistics } from './StatisticsTable/calculateCapabilityIndices';
+import { buildExportCsv, resolveControlLines, downloadCsv, generateExportFilename } from 'utils/exportCsv';
 import { CurveFit } from 'types';
 
 export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelProps) => {
@@ -163,6 +165,13 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
     [limitAnnotations.limits, optionsWithVars.curves, stampedSamples]
   );
 
+  const handleExport = useCallback(() => {
+    const statistics = calculateSeriesStatistics(samples, optionsWithVars);
+    const controlLines = resolveControlLines(allSamplesWithGaussianCalcs, optionsWithVars);
+    const csv = buildExportCsv(statistics, controlLines, histogram, optionsWithVars.statisticsTableColumns);
+    downloadCsv(csv, generateExportFilename());
+  }, [samples, optionsWithVars, allSamplesWithGaussianCalcs, histogram]);
+
   if (!histogram || !histogram.fields.length) {
     return (
       <div className="panel-empty">
@@ -196,6 +205,7 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
           series={samples}
           options={optionsWithVars}
           theme={theme}
+          onExport={handleExport}
         />
       )}
     </div>

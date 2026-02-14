@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { DataFrame, FieldType, getDisplayProcessor, formattedValueToString, GrafanaTheme2 } from '@grafana/data';
-import { InteractiveTable } from '@grafana/ui';
+import { IconButton, InteractiveTable } from '@grafana/ui';
 import { CellProps } from 'react-table';
 import { Options } from 'panelcfg';
 import { SpcChartTyp } from 'types';
@@ -10,6 +10,7 @@ interface StatisticsTableProps {
   series: DataFrame[];
   options: Options;
   theme: GrafanaTheme2;
+  onExport?: () => void;
 }
 
 type TableRow = SeriesStatistics & { id: string };
@@ -45,7 +46,7 @@ function useFormatValue(series: DataFrame[], theme: GrafanaTheme2) {
   }, [series, theme]);
 }
 
-export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, options, theme }) => {
+export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, options, theme, onExport }) => {
   const formatValue = useFormatValue(series, theme);
 
   const statistics = useMemo(() => calculateSeriesStatistics(series, options), [series, options]);
@@ -153,10 +154,17 @@ export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, option
   }
 
   return (
-    <InteractiveTable
-      columns={columns}
-      data={tableData}
-      getRowId={(row: TableRow) => row.id}
-    />
+    <div>
+      {onExport && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 4px' }}>
+          <IconButton name="download-alt" tooltip="Export statistics to CSV" onClick={onExport} size="sm" />
+        </div>
+      )}
+      <InteractiveTable
+        columns={columns}
+        data={tableData}
+        getRowId={(row: TableRow) => row.id}
+      />
+    </div>
   );
 };
