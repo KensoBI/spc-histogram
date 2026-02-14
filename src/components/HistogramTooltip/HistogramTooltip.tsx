@@ -291,6 +291,9 @@ function renderBucketTooltip(
           return;
         }
         const curveValue = gaussianFunction(binCenter, params);
+        if (curveValue < 0.1) {
+          return;
+        }
         seriesRows.push({
           color,
           label: opt.fit,
