@@ -74,15 +74,16 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
   }, [rawSeries, theme]);
 
   // Pre-compute Gaussian params for each curve so we can evaluate on hover
+  // Keyed by curve index (position in curveOptions array) to support multiple curves per series
   const gaussianParamsRef = useRef<Map<number, GaussianParams>>(new Map());
   if (curveOptions && rawSeries && histogramFrame.length >= 2) {
     const newParams = new Map<number, GaussianParams>();
-    curveOptions.forEach((opt) => {
+    curveOptions.forEach((opt, curveIndex) => {
       if (opt.fit === CurveFit.gaussian) {
         try {
           const result = createGaussianCurve(histogramFrame, rawSeries, opt.seriesIndex);
           if (result.params.mean) {
-            newParams.set(opt.seriesIndex, result.params);
+            newParams.set(curveIndex, result.params);
           }
         } catch {
           // Gaussian fitting may fail
@@ -281,21 +282,34 @@ function renderBucketTooltip(
     const binCenter = (xMinField.values[bucketIndex] + xMaxField.values[bucketIndex]) / 2;
     const colors = theme.visualization;
 
-    curveOptions.forEach((opt) => {
-      if (opt.fit !== CurveFit.gaussian) {
-        return;
-      }
-      const params = gaussianParams.get(opt.seriesIndex);
-      if (!params) {
-        return;
-      }
-      const curveValue = gaussianFunction(binCenter, params);
+    curveOptions.forEach((opt, curveIndex) => {
       const color = opt.color ? colors.getColorByName(opt.color) : 'dark-blue';
-      seriesRows.push({
-        color,
-        label: opt.name || `Gaussian (series ${opt.seriesIndex})`,
-        value: formatValue(curveValue),
-      });
+
+      if (opt.fit === CurveFit.gaussian) {
+        const params = gaussianParams.get(curveIndex);
+        if (!params) {
+          return;
+        }
+        const curveValue = gaussianFunction(binCenter, params);
+        seriesRows.push({
+          color,
+          label: opt.fit,
+          value: formatValue(curveValue),
+        });
+      } else if (opt.fit === CurveFit.histogram) {
+        // Histogram curve value is the count at this bucket for the target series
+        const countField = histogramFrame.fields[2 + opt.seriesIndex];
+        if (countField) {
+          const count = countField.values[bucketIndex];
+          if (count != null) {
+            seriesRows.push({
+              color,
+              label: opt.fit,
+              value: String(count),
+            });
+          }
+        }
+      }
     });
   }
 
