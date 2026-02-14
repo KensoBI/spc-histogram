@@ -33,6 +33,7 @@ export interface Options extends OptionsWithLegend, OptionsWithTooltip {
   curves: CurveOptions[];
   featureQueryRefIds: string[];
   showStatisticsTable?: boolean;
+  statisticsTableColumns?: string[];
 }
 
 export interface CurveOptions {
@@ -82,6 +83,7 @@ export const defaultOptions: Partial<Options> = {
   bucketCount: 30,
   bucketOffset: 0,
   showStatisticsTable: true,
+  statisticsTableColumns: ['n', 'mean', 'stdDev', 'min', 'max', 'lcl', 'ucl', 'cp', 'cpk', 'pp', 'ppk'],
 };
 
 export interface ChartPanelProps extends PanelProps<Options> {}

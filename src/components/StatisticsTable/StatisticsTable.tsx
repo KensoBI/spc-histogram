@@ -57,6 +57,8 @@ export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, option
 
   const showControlLimits = options.chartType !== SpcChartTyp.none;
   const hasCapabilityData = statistics.some((s) => s.cp != null);
+  const selectedColumns = options.statisticsTableColumns;
+  const isColumnVisible = (id: string) => !selectedColumns || selectedColumns.length === 0 || selectedColumns.includes(id);
 
   const columns = useMemo(
     () => [
@@ -70,75 +72,80 @@ export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, option
         header: 'n',
         cell: ({ row }: CellProps<TableRow>) => row.original.n,
         sortType: 'number' as const,
+        visible: () => isColumnVisible('n'),
       },
       {
         id: 'mean' as const,
         header: 'Mean',
         cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.mean),
         sortType: 'number' as const,
+        visible: () => isColumnVisible('mean'),
       },
       {
         id: 'stdDev' as const,
         header: 'Std Dev',
         cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.stdDev),
         sortType: 'number' as const,
+        visible: () => isColumnVisible('stdDev'),
       },
       {
         id: 'min' as const,
         header: 'Min',
         cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.min),
         sortType: 'number' as const,
+        visible: () => isColumnVisible('min'),
       },
       {
         id: 'max' as const,
         header: 'Max',
         cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.max),
         sortType: 'number' as const,
+        visible: () => isColumnVisible('max'),
       },
       {
         id: 'lcl' as const,
         header: 'LCL',
         cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.lcl),
         sortType: 'number' as const,
-        visible: () => showControlLimits,
+        visible: () => showControlLimits && isColumnVisible('lcl'),
       },
       {
         id: 'ucl' as const,
         header: 'UCL',
         cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.ucl),
         sortType: 'number' as const,
-        visible: () => showControlLimits,
+        visible: () => showControlLimits && isColumnVisible('ucl'),
       },
       {
         id: 'cp' as const,
         header: 'Cp',
         cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.cp),
         sortType: 'number' as const,
-        visible: () => hasCapabilityData,
+        visible: () => hasCapabilityData && isColumnVisible('cp'),
       },
       {
         id: 'cpk' as const,
         header: 'Cpk',
         cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.cpk),
         sortType: 'number' as const,
-        visible: () => hasCapabilityData,
+        visible: () => hasCapabilityData && isColumnVisible('cpk'),
       },
       {
         id: 'pp' as const,
         header: 'Pp',
         cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.pp),
         sortType: 'number' as const,
-        visible: () => hasCapabilityData,
+        visible: () => hasCapabilityData && isColumnVisible('pp'),
       },
       {
         id: 'ppk' as const,
         header: 'Ppk',
         cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.ppk),
         sortType: 'number' as const,
-        visible: () => hasCapabilityData,
+        visible: () => hasCapabilityData && isColumnVisible('ppk'),
       },
     ],
-    [formatValue, showControlLimits, hasCapabilityData]
+    [formatValue, showControlLimits, hasCapabilityData, isColumnVisible]
   );
 
   if (tableData.length === 0) {
