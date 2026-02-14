@@ -65,6 +65,26 @@ export function isLimitAnnotationArray(value: any): value is LimitAnnotation[] {
   return true;
 }
 
+function formatAnnotationLabel(annotation: LimitAnnotation): string {
+  const title = annotation.title ?? 'EMPTY';
+  if (annotation.type === 'flag' && annotation.time != null) {
+    return `${title}: ${Number(annotation.time.toFixed(4))}`;
+  }
+  if (annotation.type === 'region') {
+    const parts: string[] = [];
+    if (annotation.timeStart != null) {
+      parts.push(Number(annotation.timeStart.toFixed(4)).toString());
+    }
+    if (annotation.timeEnd != null) {
+      parts.push(Number(annotation.timeEnd.toFixed(4)).toString());
+    }
+    if (parts.length > 0) {
+      return `${title}: ${parts.join(' \u2013 ')}`;
+    }
+  }
+  return title;
+}
+
 export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations, config }) => {
   const theme = useTheme2();
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
@@ -207,7 +227,7 @@ export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations
         fontFamily: theme.typography.fontFamily,
       }}
     >
-      {tooltip.annotation.title ?? 'EMPTY'}
+      {formatAnnotationLabel(tooltip.annotation)}
     </div>
   );
 };

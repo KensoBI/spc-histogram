@@ -9,6 +9,7 @@ import { ControlLineReducerId } from 'data/spcReducers';
 import buildLimitAnnotations from './LimitAnnotations/buildLimitAnnotations';
 import { ChartPanelProps } from 'panelcfg';
 import { BellCurve } from './BellCurve/BellCurve';
+import { HistogramTooltip } from './HistogramTooltip/HistogramTooltip';
 import { createGaussianCurve } from './BellCurve/gaussian';
 import { useSubgroupSizeOptions } from './options/useSubgroupSize';
 import { StatisticsTable } from './StatisticsTable/StatisticsTable';
@@ -149,6 +150,12 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
               curveOptions={optionsWithVars.curves}
             />
           )}
+          <HistogramTooltip
+            config={config}
+            histogramFrame={alignedFrame}
+            curveOptions={optionsWithVars.curves}
+            rawSeries={stampedSamples}
+          />
         </>
       );
     },

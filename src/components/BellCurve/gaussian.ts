@@ -94,4 +94,4 @@ function createGaussianCurve(histogramFrame: DataFrame, rawSeries: DataFrame[], 
   return { x, y: fittedY, params: fittedParams };
 }
 
-export { createGaussianCurve, GaussianParams };
+export { createGaussianCurve, gaussianFunction, GaussianParams };
