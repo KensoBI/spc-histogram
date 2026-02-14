@@ -57,7 +57,7 @@ const drawCurve = (
 
 export const BellCurve: React.FC<BellCurveProps> = ({ config, rawSeries, histogramData, curveOptions }) => {
   const [plot, setPlot] = useState<uPlot>();
-  const bboxRef = useRef<DOMRect>();
+  const bboxRef = useRef<DOMRect | undefined>(undefined);
   const theme = useTheme2();
   const colors = theme.visualization;
 

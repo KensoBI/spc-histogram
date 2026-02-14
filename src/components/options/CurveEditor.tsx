@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { css } from '@emotion/css';
 import { DataFrame, GrafanaTheme2, SelectableValue, StandardEditorProps, getFrameDisplayName } from '@grafana/data';
-import { Button, ColorPicker, Field, Icon, IconButton, Select, Slider, Stack, useStyles2 } from '@grafana/ui';
+import { Button, ColorPicker, Combobox, Field, Icon, IconButton, Slider, Stack, useStyles2 } from '@grafana/ui';
 import { CurveOptions, Options, selectableCurves } from 'panelcfg';
 import { CurveFit } from 'types';
 
@@ -134,13 +134,17 @@ export const CurveEditor = ({ item, value, onChange, context }: StandardEditorPr
             <Stack direction="row" alignItems="center" gap={1}>
               <div className={styles.fieldContainer}>
                 <Field label="Fit" description="Choose how to fit a curve to histogram data.">
-                  <Select
+                  <Combobox
                     placeholder="Select fit model"
                     isClearable={true}
                     value={curve.fit}
-                    options={selectableCurvesOptions}
+                    options={selectableCurvesOptions.map((opt) => ({
+                      label: opt.label || '',
+                      value: opt.value as string,
+                      description: opt.description,
+                    }))}
                     onChange={(value) => {
-                      handleCurveOptionChange(index, 'fit', value.value);
+                      value?.value && handleCurveOptionChange(index, 'fit', value.value as CurveFit);
                     }}
                   />
                 </Field>
@@ -152,7 +156,7 @@ export const CurveEditor = ({ item, value, onChange, context }: StandardEditorPr
                   />
                 </Field> */}
                 <Field label="Series" description="Select the series for which to calculate this curve.">
-                  <Select
+                  <Combobox
                     placeholder="Select series"
                     isClearable={true}
                     value={curve.seriesIndex}
@@ -164,24 +168,11 @@ export const CurveEditor = ({ item, value, onChange, context }: StandardEditorPr
                         );
                       })
                       .map((frame, index) => ({
-                        refId: frame.refId,
                         value: index,
                         label: `${frame.refId} > ${getFrameDisplayName(frame, index)}`,
                       }))}
                     onChange={(value) => {
-                      handleCurveOptionChange(index, 'seriesIndex', value?.value);
-                    }}
-                    formatOptionLabel={(option) => {
-                      const label = option.label || '';
-                      const parts = label.split(' > ');
-
-                      return (
-                        <div>
-                          {parts[0]} {/* frame.refId */}
-                          <Icon name="angle-right" className={styles.chevron} />
-                          {parts[1] || ''} {/* getFrameDisplayName */}
-                        </div>
-                      );
+                      value?.value !== undefined && handleCurveOptionChange(index, 'seriesIndex', value.value);
                     }}
                   />
                 </Field>

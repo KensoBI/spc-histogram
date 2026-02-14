@@ -184,6 +184,9 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
   // Track the actual pixel height of the primary pane via ResizeObserver
   // so the histogram size is correct on initial render (not just after drag).
   useEffect(() => {
+    if (!showTable) {
+      return;
+    }
     const el = primaryProps.ref.current;
     if (!el) {
       return;
@@ -195,7 +198,7 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
     });
     ro.observe(el);
     return () => ro.disconnect();
-  }, [primaryProps.ref]);
+  }, [primaryProps.ref, showTable]);
 
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
 
@@ -211,37 +214,6 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
     return (
       <div className="panel-empty">
         <p>No histogram found in response</p>
-      </div>
-    );
-  }
-
-  if (!showTable) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', height }} onContextMenu={handleContextMenu}>
-        {contextMenu && (
-          <ContextMenu
-            x={contextMenu.x}
-            y={contextMenu.y}
-            onClose={() => setContextMenu(null)}
-            renderMenuItems={() => (
-              <MenuItem label="Download CSV" icon="download-alt" onClick={handleExport} />
-            )}
-          />
-        )}
-        <Histogram
-          options={optionsWithVars}
-          theme={theme}
-          legend={optionsWithVars.legend}
-          rawSeries={stampedSamples}
-          structureRev={data.structureRev}
-          width={width}
-          height={height}
-          alignedFrame={histogram}
-          bucketSize={bucketSize}
-          annotationsRange={annotationsRange}
-        >
-          {renderAnnotations}
-        </Histogram>
       </div>
     );
   }
@@ -262,7 +234,7 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
           )}
         />
       )}
-      <div {...primaryProps} style={{ ...primaryProps.style, overflow: 'hidden', minHeight: 0 }}>
+      <div {...primaryProps} style={{ ...primaryProps.style, overflow: 'hidden', minHeight: 0, ...(!showTable && { flexGrow: 1 }) }}>
         <Histogram
           options={optionsWithVars}
           theme={theme}
@@ -270,7 +242,7 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
           rawSeries={stampedSamples}
           structureRev={data.structureRev}
           width={width}
-          height={histogramHeight}
+          height={showTable ? histogramHeight : height}
           alignedFrame={histogram}
           bucketSize={bucketSize}
           annotationsRange={annotationsRange}
@@ -278,15 +250,17 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
           {renderAnnotations}
         </Histogram>
       </div>
-      <div {...splitterProps} />
-      <div {...secondaryProps} style={{ ...secondaryProps.style, overflow: 'auto', display: 'flex', justifyContent: 'center', minHeight: 0 }}>
-        <StatisticsTable
-          series={samples}
-          options={optionsWithVars}
-          theme={theme}
-          onExport={handleExport}
-        />
-      </div>
+      {showTable && <div {...splitterProps} />}
+      {showTable && (
+        <div {...secondaryProps} style={{ ...secondaryProps.style, overflow: 'auto', display: 'flex', justifyContent: 'center', minHeight: 0 }}>
+          <StatisticsTable
+            series={samples}
+            options={optionsWithVars}
+            theme={theme}
+            onExport={handleExport}
+          />
+        </div>
+      )}
     </div>
   );
 };

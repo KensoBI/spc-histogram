@@ -16,25 +16,29 @@ interface StatisticsTableProps {
 type TableRow = SeriesStatistics & { id: string };
 
 function useFormatValue(series: DataFrame[], theme: GrafanaTheme2) {
-  return useMemo(() => {
-    // Find the first numeric field to get display processor config (unit, decimals, etc.)
+  // Find the first numeric field
+  const firstNumericField = useMemo(() => {
     for (const frame of series) {
       for (const field of frame.fields) {
         if (field.type === FieldType.number) {
-          const display =
-            field.display ??
-            getDisplayProcessor({
-              field,
-              theme,
-            });
-          return (value: number | null): string => {
-            if (value == null) {
-              return '–';
-            }
-            return formattedValueToString(display(value));
-          };
+          return field;
         }
       }
+    }
+    return null;
+  }, [series]);
+
+  // Create formatter based on the field
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  return useMemo(() => {
+    if (firstNumericField) {
+      const display = firstNumericField.display ?? getDisplayProcessor({ field: firstNumericField, theme });
+      return (value: number | null): string => {
+        if (value == null) {
+          return '–';
+        }
+        return formattedValueToString(display(value));
+      };
     }
     // Fallback if no numeric field found
     return (value: number | null): string => {
@@ -43,7 +47,7 @@ function useFormatValue(series: DataFrame[], theme: GrafanaTheme2) {
       }
       return String(value);
     };
-  }, [series, theme]);
+  }, [firstNumericField, theme]);
 }
 
 export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, options, theme, onExport }) => {

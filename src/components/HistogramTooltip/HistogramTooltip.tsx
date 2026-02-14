@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DataFrame, FieldType, formattedValueToString, getDisplayProcessor, getFieldSeriesColor, GrafanaTheme2 } from '@grafana/data';
 import { UPlotConfigBuilder, useStyles2, useTheme2, SeriesTable, SeriesTableRow } from '@grafana/ui';
@@ -34,7 +34,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     whiteSpace: 'pre',
     borderRadius: theme.shape.radius.default,
     position: 'fixed',
-    background: theme.colors.background.elevated,
+    background: theme.colors.background.primary, //todo use theme.colors.background.elevated in Grafana v12
     border: `1px solid ${theme.colors.border.weak}`,
     boxShadow: theme.shadows.z2,
     pointerEvents: 'none',
@@ -52,13 +52,21 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
   const theme = useTheme2();
   const styles = useStyles2(getStyles);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
-  const plotRef = useRef<uPlot>();
+  const plotRef = useRef<uPlot | undefined>(undefined);
   const frameRef = useRef(histogramFrame);
-  frameRef.current = histogramFrame;
   const annotationsRef = useRef(annotations);
-  annotationsRef.current = annotations;
+
+  // Update refs when props change
+  useEffect(() => {
+    frameRef.current = histogramFrame;
+  }, [histogramFrame]);
+
+  useEffect(() => {
+    annotationsRef.current = annotations;
+  }, [annotations]);
 
   // Get value formatter from the first numeric field in raw series (respects Standard Options > Decimals)
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const formatValue = useMemo(() => {
     if (rawSeries) {
       for (const frame of rawSeries) {
@@ -75,23 +83,25 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
 
   // Pre-compute Gaussian params for each curve so we can evaluate on hover
   // Keyed by curve index (position in curveOptions array) to support multiple curves per series
-  const gaussianParamsRef = useRef<Map<number, GaussianParams>>(new Map());
-  if (curveOptions && rawSeries && histogramFrame.length >= 2) {
-    const newParams = new Map<number, GaussianParams>();
-    curveOptions.forEach((opt, curveIndex) => {
-      if (opt.fit === CurveFit.gaussian) {
-        try {
-          const result = createGaussianCurve(histogramFrame, rawSeries, opt.seriesIndex);
-          if (result.params.mean) {
-            newParams.set(curveIndex, result.params);
+  const gaussianParams = useMemo(() => {
+    if (curveOptions && rawSeries && histogramFrame.length >= 2) {
+      const params = new Map<number, GaussianParams>();
+      curveOptions.forEach((opt, curveIndex) => {
+        if (opt.fit === CurveFit.gaussian) {
+          try {
+            const result = createGaussianCurve(histogramFrame, rawSeries, opt.seriesIndex);
+            if (result.params.mean) {
+              params.set(curveIndex, result.params);
+            }
+          } catch {
+            // Gaussian fitting may fail
           }
-        } catch {
-          // Gaussian fitting may fail
         }
-      }
-    });
-    gaussianParamsRef.current = newParams;
-  }
+      });
+      return params;
+    }
+    return new Map<number, GaussianParams>();
+  }, [curveOptions, rawSeries, histogramFrame]);
 
   const onMouseMove = useCallback((e: MouseEvent) => {
     const u = plotRef.current;
@@ -185,7 +195,7 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
     ? renderAnnotationTooltip(tooltip.annotation, formatValue)
     : null;
   const bucketContent = tooltip.bucketIndex != null
-    ? renderBucketTooltip(tooltip.bucketIndex, histogramFrame, curveOptions, theme, gaussianParamsRef.current, formatValue)
+    ? renderBucketTooltip(tooltip.bucketIndex, histogramFrame, curveOptions, theme, gaussianParams, formatValue)
     : null;
 
   if (!annotationContent && !bucketContent) {

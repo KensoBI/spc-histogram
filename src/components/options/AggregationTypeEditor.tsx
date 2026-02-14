@@ -1,6 +1,6 @@
 import React from 'react';
-import { Select } from '@grafana/ui';
-import { SelectableValue, StandardEditorProps } from '@grafana/data';
+import { Combobox } from '@grafana/ui';
+import { StandardEditorProps } from '@grafana/data';
 import { Options } from 'panelcfg';
 import { AggregationType } from 'types';
 import { useSubgroupSize } from './useSubgroupSize';
@@ -49,12 +49,12 @@ export const AggregationTypeEditor = ({ value, onChange, context }: StandardEdit
   }
 
   return (
-    <Select
+    <Combobox
       isClearable={false}
       value={value}
-      options={selectOptions.map<SelectableValue<string>>((i) => ({ label: i.name, value: i.name }))}
-      onChange={(value) => {
-        onChange(value.value);
+      options={selectOptions.map((i) => ({ label: i.name, value: i.name as string }))}
+      onChange={(selected) => {
+        selected?.value && typeof selected.value === 'string' && onChange(selected.value);
       }}
     />
   );

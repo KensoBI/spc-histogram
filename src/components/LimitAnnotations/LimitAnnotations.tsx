@@ -53,7 +53,7 @@ export function isLimitAnnotationArray(value: any): value is LimitAnnotation[] {
 }
 
 export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations, config }) => {
-  const annotationsRef = useRef<LimitAnnotation[]>();
+  const annotationsRef = useRef<LimitAnnotation[] | undefined>(undefined);
 
   useEffect(() => {
     annotationsRef.current = annotations.sort((a, b) => typeToValue(b.type) - typeToValue(a.type));

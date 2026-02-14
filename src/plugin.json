@@ -4,8 +4,8 @@
   "name": "SPC Histogram",
   "id": "kensobi-spchistogram-panel",
   "info": {
-    "keywords": ["panel", "spc", "histogram", "kensobi"],
-    "description": "Distribution of process data with control limits.",
+    "keywords": ["panel", "spc", "histogram", "control chart", "capability", "cpk", "bell curve", "gaussian", "xmr", "xbar", "quality", "six sigma", "process control", "distribution"],
+    "description": "Histogram panel with SPC control limits, bell curves, and capability indices.",
     "author": {
       "name": "Kenso Software",
       "url": "https://kensobi.com"
