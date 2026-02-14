@@ -47,7 +47,7 @@ export const controlLineReducers: ControlLineReducer[] = [
   {
     id: ControlLineReducerId.lsl,
     name: 'LSL',
-    description: 'Draws the LCL (Lower Control Limit), marking the lower boundary of the control chart.',
+    description: 'Draws the LSL (Lower Specification Limit), marking the lower boundary of the specification range.',
     computed: false,
     isStandard: false,
     color: '#C4162A',
@@ -55,7 +55,7 @@ export const controlLineReducers: ControlLineReducer[] = [
   {
     id: ControlLineReducerId.usl,
     name: 'USL',
-    description: 'Draws the USL (Upper Control Limit), marking the upper boundary of the control chart.',
+    description: 'Draws the USL (Upper Specification Limit), marking the upper boundary of the specification range.',
     computed: false,
     isStandard: false,
     color: '#C4162A',
@@ -103,7 +103,7 @@ export const controlLineReducers: ControlLineReducer[] = [
   {
     id: ControlLineReducerId.ucl,
     name: 'UCL',
-    description: 'Draws the USL (Upper Control Limit), marking the upper boundary of the control chart.',
+    description: 'Draws the UCL (Upper Control Limit), marking the upper boundary of the control chart.',
     computed: true,
     isStandard: false,
     color: '#F2495C',
