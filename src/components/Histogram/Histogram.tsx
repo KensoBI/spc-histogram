@@ -93,8 +93,7 @@ const prepConfig = (frame: DataFrame, theme: GrafanaTheme2, annotationsRange: Hi
 
   // splits shifter, to ensure splits always start at first bucket
   let xSplits: uPlot.Axis.Splits = (u, axisIdx, scaleMin, scaleMax, foundIncr, foundSpace) => {
-    /** @ts-ignore */
-    let minSpace = u.axes[axisIdx]._space;
+    let minSpace = (u.axes[axisIdx] as any)._space;
     let bucketWidth = u.valToPos(u.data[0][0] + bucketSize, 'x') - u.valToPos(u.data[0][0], 'x');
     const { xScaleMin, xScaleMax } = calcScaleRange(u);
     let firstSplit = incrRoundDn(xScaleMin ?? u.data[0][0], bucketSize);
