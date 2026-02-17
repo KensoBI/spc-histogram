@@ -82,7 +82,7 @@ export const defaultFieldConfig: Partial<FieldConfig> = {
 export const defaultOptions: Partial<Options> = {
   bucketCount: 30,
   bucketOffset: 0,
-  showStatisticsTable: true,
+  showStatisticsTable: false,
   statisticsTableColumns: ['n', 'mean', 'stdDev', 'min', 'max', 'lcl', 'ucl', 'cp', 'cpk', 'pp', 'ppk'],
 };
 
