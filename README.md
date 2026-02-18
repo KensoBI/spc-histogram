@@ -1,53 +1,247 @@
-## SPC Histogram
+# SPC Histogram
 
-![Main](https://raw.githubusercontent.com/KensoBI/spc-histogram/main/src/img/spc-histogram.png)
+![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?logo=grafana&query=$.version&url=https://grafana.com/api/plugins/kensobi-spchistogram-panel&label=Marketplace&prefix=v&color=F47A20)
+![Grafana](https://img.shields.io/badge/Grafana-11%2B-orange?logo=grafana)
 
-Welcome to the KensoBI SPC Histogram panel for Grafana. This plugin enables you to easily create statistical process control (SPC) histograms, including Xbar-R, XbarS, and XmR charts. It automatically calculates and displays control limits on the histogram as vertical lines, with options to add your own custom limits. Additionally, you can group your samples into subgroups and aggregate them using methods such as moving range, range, mean, or standard deviation.
+Visualize your process data distributions with built-in **Statistical Process Control** — right inside Grafana. SPC Histogram turns your time series data into interactive histograms with automatic control limits, bell curves, capability indices, and a detailed statistics table.
+
+![SPC Histogram](src/img/spc-histogram-release.gif)
+
+## Why SPC Histogram?
+
+Histograms are a fundamental tool for understanding process data. When combined with Statistical Process Control, they answer the key questions about your process:
+
+- **Control limits** — automatically calculated LCL/UCL lines show whether variation is within expected bounds
+- **Capability indices** — Cp, Cpk, Pp, and Ppk tell you whether your process fits within specification limits
+- **Bell curves** — Gaussian curves fitted using the Levenberg-Marquardt algorithm reveal how closely your data follows a normal distribution
+- **Statistics at a glance** — a built-in table displays n, Mean, Std Dev, Min, Max, and more for every series
+
+![Gaussian Curve](src/img/gaussian-curve.png)
+
+## Built for Grafana
+
+SPC Histogram is built using Grafana's native visualization components. This means it inherits the look, feel, and behavior you already know:
+
+- **Native theming** — automatically adapts to light and dark mode
+- **Standard panel options** — legend placement, tooltip behavior, and field overrides work just like any other Grafana panel
+- **Resizable statistics table** — drag the splitter to balance chart and table space, just like Grafana's built-in panels
+- **Works with any data source** — use it with SQL databases, Prometheus, InfluxDB, CSV files, or any other Grafana data source
 
 ## Features
 
-- **Xbar-R, XbarS, and XmR Charts:** Create various types of SPC charts.
-- **Automatic Control Limits:** LCL, UCL and mean control limits are automatically calculated and displayed.
-- **Custom Limits:** Add your own limits for more tailored analysis.
-- **Subgrouping:** Group your samples into subgroups and aggregate it.
-- **Aggregation:** Aggregate your data by moving range, range, mean, or standard deviation.
-- **Statistics Table:** View descriptive statistics, control limits, and process capability indices (Cp, Cpk, Pp, Ppk) in a table below the histogram.
-- **Histogram Bell Curve:** Visualize the distribution of your data with a histogram bell curve overlay.
-- **Gaussian Bell Curve:** Add a Gaussian (normal) distribution curve to your histogram for comparison and analysis.
-- **Gaussian Peak (µ) Control Line:** Display the peak of the fitted Gaussian curve as a control line, using the Levenberg-Marquardt fitted mean.
-- **Interactive Tooltips:** Hover over histogram bins to see bucket range and series counts. Control line tooltips show name and value. Gaussian curve fitted values are included in the bucket tooltip.
-- **Export to CSV:** Export calculated statistics, control lines, and histogram data to a CSV file. Available from the download icon in the statistics table or by right-clicking the panel.
+| Feature | Description |
+|---------|-------------|
+| Control charts | XmR, Xbar-R, and Xbar-S chart types with automatic LCL/UCL calculation |
+| Bell curves | Gaussian (Levenberg-Marquardt fit) and histogram curve overlays |
+| Statistics table | n, Mean, Std Dev, Min, Max, LCL, UCL, Cp, Cpk, Pp, Ppk per series |
+| Custom control lines | Static values or dynamic values pulled from a separate query |
+| Specification limits | LSL/USL with automatic capability index calculation |
+| Multiple series | Compare distributions side by side or combine into one histogram |
+| Aggregation | Mean, Range, Standard Deviation, and Moving Range modes |
+| Export to CSV | Export statistics, control lines, and histogram buckets to CSV |
+| Interactive tooltips | Bucket counts, control line values, and Gaussian curve values on hover |
+| Resizable layout | Drag the splitter between chart and statistics table |
 
-## Histogram Curve
+![Statistics Table](src/img/stat-table.png)
 
-![Histogram curve](https://raw.githubusercontent.com/KensoBI/spc-histogram/main/src/img/histogram-curve.png)
+## Use Cases
 
-The histogram bell curve provides a smoothed visualization of your data distribution, making it easier to observe overall patterns and trends in the dataset. This curve is created by simply connecting the midpoints of each histogram bin, offering a straightforward representation of the data distribution.
+- **Manufacturing quality** — monitor dimensional tolerances with control limits and capability indices
+- **Process engineering** — track measurement stability and detect shifts in process centering
+- **Laboratory testing** — analyze instrument measurement distributions and repeatability
+- **Supply chain** — monitor incoming material quality against specification limits
+- **Pharmaceutical** — validate process capability for batch manufacturing (Cp/Cpk)
 
-## Gaussian Curve
+## Requirements
 
-![Gaussian bell curve ](https://raw.githubusercontent.com/KensoBI/spc-histogram/main/src/img/gaussian-curve.png)
+- Grafana **11** or later
 
-The Gaussian bell curve fits a normal distribution to your data, allowing for a direct comparison between actual data and the ideal normal distribution. This highlights deviations from normality, aiding in process analysis and improvement opportunities.
+## Getting Started
 
-The Gaussian fit is performed using the Levenberg-Marquardt algorithm, a popular method for solving non-linear least squares problems. This algorithm iteratively adjusts the parameters of the Gaussian function (amplitude, mean, and standard deviation) to minimize the difference between the fitted curve and the actual histogram data.
+1. Install the plugin from the [Grafana Plugin Catalog](https://grafana.com/grafana/plugins/kensobi-spchistogram-panel/)
+2. Add a new panel and select **SPC Histogram** as the visualization
+3. Connect a data source with time series data
+4. Choose a **Chart Type** (XmR, Xbar-R, or Xbar-S) to enable automatic control limits
+5. Add **Control Lines** for specification limits (LSL/USL) to see capability indices
+6. Add a **Bell Curve** to visualize the distribution fit
 
-The implementation uses the [ml-levenberg-marquardt](https://github.com/mljs/levenberg-marquardt) library to perform the fitting process, ensuring an accurate representation of the Gaussian distribution that best matches your data.
+![Multiple Series](src/img/multi-series.png)
 
-## Getting Help
+## Panel Options
+
+### Histogram
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| Bucket count | Approximate number of histogram bars | 30 |
+| Bucket size | Fixed width for each bucket (overrides bucket count) | Auto |
+| Bucket offset | Shifts bucket boundaries by a fixed amount | 0 |
+| Combine series | Merge all series into a single histogram | Off |
+| Feature Queries | Select queries excluded from histogram calculations | None |
+
+### SPC
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| Chart type | none, X chart (XmR), mR chart (XmR), X chart (Xbar-R), R chart (Xbar-R), X chart (Xbar-S), S chart (Xbar-S) | none |
+| Subgroup size | Number of measurements per subgroup | 1 |
+| Aggregation type | None, Moving range, Mean, Range, Standard Deviation. Only available when chart type is "none". | None |
+| Control lines | LCL, UCL, Mean, Min, Max, Range, LSL, USL, Gaussian Peak, Custom, Nominal | None |
+
+### Curve
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| Add a Bell Curve | Gaussian or Histogram curve with configurable series, line width, and color | None |
+
+### Statistics Table
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| Show statistics table | Display the statistics table below the histogram | Off |
+| Visible columns | n, Mean, Std Dev, Min, Max, LCL, UCL, Cp, Cpk, Pp, Ppk | All |
+
+### Bar Appearance
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| Fill opacity | Bar fill opacity (0–100%) | 80% |
+| Line width | Bar border width (0–10) | 1 |
+| Gradient mode | None, Opacity, or Hue | None |
+
+## Documentation
+
+For detailed documentation, configuration guides, and examples, see the [full documentation](https://docs.kensobi.com/panels/spc-histogram/).
+
+## Part of the KensoBI SPC Suite
+
+SPC Histogram is part of a growing family of **Statistical Process Control** plugins for Grafana by Kenso Software:
+
+**[SPC Chart Panel](https://github.com/KensoBI/spc-chart)** — Control charts for monitoring process stability over time. Supports Xbar-R, Xbar-S, and XmR charts with automatic calculation of control limits. If you're tracking whether a process is staying in control, this is your starting point.
+
+**[SPC Pareto Panel](https://github.com/KensoBI/spc-pareto)** — Pareto charts for identifying the most significant factors contributing to defects or issues. Automatic sorting, cumulative percentage lines, and 80/20 threshold analysis help you focus improvement efforts where they matter most.
+
+**[SPC CAD Panel](https://github.com/KensoBI/spc-cad)** — Brings 3D geometry into the picture, letting you bind the data from control charts and histograms to physical features on your parts.
+
+
+## Development Setup
+
+### Prerequisites
+
+- Node.js (LTS version recommended)
+- npm or yarn
+- Docker (for local Grafana instance)
+
+### Installation
+
+1. Clone the repository
+
+   ```bash
+   git clone https://github.com/KensoBI/spc-histogram.git
+   cd spc-histogram
+   ```
+
+2. Install dependencies
+
+   ```bash
+   npm install
+   ```
+
+### Development Workflow
+
+1. **Build plugin in development mode with watch**
+
+   ```bash
+   npm run dev
+   ```
+
+2. **Run Grafana locally**
+
+   ```bash
+   npm run server
+   ```
+
+   Access Grafana at `http://localhost:3000` (default credentials: admin/admin)
+
+3. **Build plugin for production**
+
+   ```bash
+   npm run build
+   ```
+
+### Testing
+
+**Unit Tests (Jest)**
+
+```bash
+# Run tests in watch mode (requires git init first)
+npm run test
+
+# Run tests once (CI mode)
+npm run test:ci
+```
+
+**E2E Tests (Playwright)**
+
+```bash
+# Start Grafana instance first
+npm run server
+
+# Or specify a Grafana version
+GRAFANA_VERSION=11.3.0 npm run server
+
+# Run E2E tests
+npm run e2e
+```
+
+**Linting**
+
+```bash
+npm run lint
+
+# Auto-fix issues
+npm run lint:fix
+```
+
+## Building and Packaging
+
+### Development Build
+
+```bash
+npm run dev
+```
+
+Builds the plugin with source maps and watches for changes.
+
+### Production Build
+
+```bash
+npm run build
+```
+
+## Contributing
+
+We welcome contributions, feedback, and feature requests!
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests (`npm run test:ci`)
+5. Run linter (`npm run lint:fix`)
+6. Commit your changes
+7. Push to your fork
+8. Open a Pull Request
+
+Please open an [issue](https://github.com/KensoBI/spc-histogram/issues) to discuss major changes before submitting a PR.
+
+## License
+
+This software is distributed under the AGPL-3.0-only license — see [LICENSE](LICENSE) for details.
+
+## Support
 
 If you have any questions or feedback, you can:
 
 - Ask a question on the [KensoBI Discord channel](https://discord.gg/bekfAuAjGm).
-- Create an [issue](https://github.com/KensoBI/spc-histogram/issues) to report bugs, issues, and feature suggestions.
-
-Your feedback is always welcome!
-
-
-## License
-
-This software is distributed under the [AGPL-3.0-only](https://raw.githubusercontent.com/KensoBI/spc-histogram/main/LICENSE).
-
-## Notes
-
-Copyright (c) 2024 [Kenso Software](https://kensobi.com)
+- GitHub Issues: https://github.com/KensoBI/spc-histogram/issues
+- Grafana Community: https://community.grafana.com/
