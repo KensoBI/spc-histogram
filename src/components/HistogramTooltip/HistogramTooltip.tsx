@@ -40,6 +40,11 @@ const getStyles = (theme: GrafanaTheme2) => ({
     pointerEvents: 'none',
     padding: theme.spacing(1),
   }),
+  divider: css({
+    margin: theme.spacing(0.5, 0),
+    border: 'none',
+    borderTop: `1px solid ${theme.colors.border.weak}`,
+  }),
 });
 
 export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
@@ -191,8 +196,9 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
     return null;
   }
 
+  const defaultAnnotationColor = theme.colors.primary.main;
   const annotationContent = tooltip.annotation
-    ? renderAnnotationTooltip(tooltip.annotation, formatValue)
+    ? renderAnnotationTooltip(tooltip.annotation, formatValue, defaultAnnotationColor)
     : null;
   const bucketContent = tooltip.bucketIndex != null
     ? renderBucketTooltip(tooltip.bucketIndex, histogramFrame, curveOptions, theme, gaussianParams, formatValue)
@@ -205,7 +211,7 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
   const content = (
     <>
       {annotationContent}
-      {annotationContent && bucketContent && <hr style={{ margin: '4px 0', border: 'none', borderTop: `1px solid ${theme.colors.border.weak}` }} />}
+      {annotationContent && bucketContent && <hr className={styles.divider} />}
       {bucketContent}
     </>
   );
@@ -224,13 +230,13 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
   return createPortal(tooltipEl, document.body);
 };
 
-function renderAnnotationTooltip(annotation: LimitAnnotation, formatValue: (v: number) => string): React.ReactNode {
+function renderAnnotationTooltip(annotation: LimitAnnotation, formatValue: (v: number) => string, defaultColor: string): React.ReactNode {
   const title = annotation.title ?? 'EMPTY';
   if (annotation.type === 'flag' && annotation.time != null) {
     return (
       <SeriesTable
         series={[{
-          color: annotation.color ?? '#03839e',
+          color: annotation.color ?? defaultColor,
           label: title,
           value: formatValue(annotation.time),
         }]}
@@ -248,14 +254,14 @@ function renderAnnotationTooltip(annotation: LimitAnnotation, formatValue: (v: n
     return (
       <SeriesTable
         series={[{
-          color: annotation.color ?? '#03839e',
+          color: annotation.color ?? defaultColor,
           label: title,
           value: parts.join(' \u2013 '),
         }]}
       />
     );
   }
-  return <SeriesTableRow label={title} color={annotation.color ?? '#03839e'} value="" />;
+  return <SeriesTableRow label={title} color={annotation.color ?? defaultColor} value="" />;
 }
 
 function renderBucketTooltip(

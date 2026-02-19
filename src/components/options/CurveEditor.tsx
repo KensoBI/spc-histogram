@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { css } from '@emotion/css';
 import { DataFrame, GrafanaTheme2, SelectableValue, StandardEditorProps, getFrameDisplayName } from '@grafana/data';
-import { Button, ColorPicker, Combobox, Field, Icon, IconButton, Slider, Stack, useStyles2 } from '@grafana/ui';
+import { Button, ColorPicker, Combobox, Field, Icon, IconButton, Slider, Stack, useStyles2, useTheme2 } from '@grafana/ui';
 import { CurveOptions, Options, selectableCurves } from 'panelcfg';
 import { CurveFit } from 'types';
 
-const defaultConstantColor = '#37872d';
-
 export const CurveEditor = ({ item, value, onChange, context }: StandardEditorProps<CurveOptions[], Options>) => {
+  const theme = useTheme2();
   const styles = useStyles2(getStyles);
+  const defaultCurveColor = theme.visualization.getColorByName('dark-green');
   const [expandedHandles, setExpandedHandles] = useState<number[]>([]);
 
   const addExpandedHandle = (handle: number) => {
@@ -186,9 +186,9 @@ export const CurveEditor = ({ item, value, onChange, context }: StandardEditorPr
                   />
                 </Field>
                 <Field label="Line color">
-                  <div style={{ width: '18px' }}>
+                  <div className={styles.colorPickerWrapper}>
                     <ColorPicker
-                      color={curve.color ?? defaultConstantColor}
+                      color={curve.color ?? defaultCurveColor}
                       onChange={(color) => {
                         {
                           handleCurveOptionChange(index, 'color', color);
@@ -208,11 +208,14 @@ export const CurveEditor = ({ item, value, onChange, context }: StandardEditorPr
 
 const getStyles = (theme: GrafanaTheme2) => {
   return {
-    addControlwrapper: css`
-      display: flex;
-      flex-direction: column;
-      padding-bottom: 8px;
-    `,
+    addControlwrapper: css({
+      display: 'flex',
+      flexDirection: 'column',
+      paddingBottom: theme.spacing(1),
+    }),
+    colorPickerWrapper: css({
+      width: theme.spacing(2.25),
+    }),
     controlItemWrapper: css({
       flex: 1,
       position: 'relative',

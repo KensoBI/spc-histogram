@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
+import { css } from '@emotion/css';
 import { DataFrame, FieldType, getDisplayProcessor, formattedValueToString, GrafanaTheme2 } from '@grafana/data';
-import { IconButton, InteractiveTable } from '@grafana/ui';
+import { IconButton, InteractiveTable, useStyles2 } from '@grafana/ui';
 import { CellProps } from 'react-table';
 import { Options } from 'panelcfg';
 import { SpcChartTyp } from 'types';
@@ -50,7 +51,17 @@ function useFormatValue(series: DataFrame[], theme: GrafanaTheme2) {
   }, [firstNumericField, theme]);
 }
 
+const getStyles = (theme: GrafanaTheme2) => ({
+  tableWrapper: css({ width: '100%' }),
+  exportRow: css({
+    display: 'flex',
+    justifyContent: 'flex-end',
+    padding: theme.spacing(0, 0.5),
+  }),
+});
+
 export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, options, theme, onExport }) => {
+  const styles = useStyles2(getStyles);
   const formatValue = useFormatValue(series, theme);
 
   const statistics = useMemo(() => calculateSeriesStatistics(series, options), [series, options]);
@@ -161,9 +172,9 @@ export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, option
   }
 
   return (
-    <div style={{ width: '100%' }}>
+    <div className={styles.tableWrapper}>
       {onExport && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 4px' }}>
+        <div className={styles.exportRow}>
           <IconButton name="download-alt" tooltip="Export statistics to CSV" onClick={onExport} size="sm" />
         </div>
       )}

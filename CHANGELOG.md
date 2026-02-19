@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1
+- **Theme consistency**: Replaced hardcoded pixel values and hex color constants with Grafana theme tokens (`theme.spacing()`, `theme.colors.*`, `theme.visualization.getColorByName()`) across editor and tooltip components, improving light/dark mode consistency.
+- **Documentation**: Updated plugin and usage documentation.
+
 ## 1.4.0
 - **Export to CSV**: Export calculated SPC data (statistics, control lines, and histogram buckets) to a CSV file. Available from the download icon in the statistics table header or by right-clicking the panel and selecting "Download CSV".
 - **Statistics Table**: Added a statistics table below the histogram showing descriptive statistics (n, Mean, Std Dev, Min, Max), control limits (LCL, UCL), and process capability indices (Cp, Cpk, Pp, Ppk).
