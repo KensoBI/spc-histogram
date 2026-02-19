@@ -1,9 +1,7 @@
 import React, { useRef, useEffect, useLayoutEffect } from 'react';
 import uPlot from 'uplot';
 import { colorManipulator } from '@grafana/data';
-import { UPlotConfigBuilder } from '@grafana/ui';
-
-const DEFAULT_TIMESERIES_FLAG_COLOR = '#03839e';
+import { UPlotConfigBuilder, useTheme2 } from '@grafana/ui';
 
 export type AnnotationBase = {
   title?: string;
@@ -53,7 +51,13 @@ export function isLimitAnnotationArray(value: any): value is LimitAnnotation[] {
 }
 
 export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations, config }) => {
+  const theme = useTheme2();
   const annotationsRef = useRef<LimitAnnotation[] | undefined>(undefined);
+  const defaultAnnotationColorRef = useRef(theme.colors.primary.main);
+
+  useEffect(() => {
+    defaultAnnotationColorRef.current = theme.colors.primary.main;
+  }, [theme]);
 
   useEffect(() => {
     annotationsRef.current = annotations.sort((a, b) => typeToValue(b.type) - typeToValue(a.type));
@@ -77,7 +81,7 @@ export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations
 
       for (let i = 0; i < annotationsRef.current.length; i++) {
         const entity = annotationsRef.current[i];
-        const lineColor = entity.color ?? DEFAULT_TIMESERIES_FLAG_COLOR;
+        const lineColor = entity.color ?? defaultAnnotationColorRef.current;
         const lineWidth = entity.lineWidth ?? 2;
         if (entity.type === 'flag') {
           renderLine(ctx, u, entity.time, lineColor, lineWidth);

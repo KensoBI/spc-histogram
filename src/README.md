@@ -117,11 +117,11 @@ For detailed documentation, configuration guides, and examples, see the [full do
 
 SPC Histogram is part of a growing family of **Statistical Process Control** plugins for Grafana by Kenso Software:
 
-**[SPC Chart Panel](https://github.com/KensoBI/spc-chart)** — Control charts for monitoring process stability over time. Supports Xbar-R, Xbar-S, and XmR charts with automatic calculation of control limits. If you're tracking whether a process is staying in control, this is your starting point.
+**[SPC Chart Panel](https://grafana.com/grafana/plugins/kensobi-spc-panel/)** — Control charts for monitoring process stability over time. Supports Xbar-R, Xbar-S, and XmR charts with automatic calculation of control limits. If you're tracking whether a process is staying in control, this is your starting point.
 
-**[SPC Pareto Panel](https://github.com/KensoBI/spc-pareto)** — Pareto charts for identifying the most significant factors contributing to defects or issues. Automatic sorting, cumulative percentage lines, and 80/20 threshold analysis help you focus improvement efforts where they matter most.
+**[SPC Pareto Panel](https://grafana.com/grafana/plugins/kensobi-spcpareto-panel/)** — Pareto charts for identifying the most significant factors contributing to defects or issues. Automatic sorting, cumulative percentage lines, and 80/20 threshold analysis help you focus improvement efforts where they matter most.
 
-**[SPC CAD Panel](https://github.com/KensoBI/spc-cad)** — Brings 3D geometry into the picture, letting you bind the data from control charts and histograms to physical features on your parts.
+**[SPC CAD Panel](https://grafana.com/grafana/plugins/kensobi-spccad-panel/)** — Brings 3D geometry into the picture, letting you bind the data from control charts and histograms to physical features on your parts.
 
 ## License
 
