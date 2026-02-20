@@ -2,7 +2,7 @@ import { DataFrame, FieldType } from '@grafana/data';
 import { Options, ControlLine } from 'panelcfg';
 import { ControlLineReducerId } from 'data/spcReducers';
 import { ControlChartConstants, getControlChartConstant } from 'data/calcConst';
-import { SpcChartTyp } from 'types';
+import { SpcChartTyp, PositionInput } from 'types';
 import { chunkArray, calculateSampleStandardDeviation, calculateMovingRanges } from 'calcs/common';
 import { calculateStandardStats } from 'calcs/standard';
 
@@ -39,7 +39,7 @@ export function calculateSeriesStatistics(series: DataFrame[], options: Options)
     const stdDev = calcs.stdDev ?? null;
 
     // Extract USL/LSL from control lines for this series
-    const { lsl, usl } = extractSpecLimits(options.controlLines, seriesIndex);
+    const { lsl, usl } = extractSpecLimits(options.controlLines, series, seriesIndex);
 
     // Calculate sigma-hat for capability indices
     const rawValues = numericField.values.filter(
@@ -118,6 +118,23 @@ function calculateSigmaHat(
 
 function extractSpecLimits(
   controlLines: ControlLine[],
+  series: DataFrame[],
+  seriesIndex: number
+): { lsl: number | null; usl: number | null } {
+  const result = extractSpecLimitsForIndex(controlLines, series, seriesIndex);
+
+  // If no limits are configured specifically for this series, fall back to
+  // index 0 so a single set of LSL/USL applies to all series by default.
+  if (seriesIndex !== 0 && result.lsl == null && result.usl == null) {
+    return extractSpecLimitsForIndex(controlLines, series, 0);
+  }
+
+  return result;
+}
+
+function extractSpecLimitsForIndex(
+  controlLines: ControlLine[],
+  series: DataFrame[],
   seriesIndex: number
 ): { lsl: number | null; usl: number | null } {
   let lsl: number | null = null;
@@ -127,11 +144,32 @@ function extractSpecLimits(
     if (cl.seriesIndex !== seriesIndex) {
       continue;
     }
-    if (cl.reducerId === ControlLineReducerId.lsl && cl.position != null) {
-      lsl = cl.position;
+
+    let position = cl.position ?? null;
+
+    // Resolve series-based position from the frame field
+    if (cl.positionInput === PositionInput.series && cl.field) {
+      const frame = series[seriesIndex];
+      if (frame) {
+        const field = frame.fields.find((f) => f.name === cl.field);
+        if (field && field.values.length > 0) {
+          const lastValue = field.values[field.values.length - 1];
+          if (typeof lastValue === 'number') {
+            position = lastValue;
+          }
+        }
+      }
     }
-    if (cl.reducerId === ControlLineReducerId.usl && cl.position != null) {
-      usl = cl.position;
+
+    if (position == null) {
+      continue;
+    }
+
+    if (cl.reducerId === ControlLineReducerId.lsl) {
+      lsl = position;
+    }
+    if (cl.reducerId === ControlLineReducerId.usl) {
+      usl = position;
     }
   }
 

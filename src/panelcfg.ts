@@ -100,12 +100,12 @@ export const selectableCurves: SelectableCurve[] = [
     id: CurveFit.histogram,
     name: CurveFit.histogram,
     description: 'Creates a line that connects the midpoints of the histogram bins.',
-    color: '#37872d',
+    color: 'dark-green',
   },
   {
     id: CurveFit.gaussian,
     name: CurveFit.gaussian,
     description: 'Draws a curve representing the Gaussian (normal) distribution of series values.',
-    color: '#37872d',
+    color: 'dark-green',
   },
 ];

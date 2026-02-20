@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.4.2
+
+### Features
+- **Statistics column editor**: Added an info tooltip explaining the requirements for Cp, Cpk, Pp, and Ppk to appear (both LSL and USL must be configured, sufficient data points required).
+
+### Bug Fixes
+- **Fix spec limits from feature series**: LSL and USL control lines configured to pull values from a feature series field were not being resolved correctly; capability indices now reflect the actual series value.
+- **Multi-series spec limit fallback**: When a series has no LSL/USL configured, it now falls back to the limits defined for the first series, so a single pair of spec limits applies to all series by default.
+- **Theme consistency**: Replaced remaining hardcoded values with Grafana theme tokens — control line default colors now use the visualization palette (`dark-green`, `dark-red`, `blue`, etc.), hover range and tooltip offset use `theme.spacing()`, and annotation colors are resolved via `theme.visualization.getColorByName()`.
+- **Grafana dependency**: Minimum required Grafana version bumped to 11.6.10.
+
 ## 1.4.1
 - **Theme consistency**: Replaced hardcoded pixel values and hex color constants with Grafana theme tokens (`theme.spacing()`, `theme.colors.*`, `theme.visualization.getColorByName()`) across editor and tooltip components, improving light/dark mode consistency.
 - **Documentation**: Updated plugin and usage documentation.
