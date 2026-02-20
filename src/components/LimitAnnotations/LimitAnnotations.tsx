@@ -54,9 +54,13 @@ export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations
   const theme = useTheme2();
   const annotationsRef = useRef<LimitAnnotation[] | undefined>(undefined);
   const defaultAnnotationColorRef = useRef(theme.colors.primary.main);
+  const getColorByNameRef = useRef((color: string) => theme.visualization.getColorByName(color));
+  const defaultLineWidthRef = useRef(parseFloat(theme.spacing(0.25)));
 
   useEffect(() => {
     defaultAnnotationColorRef.current = theme.colors.primary.main;
+    getColorByNameRef.current = (color: string) => theme.visualization.getColorByName(color);
+    defaultLineWidthRef.current = parseFloat(theme.spacing(0.25));
   }, [theme]);
 
   useEffect(() => {
@@ -81,8 +85,8 @@ export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations
 
       for (let i = 0; i < annotationsRef.current.length; i++) {
         const entity = annotationsRef.current[i];
-        const lineColor = entity.color ?? defaultAnnotationColorRef.current;
-        const lineWidth = entity.lineWidth ?? 2;
+        const lineColor = getColorByNameRef.current(entity.color ?? defaultAnnotationColorRef.current);
+        const lineWidth = entity.lineWidth ?? defaultLineWidthRef.current;
         if (entity.type === 'flag') {
           renderLine(ctx, u, entity.time, lineColor, lineWidth);
         } else if (entity.type === 'region') {

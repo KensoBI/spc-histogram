@@ -35,7 +35,7 @@ export const controlLineReducers: ControlLineReducer[] = [
     description: 'Draws custom control line.',
     computed: false,
     isStandard: false,
-    color: '#37872d',
+    color: 'dark-green',
   },
   {
     id: ControlLineReducerId.nominal,
@@ -43,7 +43,7 @@ export const controlLineReducers: ControlLineReducer[] = [
     description: 'Draws nominal control line.',
     computed: false,
     isStandard: false,
-    color: '#37872d',
+    color: 'dark-green',
   },
   {
     id: ControlLineReducerId.lsl,
@@ -51,7 +51,7 @@ export const controlLineReducers: ControlLineReducer[] = [
     description: 'Draws the LSL (Lower Specification Limit), marking the lower boundary of the specification range.',
     computed: false,
     isStandard: false,
-    color: '#C4162A',
+    color: 'dark-red',
   },
   {
     id: ControlLineReducerId.usl,
@@ -59,7 +59,7 @@ export const controlLineReducers: ControlLineReducer[] = [
     description: 'Draws the USL (Upper Specification Limit), marking the upper boundary of the specification range.',
     computed: false,
     isStandard: false,
-    color: '#C4162A',
+    color: 'dark-red',
   },
   {
     id: ControlLineReducerId.min,
@@ -67,7 +67,7 @@ export const controlLineReducers: ControlLineReducer[] = [
     description: 'Computes and draws the minimum of the sample values.',
     computed: true,
     isStandard: true,
-    color: '#5794F2',
+    color: 'blue',
   },
   {
     id: ControlLineReducerId.max,
@@ -75,7 +75,7 @@ export const controlLineReducers: ControlLineReducer[] = [
     description: 'Computes and draws the maximum of the sample values.',
     computed: true,
     isStandard: true,
-    color: '#5794F2',
+    color: 'blue',
   },
   {
     id: ControlLineReducerId.mean,
@@ -83,7 +83,7 @@ export const controlLineReducers: ControlLineReducer[] = [
     description: 'Computes and draws the average (arithmetic mean) of all the sample values.',
     computed: true,
     isStandard: true,
-    color: '#1F60C4',
+    color: 'dark-blue',
   },
   {
     id: ControlLineReducerId.range,
@@ -91,7 +91,7 @@ export const controlLineReducers: ControlLineReducer[] = [
     description: 'Computes and draws the range (arithmetic range) of all the sample values.',
     computed: true,
     isStandard: true,
-    color: '#B877D9',
+    color: 'purple',
   },
   {
     id: ControlLineReducerId.lcl,
@@ -99,7 +99,7 @@ export const controlLineReducers: ControlLineReducer[] = [
     description: 'Draws the LCL (Lower Control Limit), marking the lower boundary of the control chart.',
     computed: true,
     isStandard: false,
-    color: '#F2495C',
+    color: 'red',
   },
   {
     id: ControlLineReducerId.ucl,
@@ -107,7 +107,7 @@ export const controlLineReducers: ControlLineReducer[] = [
     description: 'Draws the UCL (Upper Control Limit), marking the upper boundary of the control chart.',
     computed: true,
     isStandard: false,
-    color: '#F2495C',
+    color: 'red',
   },
   {
     id: ControlLineReducerId.gaussianPeak,

@@ -97,8 +97,8 @@ export const BellCurve: React.FC<BellCurveProps> = ({ config, rawSeries, histogr
           return;
         }
 
-        const color = options.color ? colors.getColorByName(options.color) : 'dark-blue';
-        const lineWidth = options.lineWidth || 5;
+        const color = colors.getColorByName(options.color ?? 'dark-blue');
+        const lineWidth = options.lineWidth ?? parseFloat(theme.spacing(0.625));
 
         drawCurve(u, ctx, x, y, color, lineWidth);
       });

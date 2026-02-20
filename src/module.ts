@@ -1,4 +1,4 @@
-import { PanelPlugin, FieldConfigProperty, FieldColorModeId, SelectFieldConfigSettings } from '@grafana/data';
+import { PanelPlugin, FieldConfigProperty, FieldColorModeId } from '@grafana/data';
 import { commonOptionsBuilder, graphFieldOptions, GraphGradientMode } from '@grafana/ui';
 import { FieldConfig, Options, defaultOptions } from 'panelcfg';
 import { SpcHistogramPanel } from 'components/SpcHistogramPanel';
@@ -8,6 +8,7 @@ import { SubgroupEditor } from 'components/options/SubgroupEditor';
 import { SpcChartTyp } from 'types';
 import { CurveEditor } from 'components/options/CurveEditor';
 import { FeatureQueryEditor } from 'components/options/FeatureQueryEditor';
+import { StatisticsColumnEditor } from 'components/options/StatisticsColumnEditor';
 
 export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
 
@@ -131,27 +132,13 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcHistogramPanel)
       category: ['Statistics Table'],
     });
 
-    builder.addMultiSelect<string, SelectFieldConfigSettings<string>>({
+    builder.addCustomEditor({
+      id: 'statisticsTableColumns',
       path: 'statisticsTableColumns',
       name: 'Visible columns',
       description: 'Choose which columns to display in the statistics table',
-      settings: {
-        allowCustomValue: false,
-        options: [
-          { label: 'n', value: 'n' },
-          { label: 'Mean', value: 'mean' },
-          { label: 'Std Dev', value: 'stdDev' },
-          { label: 'Min', value: 'min' },
-          { label: 'Max', value: 'max' },
-          { label: 'LCL', value: 'lcl' },
-          { label: 'UCL', value: 'ucl' },
-          { label: 'Cp', value: 'cp' },
-          { label: 'Cpk', value: 'cpk' },
-          { label: 'Pp', value: 'pp' },
-          { label: 'Ppk', value: 'ppk' },
-        ],
-      },
-      defaultValue: defaultOptions.statisticsTableColumns as any,
+      editor: StatisticsColumnEditor,
+      defaultValue: defaultOptions.statisticsTableColumns,
       showIf: (option) => option.showStatisticsTable === true,
       category: ['Statistics Table'],
     });

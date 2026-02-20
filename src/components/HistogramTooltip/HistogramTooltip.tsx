@@ -8,8 +8,6 @@ import { CurveFit } from 'types';
 import { createGaussianCurve, gaussianFunction, GaussianParams } from '../BellCurve/gaussian';
 import { LimitAnnotation } from '../LimitAnnotations/LimitAnnotations';
 
-const TOOLTIP_OFFSET = 10;
-const CONTROL_LINE_HOVER_RANGE = 30;
 
 export type HistogramTooltipProps = {
   config: UPlotConfigBuilder;
@@ -60,11 +58,16 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
   const plotRef = useRef<uPlot | undefined>(undefined);
   const frameRef = useRef(histogramFrame);
   const annotationsRef = useRef(annotations);
+  const hoverRangeRef = useRef(parseFloat(theme.spacing(3.75)));
 
   // Update refs when props change
   useEffect(() => {
     frameRef.current = histogramFrame;
   }, [histogramFrame]);
+
+  useEffect(() => {
+    hoverRangeRef.current = parseFloat(theme.spacing(3.75));
+  }, [theme]);
 
   useEffect(() => {
     annotationsRef.current = annotations;
@@ -139,14 +142,14 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
       for (const annotation of currentAnnotations) {
         if (annotation.type === 'flag' && annotation.time != null) {
           const lineX = u.valToPos(annotation.time, 'x', false);
-          if (Math.abs(cursorCssX - lineX) <= CONTROL_LINE_HOVER_RANGE) {
+          if (Math.abs(cursorCssX - lineX) <= hoverRangeRef.current) {
             hoveredAnnotation = annotation;
             break;
           }
         } else if (annotation.type === 'region') {
           const x0 = annotation.timeStart != null ? u.valToPos(annotation.timeStart, 'x', false) : 0;
           const x1 = annotation.timeEnd != null ? u.valToPos(annotation.timeEnd, 'x', false) : u.over.clientWidth;
-          if (cursorCssX >= x0 - CONTROL_LINE_HOVER_RANGE && cursorCssX <= x1 + CONTROL_LINE_HOVER_RANGE) {
+          if (cursorCssX >= x0 - hoverRangeRef.current && cursorCssX <= x1 + hoverRangeRef.current) {
             hoveredAnnotation = annotation;
             break;
           }
@@ -196,9 +199,10 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
     return null;
   }
 
-  const defaultAnnotationColor = theme.colors.primary.main;
+  const resolveAnnotationColor = (color: string | undefined): string =>
+    theme.visualization.getColorByName(color ?? theme.colors.primary.main);
   const annotationContent = tooltip.annotation
-    ? renderAnnotationTooltip(tooltip.annotation, formatValue, defaultAnnotationColor)
+    ? renderAnnotationTooltip(tooltip.annotation, formatValue, resolveAnnotationColor)
     : null;
   const bucketContent = tooltip.bucketIndex != null
     ? renderBucketTooltip(tooltip.bucketIndex, histogramFrame, curveOptions, theme, gaussianParams, formatValue)
@@ -220,7 +224,7 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
     <div
       className={styles.tooltip}
       style={{
-        transform: `translateX(${tooltip.clientX + TOOLTIP_OFFSET}px) translateY(${tooltip.clientY + TOOLTIP_OFFSET}px)`,
+        transform: `translateX(calc(${tooltip.clientX}px + ${theme.spacing(1.25)})) translateY(calc(${tooltip.clientY}px + ${theme.spacing(1.25)}))`,
       }}
     >
       {content}
@@ -230,13 +234,17 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
   return createPortal(tooltipEl, document.body);
 };
 
-function renderAnnotationTooltip(annotation: LimitAnnotation, formatValue: (v: number) => string, defaultColor: string): React.ReactNode {
+function renderAnnotationTooltip(
+  annotation: LimitAnnotation,
+  formatValue: (v: number) => string,
+  resolveColor: (color: string | undefined) => string
+): React.ReactNode {
   const title = annotation.title ?? 'EMPTY';
   if (annotation.type === 'flag' && annotation.time != null) {
     return (
       <SeriesTable
         series={[{
-          color: annotation.color ?? defaultColor,
+          color: resolveColor(annotation.color),
           label: title,
           value: formatValue(annotation.time),
         }]}
@@ -254,14 +262,14 @@ function renderAnnotationTooltip(annotation: LimitAnnotation, formatValue: (v: n
     return (
       <SeriesTable
         series={[{
-          color: annotation.color ?? defaultColor,
+          color: resolveColor(annotation.color),
           label: title,
           value: parts.join(' \u2013 '),
         }]}
       />
     );
   }
-  return <SeriesTableRow label={title} color={annotation.color ?? defaultColor} value="" />;
+  return <SeriesTableRow label={title} color={resolveColor(annotation.color)} value="" />;
 }
 
 function renderBucketTooltip(
@@ -299,7 +307,7 @@ function renderBucketTooltip(
     const colors = theme.visualization;
 
     curveOptions.forEach((opt, curveIndex) => {
-      const color = opt.color ? colors.getColorByName(opt.color) : 'dark-blue';
+      const color = colors.getColorByName(opt.color ?? 'dark-blue');
 
       if (opt.fit === CurveFit.gaussian) {
         const params = gaussianParams.get(curveIndex);
