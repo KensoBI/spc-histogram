@@ -106,7 +106,7 @@ export const BellCurve: React.FC<BellCurveProps> = ({ config, rawSeries, histogr
       ctx.closePath();
       ctx.restore();
     });
-  }, [colors, config, curveOptions, histogramData, plot, rawSeries]);
+  }, [colors, config, curveOptions, histogramData, plot, rawSeries, theme]);
 
   return null;
 };
