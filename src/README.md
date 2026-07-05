@@ -1,7 +1,7 @@
 # SPC Histogram
 
 ![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?logo=grafana&query=$.version&url=https://grafana.com/api/plugins/kensobi-spchistogram-panel&label=Marketplace&prefix=v&color=F47A20)
-![Grafana](https://img.shields.io/badge/Grafana-11%2B-orange?logo=grafana)
+![Grafana](https://img.shields.io/badge/Grafana-11.6.2%2B-orange?logo=grafana)
 
 Visualize your process data distributions with built-in **Statistical Process Control** — right inside Grafana. SPC Histogram turns your time series data into interactive histograms with automatic control limits, bell curves, capability indices, and a detailed statistics table.
 
