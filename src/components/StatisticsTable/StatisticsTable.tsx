@@ -12,6 +12,8 @@ interface StatisticsTableProps {
   options: Options;
   theme: GrafanaTheme2;
   onExport?: () => void;
+  // Full, unfiltered frame array (including feature frames) for resolving series-based spec limits.
+  allSeries?: DataFrame[];
 }
 
 type TableRow = SeriesStatistics & { id: string };
@@ -60,11 +62,14 @@ const getStyles = (theme: GrafanaTheme2) => ({
   }),
 });
 
-export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, options, theme, onExport }) => {
+export const StatisticsTable: React.FC<StatisticsTableProps> = ({ series, options, theme, onExport, allSeries }) => {
   const styles = useStyles2(getStyles);
   const formatValue = useFormatValue(series, theme);
 
-  const statistics = useMemo(() => calculateSeriesStatistics(series, options), [series, options]);
+  const statistics = useMemo(
+    () => calculateSeriesStatistics(series, options, allSeries ?? series),
+    [series, options, allSeries]
+  );
 
   const tableData: TableRow[] = useMemo(
     () => statistics.map((stat) => ({ ...stat, id: String(stat.seriesIndex) })),

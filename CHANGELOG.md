@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.3
+
+### Bug Fixes
+- **Capability indices now work with spec limits from a query**: When the LSL and USL lines get their values from a data field (Position input = Series, e.g. limits pulled from a reference/feature query), the statistics table now calculates Cp, Cpk, Pp and Ppk. Previously these were left blank unless the limits were typed in as fixed values, even though the limit lines still showed on the chart. The exported CSV now includes these limits too.
+
 ## 1.4.2
 
 ### Features

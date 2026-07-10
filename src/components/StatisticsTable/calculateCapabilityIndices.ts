@@ -22,7 +22,22 @@ export interface SeriesStatistics {
   ppk: number | null;
 }
 
-export function calculateSeriesStatistics(series: DataFrame[], options: Options): SeriesStatistics[] {
+/**
+ * @param series      Data-only frames the statistics are computed for (feature frames removed).
+ * @param options     Panel options.
+ * @param allSeries   The full, unfiltered frame array (including feature frames). Used to resolve
+ *                    series-based spec limits whose field lives in a feature frame that is not part
+ *                    of `series`. Defaults to `series` for callers without feature queries.
+ */
+export function calculateSeriesStatistics(
+  series: DataFrame[],
+  options: Options,
+  allSeries: DataFrame[] = series
+): SeriesStatistics[] {
+  // Resolve LSL/USL from control lines once, against the full frame array, so that
+  // feature-series limits (whose field lives in a filtered-out feature frame) resolve correctly.
+  const specLimits = resolveSpecLimits(options.controlLines, allSeries);
+
   return series.map((frame, seriesIndex) => {
     const numericField = frame.fields.find((f) => f.type === FieldType.number);
 
@@ -38,8 +53,10 @@ export function calculateSeriesStatistics(series: DataFrame[], options: Options)
     const mean = calcs.mean ?? null;
     const stdDev = calcs.stdDev ?? null;
 
-    // Extract USL/LSL from control lines for this series
-    const { lsl, usl } = extractSpecLimits(options.controlLines, series, seriesIndex);
+    // Extract USL/LSL for this series. Control-line seriesIndex is expressed in terms of the
+    // full frame array, so map this data frame back to its index there before matching.
+    const fullIndex = indexOfFrame(allSeries, frame, seriesIndex);
+    const { lsl, usl } = selectSpecLimits(specLimits, fullIndex);
 
     // Calculate sigma-hat for capability indices
     const rawValues = numericField.values.filter(
@@ -116,64 +133,93 @@ function calculateSigmaHat(
   }
 }
 
-function extractSpecLimits(
-  controlLines: ControlLine[],
-  series: DataFrame[],
-  seriesIndex: number
-): { lsl: number | null; usl: number | null } {
-  const result = extractSpecLimitsForIndex(controlLines, series, seriesIndex);
-
-  // If no limits are configured specifically for this series, fall back to
-  // index 0 so a single set of LSL/USL applies to all series by default.
-  if (seriesIndex !== 0 && result.lsl == null && result.usl == null) {
-    return extractSpecLimitsForIndex(controlLines, series, 0);
-  }
-
-  return result;
+interface ResolvedSpecLimit {
+  reducerId: ControlLineReducerId;
+  // Index into the full frame array (the control line's configured series).
+  seriesIndex: number;
+  position: number;
 }
 
-function extractSpecLimitsForIndex(
-  controlLines: ControlLine[],
-  series: DataFrame[],
-  seriesIndex: number
-): { lsl: number | null; usl: number | null } {
-  let lsl: number | null = null;
-  let usl: number | null = null;
+/**
+ * Resolve every LSL/USL control line to a numeric position, reading series-based positions from the
+ * full frame array so that limits sourced from a feature query resolve to the correct field value.
+ */
+function resolveSpecLimits(controlLines: ControlLine[] | undefined, allSeries: DataFrame[]): ResolvedSpecLimit[] {
+  if (!controlLines || controlLines.length === 0) {
+    return [];
+  }
+
+  const resolved: ResolvedSpecLimit[] = [];
 
   for (const cl of controlLines) {
-    if (cl.seriesIndex !== seriesIndex) {
+    if (cl.reducerId !== ControlLineReducerId.lsl && cl.reducerId !== ControlLineReducerId.usl) {
       continue;
     }
 
-    let position = cl.position ?? null;
-
-    // Resolve series-based position from the frame field
-    if (cl.positionInput === PositionInput.series && cl.field) {
-      const frame = series[seriesIndex];
-      if (frame) {
-        const field = frame.fields.find((f) => f.name === cl.field);
-        if (field && field.values.length > 0) {
-          const lastValue = field.values[field.values.length - 1];
-          if (typeof lastValue === 'number') {
-            position = lastValue;
-          }
-        }
-      }
-    }
-
+    const position = resolveControlLinePosition(cl, allSeries);
     if (position == null) {
       continue;
     }
 
-    if (cl.reducerId === ControlLineReducerId.lsl) {
-      lsl = position;
-    }
-    if (cl.reducerId === ControlLineReducerId.usl) {
-      usl = position;
-    }
+    resolved.push({ reducerId: cl.reducerId, seriesIndex: cl.seriesIndex, position });
   }
 
-  return { lsl, usl };
+  return resolved;
+}
+
+function resolveControlLinePosition(cl: ControlLine, allSeries: DataFrame[]): number | null {
+  if (cl.positionInput === PositionInput.series && cl.field) {
+    const frame = allSeries[cl.seriesIndex];
+    if (!frame) {
+      return null;
+    }
+    const field = frame.fields.find((f) => f.name === cl.field);
+    if (field && field.values.length > 0) {
+      const lastValue = field.values[field.values.length - 1];
+      if (typeof lastValue === 'number' && !Number.isNaN(lastValue)) {
+        return lastValue;
+      }
+    }
+    return null;
+  }
+
+  return typeof cl.position === 'number' && !Number.isNaN(cl.position) ? cl.position : null;
+}
+
+/**
+ * Pick the LSL/USL that apply to the data series at `dataFullIndex`: a limit configured specifically
+ * for that series wins, otherwise the first resolvable limit is used as a shared default (the common
+ * case of a single LSL/USL — e.g. from a feature query — applied to all series).
+ */
+function selectSpecLimits(
+  resolved: ResolvedSpecLimit[],
+  dataFullIndex: number
+): { lsl: number | null; usl: number | null } {
+  const pick = (reducerId: ControlLineReducerId): number | null => {
+    const specific = resolved.find((r) => r.reducerId === reducerId && r.seriesIndex === dataFullIndex);
+    if (specific) {
+      return specific.position;
+    }
+    const shared = resolved.find((r) => r.reducerId === reducerId);
+    return shared ? shared.position : null;
+  };
+
+  return { lsl: pick(ControlLineReducerId.lsl), usl: pick(ControlLineReducerId.usl) };
+}
+
+/** Locate a data frame within the full frame array by identity, then refId, falling back to `fallback`. */
+function indexOfFrame(allSeries: DataFrame[], frame: DataFrame, fallback: number): number {
+  const byIdentity = allSeries.indexOf(frame);
+  if (byIdentity >= 0) {
+    return byIdentity;
+  }
+  if (frame.refId != null) {
+    const byRefId = allSeries.findIndex((f) => f.refId === frame.refId);
+    if (byRefId >= 0) {
+      return byRefId;
+    }
+  }
+  return fallback;
 }
 
 function calculateCapability(

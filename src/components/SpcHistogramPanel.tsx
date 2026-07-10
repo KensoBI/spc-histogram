@@ -166,7 +166,7 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
   );
 
   const handleExport = useCallback(() => {
-    const statistics = calculateSeriesStatistics(samples, optionsWithVars);
+    const statistics = calculateSeriesStatistics(samples, optionsWithVars, allSamplesWithGaussianCalcs);
     const controlLines = resolveControlLines(allSamplesWithGaussianCalcs, optionsWithVars);
     const csv = buildExportCsv(statistics, controlLines, histogram, optionsWithVars.statisticsTableColumns);
     downloadCsv(csv, generateExportFilename());
@@ -258,6 +258,7 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
             options={optionsWithVars}
             theme={theme}
             onExport={handleExport}
+            allSeries={allSamplesWithGaussianCalcs}
           />
         </div>
       )}
