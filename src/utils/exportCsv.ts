@@ -139,24 +139,30 @@ export function resolveControlLines(series: DataFrame[], options: Options): Reso
 
   for (const cl of options.controlLines) {
     const seriesIndex = cl.seriesIndex;
-    if (seriesIndex < 0 || seriesIndex >= dataSeries.length) {
-      continue;
-    }
-
-    const frame = dataSeries[seriesIndex];
-    const numericField = frame.fields.find((f) => f.type === FieldType.number);
-    const seriesName = numericField?.config?.displayName || numericField?.name || frame.name || `Series ${seriesIndex}`;
 
     let position: number | undefined;
+    let seriesName: string;
 
     if (computedReducerIds.includes(cl.reducerId)) {
-      // Computed: read from calcs
+      // Computed: indexed against data-only frames; read from calcs.
+      if (seriesIndex < 0 || seriesIndex >= dataSeries.length) {
+        continue;
+      }
+      const frame = dataSeries[seriesIndex];
+      const numericField = frame.fields.find((f) => f.type === FieldType.number);
+      seriesName = numericField?.config?.displayName || numericField?.name || frame.name || `Series ${seriesIndex}`;
       const calcs = numericField?.state?.calcs;
       if (calcs) {
         position = calcs[cl.reducerId];
       }
     } else if (cl.positionInput === PositionInput.series) {
-      // Series-based: read last value from named field
+      // Series-based: indexed against the full frame array (the field may live in a feature frame).
+      const frame = series[seriesIndex];
+      if (!frame) {
+        continue;
+      }
+      const numericField = frame.fields.find((f) => f.type === FieldType.number);
+      seriesName = numericField?.config?.displayName || numericField?.name || frame.name || `Series ${seriesIndex}`;
       const field = frame.fields.find((f) => f.name === cl.field);
       if (field && field.values.length > 0) {
         const lastValue = field.values[field.values.length - 1];
@@ -165,7 +171,13 @@ export function resolveControlLines(series: DataFrame[], options: Options): Reso
         }
       }
     } else {
-      // Static position
+      // Static position: like series-based lines, indexed against the full frame array.
+      const frame = series[seriesIndex];
+      if (!frame) {
+        continue;
+      }
+      const numericField = frame.fields.find((f) => f.type === FieldType.number);
+      seriesName = numericField?.config?.displayName || numericField?.name || frame.name || `Series ${seriesIndex}`;
       position = cl.position;
     }
 

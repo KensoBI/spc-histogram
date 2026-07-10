@@ -1,4 +1,8 @@
-import { buildExportCsv, ResolvedControlLine } from './exportCsv';
+import { toDataFrame, FieldType } from '@grafana/data';
+import { Options, ControlLine } from 'panelcfg';
+import { ControlLineReducerId } from 'data/spcReducers';
+import { PositionInput } from 'types';
+import { buildExportCsv, resolveControlLines, ResolvedControlLine } from './exportCsv';
 import { SeriesStatistics } from 'components/StatisticsTable/calculateCapabilityIndices';
 
 function makeStat(overrides: Partial<SeriesStatistics> & { seriesName: string; seriesIndex: number }): SeriesStatistics {
@@ -180,5 +184,123 @@ describe('buildExportCsv', () => {
     const lines = csv.split('\n');
 
     expect(lines[1]).toBe('Series,n,Mean,Std Dev,Min,Max,LCL,UCL,Cp,Cpk,Pp,Ppk');
+  });
+});
+
+describe('resolveControlLines', () => {
+  const featureFrame = toDataFrame({
+    refId: 'A',
+    fields: [
+      { name: 'name', type: FieldType.string, values: ['characteristic1'] },
+      { name: 'usl', type: FieldType.number, values: [9] },
+      { name: 'lsl', type: FieldType.number, values: [-3] },
+    ],
+  });
+
+  const dataFrame = toDataFrame({
+    refId: 'B',
+    fields: [
+      { name: 'time', type: FieldType.time, values: [1, 2, 3] },
+      { name: 'value', type: FieldType.number, values: [1, 2, 3] },
+    ],
+  });
+
+  function makeControlLine(overrides: Partial<ControlLine>): ControlLine {
+    return {
+      name: 'limit',
+      field: '',
+      positionInput: PositionInput.static,
+      seriesIndex: 0,
+      lineWidth: 4,
+      lineColor: '#000',
+      fillDirection: 0,
+      fillOpacity: 10,
+      reducerId: ControlLineReducerId.lsl,
+      ...overrides,
+    };
+  }
+
+  function makeOptions(controlLines: ControlLine[], featureQueryRefIds: string[] = []): Options {
+    return { controlLines, featureQueryRefIds } as unknown as Options;
+  }
+
+  it('resolves a series-based limit whose field lives in a feature frame', () => {
+    const options = makeOptions(
+      [
+        makeControlLine({
+          name: 'USL',
+          reducerId: ControlLineReducerId.usl,
+          positionInput: PositionInput.series,
+          field: 'usl',
+          seriesIndex: 0, // the feature frame in the full array
+        }),
+      ],
+      ['A']
+    );
+
+    const resolved = resolveControlLines([featureFrame, dataFrame], options);
+
+    expect(resolved).toHaveLength(1);
+    expect(resolved[0]).toMatchObject({ name: 'USL', type: 'usl', position: 9 });
+  });
+
+  it('resolves a static limit whose seriesIndex points past the feature frame', () => {
+    // The editor assigns seriesIndex against the full frame array, so with a feature
+    // frame at index 0 a static limit on the data series carries seriesIndex 1.
+    const options = makeOptions(
+      [
+        makeControlLine({
+          name: 'LSL',
+          reducerId: ControlLineReducerId.lsl,
+          positionInput: PositionInput.static,
+          position: -3,
+          seriesIndex: 1,
+        }),
+      ],
+      ['A']
+    );
+
+    const resolved = resolveControlLines([featureFrame, dataFrame], options);
+
+    expect(resolved).toHaveLength(1);
+    expect(resolved[0]).toMatchObject({ name: 'LSL', type: 'lsl', position: -3, seriesName: 'value' });
+  });
+
+  it('resolves a computed limit against data-only frames', () => {
+    const frame = toDataFrame({
+      refId: 'B',
+      fields: [
+        { name: 'time', type: FieldType.time, values: [1, 2, 3] },
+        { name: 'value', type: FieldType.number, values: [1, 2, 3] },
+      ],
+    });
+    frame.fields[1].state = { calcs: { mean: 2 } };
+
+    const options = makeOptions(
+      [makeControlLine({ name: 'Mean', reducerId: ControlLineReducerId.mean, seriesIndex: 0 })],
+      ['A']
+    );
+
+    // Computed lines are indexed against data-only frames: index 0 is `frame`, not the feature frame.
+    const resolved = resolveControlLines([featureFrame, frame], options);
+
+    expect(resolved).toHaveLength(1);
+    expect(resolved[0]).toMatchObject({ name: 'Mean', type: 'mean', position: 2 });
+  });
+
+  it('drops limits whose series cannot be found', () => {
+    const options = makeOptions([
+      makeControlLine({ positionInput: PositionInput.static, position: 1, seriesIndex: 5 }),
+    ]);
+
+    expect(resolveControlLines([dataFrame], options)).toHaveLength(0);
+  });
+
+  it('drops series-based limits whose field is missing', () => {
+    const options = makeOptions([
+      makeControlLine({ positionInput: PositionInput.series, field: 'does-not-exist', seriesIndex: 0 }),
+    ]);
+
+    expect(resolveControlLines([dataFrame], options)).toHaveLength(0);
   });
 });

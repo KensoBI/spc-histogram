@@ -32,6 +32,15 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
     return allSamplesWithCalcs;
   }, [allSamplesWithCalcs, optionsWithVars.featureQueryRefIds]);
 
+  // Pre-aggregation data frames: capability statistics are computed from the raw
+  // individual observations, not from the plotted subgroup aggregates.
+  const rawSamples = useMemo(() => {
+    if (optionsWithVars.featureQueryRefIds) {
+      return data.series.filter((frame) => !optionsWithVars.featureQueryRefIds.includes(frame.refId!));
+    }
+    return data.series;
+  }, [data.series, optionsWithVars.featureQueryRefIds]);
+
   const stampedSamples = useMemo(() => {
     return samples.map((frame, frameIndex) => ({
       ...frame,
@@ -166,11 +175,11 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
   );
 
   const handleExport = useCallback(() => {
-    const statistics = calculateSeriesStatistics(samples, optionsWithVars);
+    const statistics = calculateSeriesStatistics(samples, optionsWithVars, allSamplesWithGaussianCalcs, rawSamples);
     const controlLines = resolveControlLines(allSamplesWithGaussianCalcs, optionsWithVars);
     const csv = buildExportCsv(statistics, controlLines, histogram, optionsWithVars.statisticsTableColumns);
     downloadCsv(csv, generateExportFilename());
-  }, [samples, optionsWithVars, allSamplesWithGaussianCalcs, histogram]);
+  }, [samples, optionsWithVars, allSamplesWithGaussianCalcs, rawSamples, histogram]);
 
   const showTable = optionsWithVars.showStatisticsTable !== false;
 
@@ -258,6 +267,8 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
             options={optionsWithVars}
             theme={theme}
             onExport={handleExport}
+            allSeries={allSamplesWithGaussianCalcs}
+            rawSeries={rawSamples}
           />
         </div>
       )}
