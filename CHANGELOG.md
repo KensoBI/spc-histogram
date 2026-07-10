@@ -1,9 +1,16 @@
 # Changelog
 
-## 1.4.3
+## 1.5.0
+
+### Breaking changes
+- **Statistics table is now a Minitab-style capability report**: n, Mean, Std Dev, Min and Max describe the raw individual measurements (not the plotted subgroup aggregates). Cp/Cpk use the within-subgroup sigma estimated the way Minitab does - Rbar/d2 for Xbar-R charts, sbar/c4 for Xbar-S, average moving range/d2 for XmR and ungrouped data, pooled standard deviation (with c4 unbiasing) for subgrouped data without a chart. Pp/Ppk use the overall sample standard deviation of the individuals. Previously all of these were computed from the aggregated (e.g. subgroup-mean) values, which overstated capability by roughly √subgroup-size. LCL/UCL still show the control chart limits.
 
 ### Bug Fixes
 - **Capability indices now work with spec limits from a query**: When the LSL and USL lines get their values from a data field (Position input = Series, e.g. limits pulled from a reference/feature query), the statistics table now calculates Cp, Cpk, Pp and Ppk. Previously these were left blank unless the limits were typed in as fixed values, even though the limit lines still showed on the chart. The exported CSV now includes these limits too.
+- **S chart lower control limit used the wrong constant**: the LCL was computed with A3 instead of B3, producing an incorrect lower limit for every subgroup size.
+- **Standard deviation ignored missing data incorrectly**: null and NaN values could distort (or poison) the Std Dev statistic; it is now computed over valid values only.
+- **Control limits from partial subgroups**: Xbar-R/S center lines and limits are now estimated from complete subgroups only, and charts with insufficient data no longer produce NaN limits.
+- **CSV export dropped static control lines when a feature query was configured** (series index mismatch).
 
 ## 1.4.2
 

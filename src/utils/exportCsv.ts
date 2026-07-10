@@ -171,11 +171,11 @@ export function resolveControlLines(series: DataFrame[], options: Options): Reso
         }
       }
     } else {
-      // Static position, associated with a data-only frame.
-      if (seriesIndex < 0 || seriesIndex >= dataSeries.length) {
+      // Static position: like series-based lines, indexed against the full frame array.
+      const frame = series[seriesIndex];
+      if (!frame) {
         continue;
       }
-      const frame = dataSeries[seriesIndex];
       const numericField = frame.fields.find((f) => f.type === FieldType.number);
       seriesName = numericField?.config?.displayName || numericField?.name || frame.name || `Series ${seriesIndex}`;
       position = cl.position;
