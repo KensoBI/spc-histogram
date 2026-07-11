@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.1
+
+### Bug Fixes
+- **Wide queries now show every measurement in the statistics table**: When a single query returns several value columns (for example `part_a` and `part_b` in one result), the histogram already drew a distribution for each, but the statistics table only listed the first one. It now shows one row per value column, each with its own n, Mean, Std Dev, Min, Max and control limits.
+- **Missing values no longer skew subgroup calculations**: With subgrouping or aggregation enabled, empty/null readings inside a subgroup were being treated as zero, pulling means and ranges toward 0 (and a fully empty subgroup could produce bad values). Missing readings are now ignored, and a subgroup with no data simply leaves a gap.
+- **Correct series label on collapsed control lines**: The series name shown on a collapsed control-line header could be wrong (or read "(stale series)") when a feature/reference query came before the plotted data. Each control line now shows the correct series it applies to.
+
 ## 1.5.0
 
 ### Breaking changes

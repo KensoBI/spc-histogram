@@ -81,7 +81,9 @@ export const StatisticsTable: React.FC<StatisticsTableProps> = ({
   );
 
   const tableData: TableRow[] = useMemo(
-    () => statistics.map((stat) => ({ ...stat, id: String(stat.seriesIndex) })),
+    // A frame can contribute several rows (one per value field), so the row index — not the
+    // frame seriesIndex — is what uniquely identifies a row.
+    () => statistics.map((stat, index) => ({ ...stat, id: String(index) })),
     [statistics]
   );
 

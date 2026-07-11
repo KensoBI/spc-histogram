@@ -221,3 +221,51 @@ describe('calculateSeriesStatistics — Minitab-style report from raw observatio
     expect(stats[0].pp).toBeCloseTo(12 / (6 * RAW_OVERALL), 10);
   });
 });
+
+describe('calculateSeriesStatistics — multiple value fields in one frame (wide format)', () => {
+  // One query returns a wide frame with two measurement columns. The histogram plots a distribution
+  // per value field, so each column must get its own statistics row with its own raw values.
+  const PART_A = [50.2, 49.8, 51.1, 49.5, 50.8];
+  const PART_B = [48.5, 49.1, 47.8, 50.3, 48.9];
+  const meanOf = (xs: number[]) => xs.reduce((s, v) => s + v, 0) / xs.length;
+
+  const wideFrame = toDataFrame({
+    refId: 'A',
+    fields: [
+      { name: 'time', type: FieldType.time, values: [1, 2, 3, 4, 5] },
+      { name: 'part_a', type: FieldType.number, values: PART_A },
+      { name: 'part_b', type: FieldType.number, values: PART_B },
+    ],
+  });
+  wideFrame.fields[1].state = { calcs: { lcl: 47, ucl: 53, mean: meanOf(PART_A) } };
+  wideFrame.fields[2].state = { calcs: { lcl: 45, ucl: 52, mean: meanOf(PART_B) } };
+
+  const options = {
+    chartType: SpcChartTyp.x_XmR,
+    subgroupSize: 1,
+    aggregationType: AggregationType.none,
+    controlLines: [],
+    curves: [],
+    featureQueryRefIds: [],
+  } as unknown as Options;
+
+  it('emits one row per value field, each with its own statistics', () => {
+    const stats = calculateSeriesStatistics([wideFrame], options, [wideFrame], [wideFrame]);
+
+    expect(stats).toHaveLength(2);
+    expect(stats.map((s) => s.seriesName)).toEqual(['part_a', 'part_b']);
+
+    expect(stats[0].mean).toBeCloseTo(meanOf(PART_A), 10);
+    expect(stats[0].min).toBe(49.5);
+    expect(stats[0].max).toBe(51.1);
+    expect(stats[0].lcl).toBe(47);
+    expect(stats[0].ucl).toBe(53);
+
+    // part_b must use its own raw values, not part_a's — this is the field-name match, not first-field.
+    expect(stats[1].mean).toBeCloseTo(meanOf(PART_B), 10);
+    expect(stats[1].min).toBe(47.8);
+    expect(stats[1].max).toBe(50.3);
+    expect(stats[1].lcl).toBe(45);
+    expect(stats[1].ucl).toBe(52);
+  });
+});

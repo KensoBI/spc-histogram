@@ -46,64 +46,73 @@ export function calculateSeriesStatistics(
   // feature-series limits (whose field lives in a filtered-out feature frame) resolve correctly.
   const specLimits = resolveSpecLimits(options.controlLines, allSeries);
 
-  return series.map((frame, seriesIndex) => {
-    const numericField = frame.fields.find((f) => f.type === FieldType.number);
+  return series.flatMap((frame, seriesIndex) => {
+    // A single frame can carry several value fields (wide format, e.g. one query returning
+    // `sample, part_a, part_b`); the histogram plots a distribution per value field, so each gets
+    // its own table row.
+    const valueFields = frame.fields.filter((f) => f.type === FieldType.number);
 
-    if (!numericField) {
-      return emptyStatistics(frame.name || `Series ${seriesIndex}`, seriesIndex);
+    if (valueFields.length === 0) {
+      return [emptyStatistics(frame.name || `Series ${seriesIndex}`, seriesIndex)];
     }
-
-    // Control chart limits belong to the plotted chart, computed by doSpcCalcs.
-    const chartCalcs = numericField.state?.calcs;
-
-    // Everything else describes the raw individual observations.
-    const rawField = findRawNumericField(rawSeries, frame, seriesIndex) ?? numericField;
-    const rawStats = calculateStandardStats(rawField);
-    const mean = rawStats.mean ?? null;
-    const sigmaOverall = rawStats.stdDev ?? null;
 
     // Extract USL/LSL for this series. Control-line seriesIndex is expressed in terms of the
     // full frame array, so map this data frame back to its index there before matching.
     const fullIndex = indexOfFrame(allSeries, frame, seriesIndex);
     const { lsl, usl } = selectSpecLimits(specLimits, fullIndex);
+    const rawFrame = findRawFrame(rawSeries, frame, seriesIndex);
 
-    const rawValues = rawField.values.filter(
-      (v: unknown): v is number => typeof v === 'number' && !Number.isNaN(v)
-    );
-    const sigmaWithin = estimateSigmaWithin(rawValues, options.chartType, options.subgroupSize);
+    return valueFields.map((numericField) => {
+      // Control chart limits belong to the plotted chart, computed by doSpcCalcs.
+      const chartCalcs = numericField.state?.calcs;
 
-    const { cp, cpk, pp, ppk } = calculateCapability(mean, sigmaWithin, sigmaOverall, lsl, usl);
+      // Everything else describes the raw individual observations of this same field.
+      const rawField = findRawFieldByName(rawFrame, numericField.name) ?? numericField;
+      const rawStats = calculateStandardStats(rawField);
+      const mean = rawStats.mean ?? null;
+      const sigmaOverall = rawStats.stdDev ?? null;
 
-    return {
-      seriesName: numericField.config.displayName || numericField.name || frame.name || `Series ${seriesIndex}`,
-      seriesIndex,
-      n: rawStats.count ?? 0,
-      mean,
-      stdDev: sigmaOverall,
-      min: rawStats.min ?? null,
-      max: rawStats.max ?? null,
-      lcl: chartCalcs?.lcl ?? null,
-      ucl: chartCalcs?.ucl ?? null,
-      cp,
-      cpk,
-      pp,
-      ppk,
-    };
+      const rawValues = rawField.values.filter(
+        (v: unknown): v is number => typeof v === 'number' && !Number.isNaN(v)
+      );
+      const sigmaWithin = estimateSigmaWithin(rawValues, options.chartType, options.subgroupSize);
+
+      const { cp, cpk, pp, ppk } = calculateCapability(mean, sigmaWithin, sigmaOverall, lsl, usl);
+
+      return {
+        seriesName: numericField.config.displayName || numericField.name || frame.name || `Series ${seriesIndex}`,
+        seriesIndex,
+        n: rawStats.count ?? 0,
+        mean,
+        stdDev: sigmaOverall,
+        min: rawStats.min ?? null,
+        max: rawStats.max ?? null,
+        lcl: chartCalcs?.lcl ?? null,
+        ucl: chartCalcs?.ucl ?? null,
+        cp,
+        cpk,
+        pp,
+        ppk,
+      };
+    });
   });
 }
 
 /** Find the raw counterpart of a plotted frame by refId, falling back to position. */
-function findRawNumericField(
+function findRawFrame(
   rawSeries: DataFrame[] | undefined,
   frame: DataFrame,
   seriesIndex: number
-): Field | undefined {
+): DataFrame | undefined {
   if (!rawSeries) {
     return undefined;
   }
-  const rawFrame =
-    (frame.refId != null ? rawSeries.find((f) => f.refId === frame.refId) : undefined) ?? rawSeries[seriesIndex];
-  return rawFrame?.fields.find((f) => f.type === FieldType.number);
+  return (frame.refId != null ? rawSeries.find((f) => f.refId === frame.refId) : undefined) ?? rawSeries[seriesIndex];
+}
+
+/** Locate a value field within the raw frame by name so each plotted field maps to its own raw data. */
+function findRawFieldByName(rawFrame: DataFrame | undefined, fieldName: string): Field | undefined {
+  return rawFrame?.fields.find((f) => f.type === FieldType.number && f.name === fieldName);
 }
 
 interface ResolvedSpecLimit {
