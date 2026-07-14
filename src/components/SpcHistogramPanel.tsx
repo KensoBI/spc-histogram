@@ -92,8 +92,8 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
     const fittedMeans = new Map<number, number>();
     gaussianCurves.forEach((curve) => {
       try {
-        const result = createGaussianCurve(histogram, stampedSamples, curve.seriesIndex);
-        if (result.params.mean) {
+        const result = createGaussianCurve(histogram, curve.seriesIndex);
+        if (Number.isFinite(result.params.mean)) {
           fittedMeans.set(curve.seriesIndex, result.params.mean);
         }
       } catch {
@@ -131,7 +131,7 @@ export const SpcHistogramPanel = ({ data, options, width, height }: ChartPanelPr
         }),
       };
     });
-  }, [allSamplesWithCalcs, histogram, stampedSamples, optionsWithVars.controlLines, optionsWithVars.curves]);
+  }, [allSamplesWithCalcs, histogram, optionsWithVars.controlLines, optionsWithVars.curves]);
 
   const limitAnnotations = useMemo(() => {
     return buildLimitAnnotations(allSamplesWithGaussianCalcs, optionsWithVars);

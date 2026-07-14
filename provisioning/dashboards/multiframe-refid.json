@@ -1,0 +1,300 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "spc-multiframe-refid",
+    "namespace": "default",
+    "uid": "9e78893e-a4f0-400a-959e-e3e0f4797e3e",
+    "resourceVersion": "1784063543754002",
+    "generation": 1,
+    "creationTimestamp": "2026-07-14T21:12:23Z",
+    "labels": {
+      "grafana.app/deprecatedInternalID": "979740056985600"
+    },
+    "annotations": {
+      "grafana.app/createdBy": "access-policy:service",
+      "grafana.app/managedBy": "classic-file-provisioning",
+      "grafana.app/managerId": "Sample dashboard provider",
+      "grafana.app/sourceChecksum": "b6c31af066b2e88285261bfce2e2ae64",
+      "grafana.app/sourcePath": "/etc/grafana/provisioning/dashboards/multiframe-refid.json",
+      "grafana.app/sourceTimestamp": "1784062801000",
+      "grafana.app/folder": ""
+    }
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "builtIn": true,
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "query": {
+            "datasource": {
+              "name": "-- Grafana --"
+            },
+            "group": "grafana",
+            "kind": "DataQuery",
+            "spec": {},
+            "version": "v0"
+          }
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "description": "Regression fixture for the fix where a single query (refId A) returns several frames. One TestData query emits three frames that all share refId A but carry different values under label sets line=A/B/C - the same shape a Prometheus query with several label sets produces. Each row of the statistics table must show its own n, Mean, Std Dev, Min, Max and Cp/Cpk/Pp/Ppk. Before the fix every row copied frame 0.",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "testdata"
+                      },
+                      "group": "grafana-testdata-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "csvContent": "line,value\nA,10\nA,12\nA,11\nA,13\nA,12\nA,14\nA,11\nA,10\nA,13\nA,12\nB,48\nB,52\nB,50\nB,53\nB,49\nB,51\nB,50\nB,52\nB,48\nB,50\nC,90\nC,95\nC,88\nC,92\nC,110\nC,85\nC,105\nC,93\nC,97\nC,100\n",
+                        "scenarioId": "csv_content"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "partitionByValues",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "fields": [
+                        "line"
+                      ],
+                      "keepFields": false,
+                      "naming": {
+                        "asLabels": true
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 1,
+          "links": [],
+          "title": "One query (refId A) -> 3 frames: each row must be distinct",
+          "vizConfig": {
+            "group": "kensobi-spchistogram-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "aggregationType": "none",
+                "chartType": "none",
+                "controlLines": [
+                  {
+                    "fillDirection": -1,
+                    "fillOpacity": 10,
+                    "lineColor": "#C4162A",
+                    "lineWidth": 4,
+                    "name": "LSL",
+                    "position": 0,
+                    "positionInput": "static",
+                    "reducerId": "lsl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "fillDirection": 1,
+                    "fillOpacity": 10,
+                    "lineColor": "#C4162A",
+                    "lineWidth": 4,
+                    "name": "USL",
+                    "position": 120,
+                    "positionInput": "static",
+                    "reducerId": "usl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "curves": [
+                  {
+                    "color": "#3274D9",
+                    "fit": "Gaussian",
+                    "lineWidth": 4,
+                    "name": "Gaussian",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "color": "#C4162A",
+                    "fit": "Gaussian",
+                    "lineWidth": 4,
+                    "name": "Histogram",
+                    "seriesIndex": 1
+                  },
+                  {
+                    "color": "#FADE2A",
+                    "fit": "Gaussian",
+                    "lineWidth": 4,
+                    "name": "Histogram",
+                    "seriesIndex": 2
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 1
+              }
+            },
+            "version": "1.5.2"
+          }
+        }
+      },
+      "panel-10": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 10,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "text",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "code": {
+                  "language": "plaintext",
+                  "showLineNumbers": false,
+                  "showMiniMap": false
+                },
+                "content": "# Multiple frames sharing one refId\n\nA Grafana **refId identifies the query, not a frame**. One query can return several frames that share a refId but hold different measurements (a Prometheus query with several label sets, or a datasource that splits series by timestamp).\n\nThe single query below returns **three frames, all `refId: A`**, under label sets `line=A`, `line=B`, `line=C`, centred near **12**, **50** and **95** - exactly the shape the reviewer described. Spec limits are LSL = 0, USL = 120.\n\n**What to verify:** the statistics table shows **three distinct rows**, each with its own n, Mean, Std Dev, Min, Max and Cp/Cpk/Pp/Ppk matching its own frame (Min/Max around 10-14, 48-53, 85-110 respectively).\n\n**Before the fix** the raw-statistics and spec-limit lookups matched frames by refId and took the first match, so all three rows displayed **frame 0's** numbers (Min 10 / Max 14 everywhere). **After the fix** frames are matched by position, so each row reflects its own frame.",
+                "mode": "markdown"
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-10"
+              },
+              "height": 6,
+              "width": 24,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-1"
+              },
+              "height": 18,
+              "width": 24,
+              "x": 0,
+              "y": 6
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "spc",
+      "regression",
+      "multi-frame-refid"
+    ],
+    "timeSettings": {
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "fiscalYearStartMonth": 0,
+      "from": "now-6h",
+      "hideTimepicker": false,
+      "timezone": "browser",
+      "to": "now"
+    },
+    "title": "Multiple frames per refId (fix verification)",
+    "variables": []
+  }
+}

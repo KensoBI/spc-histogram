@@ -97,8 +97,8 @@ export const HistogramTooltip: React.FC<HistogramTooltipProps> = ({
       curveOptions.forEach((opt, curveIndex) => {
         if (opt.fit === CurveFit.gaussian) {
           try {
-            const result = createGaussianCurve(histogramFrame, rawSeries, opt.seriesIndex);
-            if (result.params.mean) {
+            const result = createGaussianCurve(histogramFrame, opt.seriesIndex);
+            if (Number.isFinite(result.params.mean)) {
               params.set(curveIndex, result.params);
             }
           } catch {

@@ -27,19 +27,47 @@ const drawCurve = (
 
   const tension = 0.0;
 
-  for (let i = 0; i < x.length; i++) {
-    const xPos = u.valToPos(x[i], 'x', true);
-    const yPos = u.valToPos(y[i], 'y', true);
+  // Near-zero points are not drawn so the curve does not trace the x axis across
+  // bins where the series has no data (joined histograms zero-fill those bins).
+  // Zero points directly adjacent to a visible run are kept so segments rise from
+  // and fall back to the axis, and the pen is lifted between runs — including
+  // across x gaps, since joined multi-series histograms have no bins at all in
+  // ranges only covered by other series.
+  const valueAt = (i: number) => y[i] ?? 0;
+  const threshold = 0.1;
 
-    if (y[i] < 0.1) {
+  // typical point spacing (bin width or sample step); larger jumps are gaps
+  let typicalGap = Infinity;
+  for (let i = 1; i < x.length; i++) {
+    const dx = x[i] - x[i - 1];
+    if (dx > 0 && dx < typicalGap) {
+      typicalGap = dx;
+    }
+  }
+  const isContiguous = (i: number) => x[i] - x[i - 1] <= typicalGap * 1.5;
+
+  let penDown = false;
+
+  for (let i = 0; i < x.length; i++) {
+    const visible =
+      valueAt(i) >= threshold ||
+      (i > 0 && isContiguous(i) && valueAt(i - 1) >= threshold) ||
+      (i < y.length - 1 && isContiguous(i + 1) && valueAt(i + 1) >= threshold);
+
+    if (!visible) {
+      penDown = false;
       continue;
     }
 
-    if (i === 0) {
+    const xPos = u.valToPos(x[i], 'x', true);
+    const yPos = u.valToPos(valueAt(i), 'y', true);
+
+    if (!penDown || !isContiguous(i)) {
       ctx.moveTo(xPos, yPos);
+      penDown = true;
     } else {
       const x0 = u.valToPos(x[i - 1], 'x', true);
-      const y0 = u.valToPos(y[i - 1], 'y', true);
+      const y0 = u.valToPos(valueAt(i - 1), 'y', true);
       const x1 = xPos;
       const y1 = yPos;
 
@@ -92,7 +120,7 @@ export const BellCurve: React.FC<BellCurveProps> = ({ config, rawSeries, histogr
         if (options.fit === CurveFit.histogram) {
           ({ x, y } = createHistogramCurve(histogramData, options.seriesIndex));
         } else if (options.fit === CurveFit.gaussian) {
-          ({ x, y } = createGaussianCurve(histogramData, rawSeries, options.seriesIndex));
+          ({ x, y } = createGaussianCurve(histogramData, options.seriesIndex));
         } else {
           return;
         }

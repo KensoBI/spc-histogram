@@ -30,11 +30,17 @@ export interface SeriesStatistics {
  * @param series      Plotted data-only frames (feature frames removed; values may be subgroup
  *                    aggregates when a chart type or aggregation is active).
  * @param options     Panel options.
- * @param allSeries   The full, unfiltered frame array (including feature frames). Used to resolve
- *                    series-based spec limits whose field lives in a feature frame that is not part
- *                    of `series`. Defaults to `series` for callers without feature queries.
- * @param rawSeries   Pre-aggregation frames holding the raw individual observations. Defaults to
- *                    `series` (correct whenever no chart type or aggregation transformed the values).
+ * @param allSeries   The full, unfiltered frame array (including feature frames), of which `series`
+ *                    is an in-order subsequence. Used to resolve series-based spec limits whose field
+ *                    lives in a feature frame that is not part of `series`. Defaults to `series` for
+ *                    callers without feature queries.
+ * @param rawSeries   Pre-aggregation frames holding the raw individual observations, aligned 1:1
+ *                    (same length and order) with `series`. Defaults to `series` (correct whenever no
+ *                    chart type or aggregation transformed the values).
+ *
+ * A Grafana `refId` identifies the query, not a frame — one query can return several frames sharing
+ * a refId (e.g. one frame per Prometheus label set). Frame↔frame mappings therefore rely on array
+ * position, never on refId, so frames with the same refId but different values stay distinct.
  */
 export function calculateSeriesStatistics(
   series: DataFrame[],
@@ -45,6 +51,10 @@ export function calculateSeriesStatistics(
   // Resolve LSL/USL from control lines once, against the full frame array, so that
   // feature-series limits (whose field lives in a filtered-out feature frame) resolve correctly.
   const specLimits = resolveSpecLimits(options.controlLines, allSeries);
+
+  // Resolve each plotted frame's index in the full array once, preserving a unique mapping even
+  // when frames share a refId (see the note above about refIds identifying the query, not the frame).
+  const fullIndices = mapToFullIndices(series, allSeries);
 
   return series.flatMap((frame, seriesIndex) => {
     // A single frame can carry several value fields (wide format, e.g. one query returning
@@ -58,9 +68,9 @@ export function calculateSeriesStatistics(
 
     // Extract USL/LSL for this series. Control-line seriesIndex is expressed in terms of the
     // full frame array, so map this data frame back to its index there before matching.
-    const fullIndex = indexOfFrame(allSeries, frame, seriesIndex);
-    const { lsl, usl } = selectSpecLimits(specLimits, fullIndex);
-    const rawFrame = findRawFrame(rawSeries, frame, seriesIndex);
+    const { lsl, usl } = selectSpecLimits(specLimits, fullIndices[seriesIndex]);
+    // Raw frames are aligned 1:1 with the plotted frames, so position is the unique counterpart.
+    const rawFrame = rawSeries?.[seriesIndex];
 
     return valueFields.map((numericField) => {
       // Control chart limits belong to the plotted chart, computed by doSpcCalcs.
@@ -96,18 +106,6 @@ export function calculateSeriesStatistics(
       };
     });
   });
-}
-
-/** Find the raw counterpart of a plotted frame by refId, falling back to position. */
-function findRawFrame(
-  rawSeries: DataFrame[] | undefined,
-  frame: DataFrame,
-  seriesIndex: number
-): DataFrame | undefined {
-  if (!rawSeries) {
-    return undefined;
-  }
-  return (frame.refId != null ? rawSeries.find((f) => f.refId === frame.refId) : undefined) ?? rawSeries[seriesIndex];
 }
 
 /** Locate a value field within the raw frame by name so each plotted field maps to its own raw data. */
@@ -189,19 +187,39 @@ function selectSpecLimits(
   return { lsl: pick(ControlLineReducerId.lsl), usl: pick(ControlLineReducerId.usl) };
 }
 
-/** Locate a data frame within the full frame array by identity, then refId, falling back to `fallback`. */
-function indexOfFrame(allSeries: DataFrame[], frame: DataFrame, fallback: number): number {
-  const byIdentity = allSeries.indexOf(frame);
-  if (byIdentity >= 0) {
-    return byIdentity;
-  }
-  if (frame.refId != null) {
-    const byRefId = allSeries.findIndex((f) => f.refId === frame.refId);
-    if (byRefId >= 0) {
-      return byRefId;
+/**
+ * Map every frame in `series` to its index in `allSeries`, preserving a unique mapping even when
+ * several frames share a refId. `series` is an in-order subsequence of `allSeries` (only feature
+ * frames were removed), so we consume `allSeries` left to right: each plotted frame claims the next
+ * position that matches it by identity or refId. Advancing a cursor stops two frames with the same
+ * refId from both resolving to the first match, which is the bug a plain `findIndex` by refId causes.
+ * A frame with no match (arrays not aligned as expected) falls back to its own position in `series`.
+ */
+function mapToFullIndices(series: DataFrame[], allSeries: DataFrame[]): number[] {
+  const indices: number[] = [];
+  let cursor = 0;
+
+  for (let seriesIndex = 0; seriesIndex < series.length; seriesIndex++) {
+    const frame = series[seriesIndex];
+    let matched = -1;
+
+    for (let j = cursor; j < allSeries.length; j++) {
+      const candidate = allSeries[j];
+      if (candidate === frame || (frame.refId != null && candidate.refId === frame.refId)) {
+        matched = j;
+        break;
+      }
+    }
+
+    if (matched >= 0) {
+      indices.push(matched);
+      cursor = matched + 1;
+    } else {
+      indices.push(seriesIndex);
     }
   }
-  return fallback;
+
+  return indices;
 }
 
 function emptyStatistics(name: string, seriesIndex: number): SeriesStatistics {

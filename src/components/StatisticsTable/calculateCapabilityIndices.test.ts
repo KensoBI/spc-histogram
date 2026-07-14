@@ -222,6 +222,89 @@ describe('calculateSeriesStatistics — Minitab-style report from raw observatio
   });
 });
 
+describe('calculateSeriesStatistics — multiple frames sharing one refId', () => {
+  // A Grafana refId identifies the query, not a frame: one query (e.g. Prometheus with several label
+  // sets, or a datasource splitting series by timestamp) can return several frames sharing a refId
+  // but carrying different measurements. Frame↔frame mappings must stay unique per position.
+
+  it('maps each plotted frame to its own raw frame by position, not to the first refId match', () => {
+    // Two plotted frames share refId 'A'; their raw counterparts hold different observations.
+    const plottedA1 = toDataFrame({
+      refId: 'A',
+      fields: [{ name: 'value', type: FieldType.number, values: [1, 2, 3, 4, 5] }],
+    });
+    const plottedA2 = toDataFrame({
+      refId: 'A',
+      fields: [{ name: 'value', type: FieldType.number, values: [10, 20, 30] }],
+    });
+    const rawA1 = toDataFrame({
+      refId: 'A',
+      fields: [{ name: 'value', type: FieldType.number, values: [1, 2, 3, 4, 5] }],
+    });
+    const rawA2 = toDataFrame({
+      refId: 'A',
+      fields: [{ name: 'value', type: FieldType.number, values: [10, 20, 30] }],
+    });
+
+    const options = makeOptions([]);
+    const stats = calculateSeriesStatistics(
+      [plottedA1, plottedA2],
+      options,
+      [plottedA1, plottedA2],
+      [rawA1, rawA2]
+    );
+
+    expect(stats).toHaveLength(2);
+    // First frame keeps its own raw data.
+    expect(stats[0].n).toBe(5);
+    expect(stats[0].mean).toBeCloseTo(3, 10);
+    expect(stats[0].min).toBe(1);
+    expect(stats[0].max).toBe(5);
+    // Second frame must use rawA2, not rawA1 (the old refId lookup returned the first 'A').
+    expect(stats[1].n).toBe(3);
+    expect(stats[1].mean).toBeCloseTo(20, 10);
+    expect(stats[1].min).toBe(10);
+    expect(stats[1].max).toBe(30);
+  });
+
+  it('resolves each frame to its own full-array index when identity differs and refIds repeat', () => {
+    // Two data frames share refId 'A'. `allSeries` carries clones (distinct objects, e.g. after the
+    // Gaussian-peak recompute), so identity lookup fails and mapping must fall back to in-order refId
+    // matching — a plain findIndex by refId would resolve both frames to the first 'A'.
+    const makeData = () =>
+      toDataFrame({
+        refId: 'A',
+        fields: [{ name: 'value', type: FieldType.number, values: DATA_VALUES }],
+      });
+
+    const dataA1 = makeData();
+    const dataA2 = makeData();
+    // Full array: a feature frame at index 0, then clones of the two data frames at indices 1 and 2.
+    const feature = toDataFrame({
+      refId: 'F',
+      fields: [{ name: 'name', type: FieldType.string, values: ['c1'] }],
+    });
+    const allSeries = [feature, makeData(), makeData()];
+
+    // Per-series static limits: seriesIndex 1 spans 12 (Cp large), seriesIndex 2 spans 6 (Cp half).
+    const controlLines: ControlLine[] = [
+      makeControlLine({ name: 'LSL1', reducerId: ControlLineReducerId.lsl, position: -3, seriesIndex: 1 }),
+      makeControlLine({ name: 'USL1', reducerId: ControlLineReducerId.usl, position: 9, seriesIndex: 1 }),
+      makeControlLine({ name: 'LSL2', reducerId: ControlLineReducerId.lsl, position: 0, seriesIndex: 2 }),
+      makeControlLine({ name: 'USL2', reducerId: ControlLineReducerId.usl, position: 6, seriesIndex: 2 }),
+    ];
+    const options = makeOptions(controlLines, ['F']);
+
+    const stats = calculateSeriesStatistics([dataA1, dataA2], options, allSeries, [dataA1, dataA2]);
+
+    expect(stats).toHaveLength(2);
+    // First frame → full index 1 → spread 12.
+    expect(stats[0].cp).toBeCloseTo(12 / (6 * SIGMA_WITHIN), 4);
+    // Second frame → full index 2 → spread 6 (would be 12 if it wrongly matched the first 'A').
+    expect(stats[1].cp).toBeCloseTo(6 / (6 * SIGMA_WITHIN), 4);
+  });
+});
+
 describe('calculateSeriesStatistics — multiple value fields in one frame (wide format)', () => {
   // One query returns a wide frame with two measurement columns. The histogram plots a distribution
   // per value field, so each column must get its own statistics row with its own raw values.

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.2
+
+### Bug Fixes
+- **Correct statistics when one query returns several frames**: A query can return multiple data frames that share a refId but hold different measurements (for example a Prometheus query with several label sets, or a datasource that splits series by timestamp). The statistics table matched raw data and spec limits by refId, so every such frame reused the first frame's values — showing wrong n, Mean, Std Dev, Min, Max and capability indices. Each frame is now matched to its own data by position, keeping frames with a shared refId distinct.
+- **Gaussian curve fits data on any measurement scale**: The Levenberg-Marquardt fit used a fixed gradient step of 0.1, so for data measured in small units (for example 0.005 ± 0.0005 mm) the fit never moved off its initial guess and the drawn bell did not match the data. Gradient steps now scale with each fitted parameter, and the fit converges to the correct amplitude, mean and sigma regardless of the measurement scale.
+- **Smooth Gaussian curve with an exact peak**: The fitted curve was only evaluated at histogram bin centers, drawing an angular line whose peak was clipped whenever the true mean fell between two bins. The curve is now sampled at 200 points concentrated on the bell itself (mean ± 5 sigma), so it stays smooth and full-height even when coarse bins are used or several frames widen the histogram range.
+- **Gaussian fit uses the right series with multiple frames and wide queries**: Initial fit parameters were estimated from raw values pooled across all value columns of a frame, which targeted the wrong data when a query returned several frames or several value columns. They are now derived from the histogram of the selected series itself, which also makes the fit work for pre-binned histogram queries.
+- **Histogram-fit curves no longer bridge empty regions**: With several frames joined into one histogram, a Histogram-fit curve drew long lines across ranges where its series has no data, connecting it to other series' regions. The curve now stays over its own bins.
+- **Curve options pointing at a removed query no longer break rendering**: A stale series reference in the curve or bell-curve options could crash panel drawing; such curves are now skipped. A fitted Gaussian mean of exactly 0 is also no longer ignored by the Gaussian Peak (µ) control line.
+
 ## 1.5.1
 
 ### Bug Fixes
